@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BLOCKS — Mobile App Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14142B; --bg:#F6F5FB; --card:#fff; --line:#E7E5F2; --muted:#6B6A85; --soft:#F0EEFA;
+  --brand:#5B3DF5; --brand-2:#EDE9FF; --brand-ink:#3A22C4;
+  --d1:#0FA39A; --s1:#2F6BFF; --n1:#F08A00; --g1:#D6246E;
+  --good:#12945A; --warn:#B7791F; --bad:#D92D3A;
+  --r:18px; --font:'Plus Jakarta Sans','Noto Sans Devanagari',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:var(--font);background:#E9E6F7;color:var(--ink);font-size:14px;line-height:1.4;display:flex;justify-content:center;align-items:center;gap:40px;padding:24px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea,select{font:inherit;color:inherit}
+svg{display:block}
+
+/* ---------- screen map (desktop only) ---------- */
+.map{width:250px;align-self:stretch;max-height:820px;overflow:auto;padding-right:6px}
+.map h1{font-size:22px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.map p{color:var(--muted);font-size:12px;margin-bottom:16px}
+.map h4{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+.map button{display:block;width:100%;text-align:left;padding:7px 10px;border-radius:10px;font-weight:600;font-size:13px}
+.map button:hover{background:#fff}
+.map button.on{background:var(--ink);color:#fff}
+.map a{display:block;margin-top:16px;padding:10px 12px;border-radius:12px;background:var(--brand);color:#fff;text-decoration:none;font-weight:700;font-size:13px;text-align:center}
+
+/* ---------- phone ---------- */
+.phone{width:390px;height:812px;background:var(--bg);border-radius:44px;box-shadow:0 0 0 10px #14142B,0 30px 80px rgba(20,20,43,.35);position:relative;overflow:hidden;display:flex;flex-direction:column;flex:none}
+.status{height:34px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:6px 26px 0;font-size:12px;font-weight:700}
+.view{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;scrollbar-width:none}
+.view::-webkit-scrollbar{display:none}
+.nav{flex:none;height:72px;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;padding:0 8px 10px}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;color:var(--muted);width:64px;padding:6px 0}
+.nav button.on{color:var(--brand)}
+.nav .plus{width:52px;height:40px;border-radius:14px;background:var(--ink);color:#fff;display:grid;place-items:center;margin-top:-2px}
+.nav .plus svg{width:22px;height:22px}
+.nav svg{width:24px;height:24px}
+
+@media (max-width:900px){
+  body{padding:0;display:block;background:var(--bg)}
+  .map{display:none}
+  .phone{width:100%;height:100dvh;border-radius:0;box-shadow:none}
+  .status{display:none}
+}
+
+/* ---------- common ---------- */
+.top{display:flex;align-items:center;gap:10px;padding:10px 16px;position:sticky;top:0;background:rgba(246,245,251,.92);backdrop-filter:blur(10px);z-index:5}
+.top h2{font-size:18px;font-weight:800;letter-spacing:-.01em;flex:1}
+.ib{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);position:relative;flex:none}
+.ib svg{width:20px;height:20px}
+.ib .dot{position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--g1);border:2px solid #fff}
+.pad{padding:0 16px 24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.stack>*+*{margin-top:12px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+.muted{color:var(--muted)}
+.sm{font-size:12px}
+.xs{font-size:11px}
+.b{font-weight:700}
+.eb{font-weight:800}
+.h1{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.h3{font-size:16px;font-weight:800}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:14px;background:var(--brand);color:#fff;font-weight:700;width:100%}
+.btn.dark{background:var(--ink)}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.soft{background:var(--brand-2);color:var(--brand-ink)}
+.btn.sm{padding:8px 14px;width:auto;font-size:13px;border-radius:11px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.danger{background:#FDECEE;color:var(--bad)}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:13px;white-space:nowrap}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:7px;font-size:11px;font-weight:700;background:var(--soft);color:var(--muted)}
+.tag.good{background:#E3F6EC;color:var(--good)} .tag.warn{background:#FFF1D6;color:var(--warn)} .tag.bad{background:#FDECEE;color:var(--bad)} .tag.brand{background:var(--brand-2);color:var(--brand-ink)}
+.scroll-x{display:flex;gap:8px;overflow-x:auto;padding:2px 16px;scrollbar-width:none}
+.scroll-x::-webkit-scrollbar{display:none}
+.field{display:block}
+.field span{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.input{width:100%;padding:13px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);outline:none}
+.input:focus{border-color:var(--brand)}
+textarea.input{resize:none;min-height:96px}
+.sep{height:1px;background:var(--line);margin:12px 0}
+.sw{width:46px;height:28px;border-radius:99px;background:#CFCBE6;position:relative;flex:none;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.sw.on{background:var(--brand)} .sw.on::after{left:21px}
+.list>*{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.list>*:last-child{border-bottom:0}
+.list .ico{width:38px;height:38px;border-radius:12px;background:var(--brand-2);color:var(--brand-ink);display:grid;place-items:center;flex:none}
+.list .ico svg{width:20px;height:20px}
+
+/* avatar */
+.av{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;color:#fff;font-weight:800;flex:none;font-size:15px}
+.av.lg{width:84px;height:84px;border-radius:28px;font-size:30px}
+.av.sm{width:32px;height:32px;border-radius:11px;font-size:12px}
+.ring{padding:3px;border-radius:19px;background:conic-gradient(var(--d1),var(--s1),var(--n1),var(--g1),var(--d1));flex:none}
+.ring .av{border:3px solid var(--bg)}
+
+/* Reach Ladder: stepped blocks */
+.lad{display:flex;align-items:flex-end;gap:3px}
+.lad i{display:block;width:12px;border-radius:3px;background:#DAD7EC;position:relative;overflow:hidden}
+.lad i:nth-child(1){height:9px}.lad i:nth-child(2){height:14px}.lad i:nth-child(3){height:19px}.lad i:nth-child(4){height:24px}
+.lad i.f1{background:var(--d1)}.lad i.f2{background:var(--s1)}.lad i.f3{background:var(--n1)}.lad i.f4{background:var(--g1)}
+.lad i.p::after{content:"";position:absolute;left:0;right:0;bottom:0;height:var(--p);background:currentColor}
+.lad.big i{width:46px}.lad.big{gap:6px}
+.lad.big i:nth-child(1){height:34px}.lad.big i:nth-child(2){height:54px}.lad.big i:nth-child(3){height:74px}.lad.big i:nth-child(4){height:94px}
+.lv{display:inline-flex;align-items:center;gap:6px;padding:4px 9px 4px 6px;border-radius:99px;font-size:11px;font-weight:800;color:#fff}
+.lv::before{content:"";width:8px;height:8px;border-radius:3px;background:rgba(255,255,255,.85)}
+.lv.D1{background:var(--d1)}.lv.S1{background:var(--s1)}.lv.N1{background:var(--n1)}.lv.G1{background:var(--g1)}
+.bar{height:8px;border-radius:99px;background:var(--soft);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:99px;background:var(--brand)}
+.c-D1{color:var(--d1)}.c-S1{color:var(--s1)}.c-N1{color:var(--n1)}.c-G1{color:var(--g1)}
+.bg-D1{background:var(--d1)}.bg-S1{background:var(--s1)}.bg-N1{background:var(--n1)}.bg-G1{background:var(--g1)}
+
+/* feed */
+.post{background:var(--card);border-bottom:1px solid var(--line);padding:14px 0 6px}
+.post .hd{display:flex;align-items:center;gap:10px;padding:0 16px 10px}
+.post .name{font-weight:700;display:flex;align-items:center;gap:5px}
+.media{margin:0 16px;border-radius:20px;height:360px;position:relative;overflow:hidden;color:#fff}
+.media.photo{height:300px}
+.media.textp{height:auto;min-height:150px;padding:20px;color:var(--ink);background:var(--soft)}
+.media .pat{position:absolute;inset:0;opacity:.18;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:36px 36px}
+.media .play{position:absolute;inset:0;display:grid;place-items:center}
+.media .play span{width:60px;height:60px;border-radius:20px;background:rgba(255,255,255,.22);backdrop-filter:blur(8px);display:grid;place-items:center}
+.media .play svg{width:26px;height:26px}
+.media .over{position:absolute;left:12px;top:12px;right:12px;display:flex;justify-content:space-between;gap:8px}
+.media .cap{position:absolute;left:0;right:0;bottom:0;padding:40px 14px 12px;background:linear-gradient(transparent,rgba(0,0,0,.55));font-weight:600}
+.pill{background:rgba(20,20,43,.55);backdrop-filter:blur(8px);color:#fff;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:5px}
+.acts{display:flex;align-items:center;gap:4px;padding:8px 10px 0}
+.acts button{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:12px;font-weight:700;font-size:13px}
+.acts svg{width:22px;height:22px}
+.acts .on{color:var(--g1)}
+.acts .sv.on{color:var(--brand)}
+.climb{margin:10px 16px 8px;padding:10px 12px;border-radius:14px;background:var(--soft);display:flex;align-items:center;gap:12px;width:calc(100% - 32px);text-align:left}
+.climb .t{font-size:12px;line-height:1.3}
+.lbl{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px}
+.lbl.original{background:#E3F6EC;color:#0B6B40}.lbl.report{background:#FFF1D6;color:#8A5A0B}.lbl.src{background:#E3EDFF;color:#1D4FC4}.lbl.pub{background:#E9E2FF;color:#4B2BD6}.lbl.ai{background:#FCE4F0;color:#A31756}.lbl.unv{background:#EEE;color:#555}.lbl.disp{background:#FDECEE;color:#B02030}
+.lbl svg{width:12px;height:12px}
+
+/* stories */
+.stories{display:flex;gap:12px;overflow-x:auto;padding:4px 16px 14px;scrollbar-width:none}
+.stories::-webkit-scrollbar{display:none}
+.story{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;font-weight:600;width:66px;flex:none}
+.story .av{width:56px;height:56px;border-radius:19px}
+
+/* sheet */
+.scrim{position:absolute;inset:0;background:rgba(20,20,43,.5);z-index:20;display:flex;align-items:flex-end;animation:fade .2s}
+.sheet{background:var(--card);width:100%;border-radius:26px 26px 0 0;padding:10px 18px 24px;max-height:82%;overflow:auto;animation:up .25s}
+.sheet .grab{width:42px;height:5px;border-radius:9px;background:#D5D2E8;margin:0 auto 14px}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.toast{position:absolute;left:16px;right:16px;bottom:90px;z-index:30;background:var(--ink);color:#fff;padding:12px 16px;border-radius:14px;font-weight:600;font-size:13px;animation:up .25s}
+
+/* ladder visuals */
+.step{display:flex;gap:14px;position:relative;padding-bottom:18px}
+.step:last-child{padding-bottom:0}
+.step::before{content:"";position:absolute;left:17px;top:38px;bottom:0;width:2px;background:var(--line)}
+.step:last-child::before{display:none}
+.step.done::before{background:currentColor}
+.step .node{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:12px;background:var(--soft);color:var(--muted);flex:none}
+.step.done .node,.step.now .node{color:#fff}
+.step.now .node{box-shadow:0 0 0 5px rgba(91,61,245,.14)}
+.step.lock{opacity:.7}
+
+.seg{display:flex;background:var(--soft);padding:4px;border-radius:14px;gap:2px}
+.seg button{flex:1;padding:8px;border-radius:11px;font-weight:700;font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(20,20,43,.1)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.grid3 .t{aspect-ratio:3/4;border-radius:10px;position:relative;overflow:hidden}
+.grid3 .t .lv{position:absolute;left:5px;bottom:5px;font-size:10px;padding:2px 7px 2px 5px}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi .card{padding:12px}
+.kpi b{font-size:22px;letter-spacing:-.02em;display:block;margin-top:2px}
+.steps-dots{display:flex;gap:6px}
+.steps-dots i{flex:1;height:5px;border-radius:9px;background:var(--line)}
+.steps-dots i.on{background:var(--brand)}
+.opt{display:flex;gap:12px;padding:14px;border:1.5px solid var(--line);border-radius:16px;background:var(--card);width:100%;text-align:left;align-items:center}
+.opt.on{border-color:var(--brand);background:var(--brand-2)}
+.opt .ico{width:40px;height:40px;border-radius:13px;background:var(--soft);display:grid;place-items:center;flex:none}
+.opt.on .ico{background:#fff;color:var(--brand)}
+.otp{display:flex;gap:10px;justify-content:center}
+.otp input{width:48px;height:56px;text-align:center;font-size:22px;font-weight:800;border-radius:14px;border:1.5px solid var(--line);background:#fff;outline:none}
+.otp input:focus{border-color:var(--brand)}
+.hero{background:var(--ink);color:#fff;border-radius:26px;padding:22px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:36px;background:var(--brand);opacity:.55;transform:rotate(18deg)}
+.check{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.check:last-child{border:0}
+.check .m{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;flex:none;color:#fff}
+.check .m svg{width:16px;height:16px}
+.check .m.ok{background:var(--good)}.check .m.no{background:var(--bad)}.check .m.wait{background:#C9C6DE}
+.lrow{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);align-items:center}
+.lrow:last-child{border:0}
+.live-vid{height:430px;border-radius:0;background:linear-gradient(160deg,#2c1c6e,#7a1f5c 60%,#d6246e);position:relative;color:#fff}
+.chat p{background:rgba(20,20,43,.45);padding:6px 10px;border-radius:12px;margin-top:6px;font-size:12.5px;width:fit-content;max-width:90%}
+.sparkline{width:100%;height:80px}
+</style>
+</head>
+<body>
+
+<aside class="map" id="map"></aside>
+
+<main class="phone" id="phone">
+  <div class="status"><span>9:41</span><span>5G ▮▮▮ 86%</span></div>
+  <div class="view" id="view"></div>
+  <nav class="nav" id="nav"></nav>
+  <div id="overlay"></div>
+</main>
+
+<script>
+/* ===================== icons ===================== */
+const P={
+home:'<path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>',
+rise:'<path d="M4 20V14M10 20V9M16 20V12M22 20V4"/><path d="M3 7l5-4 4 3 6-5" />',
+plus:'<path d="M12 5v14M5 12h14"/>',
+bars:'<path d="M5 20v-6M12 20V6M19 20v-10"/>',
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',
+heart:'<path d="M12 21s-8-5.2-8-11a4.6 4.6 0 018-3 4.6 4.6 0 018 3c0 5.8-8 11-8 11z"/>',
+msg:'<path d="M4 5h16v11H9l-5 4z"/>',
+share:'<path d="M4 12v7h16v-7M12 3v12M7 8l5-5 5 5"/>',
+save:'<path d="M6 3h12v18l-6-4-6 4z"/>',
+bell:'<path d="M6 17V11a6 6 0 0112 0v6l2 2H4zM10 21h4"/>',
+back:'<path d="M15 5l-7 7 7 7"/>',
+more:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+check:'<path d="M5 12l5 5 9-10"/>',
+x:'<path d="M6 6l12 12M18 6L6 18"/>',
+shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+pin:'<path d="M12 21s7-6 7-11a7 7 0 00-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+play:'<path d="M7 4l13 8-13 8z" fill="currentColor"/>',
+video:'<rect x="3" y="6" width="13" height="12" rx="3"/><path d="M16 10l5-3v10l-5-3"/>',
+image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M4 18l5-5 4 4 3-3 4 4"/>',
+text:'<path d="M5 6h14M12 6v13M9 19h6"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+live:'<circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 000 11.4M17.7 6.3a8 8 0 010 11.4M3.5 3.5a12 12 0 000 17M20.5 3.5a12 12 0 010 17"/>',
+lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
+flag:'<path d="M5 21V4h12l-2 4 2 4H5"/>',
+block:'<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
+star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+rupee:'<path d="M7 5h11M7 9h11M7 5c6 0 6 8-1 8h-.5L14 20"/>',
+eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+store:'<path d="M4 9l1-5h14l1 5M4 9v11h16V9M4 9a2.7 2.7 0 005.3 0 2.7 2.7 0 005.4 0A2.7 2.7 0 0020 9M10 20v-6h4v6"/>',
+phone:'<path d="M5 3h4l2 5-2.5 1.5a11 11 0 006 6L16 13l5 2v4a2 2 0 01-2 2A16 16 0 013 5a2 2 0 012-2z"/>',
+trend:'<path d="M3 17l6-6 4 4 8-9M15 6h6v6"/>',
+tag:'<path d="M3 12V4h8l10 10-8 8zM7.5 7.5h.01"/>',
+sparkle:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 17l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>',
+help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 115 0c0 1.7-2.5 2-2.5 4M12 17h.01"/>',
+doc:'<path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6"/>',
+download:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
+trash:'<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/>',
+snow:'<path d="M12 2v20M4 7l16 10M20 7L4 17"/>',
+mic:'<rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>',
+news:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h4"/>',
+link:'<path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/>',
+repost:'<path d="M4 11V8a3 3 0 013-3h11l-3-3M20 13v3a3 3 0 01-3 3H6l3 3"/>',
+users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.3-5 6.5-5s5.7 1.5 6.5 5M17 4.5a3.5 3.5 0 010 7M18 15c2 .6 3.3 2.2 3.8 5"/>',
+};
+const ic=(n,s)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" ${s?`style="width:${s}px;height:${s}px"`:''}>${P[n]||''}</svg>`;
+
+/* ===================== data ===================== */
+const LV={D1:{n:'District',c:'d1',i:1},S1:{n:'State',c:'s1',i:2},N1:{n:'National',c:'n1',i:3},G1:{n:'Global',c:'g1',i:4}};
+const NEXT={D1:'S1',S1:'N1',N1:'G1',G1:null};
+const GR=['linear-gradient(150deg,#ff7a45,#c2185b)','linear-gradient(150deg,#2f6bff,#6a1fd0)','linear-gradient(150deg,#0fa39a,#0b4f8a)','linear-gradient(150deg,#f5a623,#d6246e)','linear-gradient(150deg,#14142b,#5b3df5)','linear-gradient(150deg,#12945a,#0b3d5c)'];
+const COLORS=['#5B3DF5','#0FA39A','#D6246E','#2F6BFF','#F08A00','#12945A'];
+const ME={name:'Priya Verma',handle:'priya.patna',district:'Patna',state:'Bihar'};
+
+const POSTS=[
+{id:1,name:'Riya Sharma',handle:'riya.eats',av:0,place:'Patna, Bihar',type:'video',g:0,lv:'D1',prog:78,label:'original',cap:'Litti chokha behind Gandhi Maidan — same recipe for 40 years.',tags:'#PatnaEats #RiseFromYourDistrict',likes:'2.4K',cm:318,sh:96,views:'18K',tabs:['foryou','near','following','rising'],ver:false,dur:'0:34',cross:'3 new districts this hour'},
+{id:2,name:'Sai Footwear',handle:'saifootwear',av:4,place:'Hyderabad, Telangana',type:'photo',g:3,lv:'S1',prog:41,label:'original',cap:'Diwali offer: 20% off handcrafted kolhapuri. Only this week in Charminar store.',tags:'#Hyderabad #LocalBusiness',likes:'860',cm:42,sh:51,views:'9.1K',tabs:['foryou','following','rising'],biz:true,ver:'biz',cross:'Spreading across Telangana'},
+{id:3,name:'Tanvi Nair',handle:'tanvi.kochi',av:1,place:'Kochi, Kerala',type:'video',g:2,lv:'N1',prog:64,label:'original',cap:'Kathakali make-up in 4 minutes. Chapter 1: the green face.',tags:'#Kerala #Culture',likes:'48K',cm:2100,sh:6400,views:'512K',tabs:['foryou','india','following'],ver:'id',dur:'0:58',cross:'Viewers in 14 states'},
+{id:4,name:'Meghdoot News',handle:'meghdoot.news',av:4,place:'Lucknow, Uttar Pradesh',type:'text',lv:'N1',prog:22,label:'pub',cap:'Gomti riverfront phase 2 inaugurated; commuters get a new 6 km cycle track.',src:'Source: UP Urban Development release, 7 Oct',tags:'#Lucknow',likes:'3.2K',cm:410,sh:880,views:'96K',tabs:['foryou','india','verified'],ver:'pub'},
+{id:5,name:'Arjun Singh',handle:'arjun.reports',av:3,place:'Jaipur, Rajasthan',type:'photo',g:5,lv:'D1',prog:30,label:'report',cap:'Waterlogging near Sindhi Camp after tonight\'s rain. Avoid the flyover route.',tags:'#Jaipur #Traffic',likes:'412',cm:57,sh:130,views:'4.8K',tabs:['foryou','india'],ver:false},
+{id:6,name:'Kabir Makes',handle:'kabir.makes',av:2,place:'Pune, Maharashtra',type:'photo',g:4,lv:'G1',prog:100,label:'ai',cap:'Midjourney-style study: Pune skyline as stacked blocks. Made with AI, edited by hand.',tags:'#AIArt #Pune',likes:'121K',cm:5300,sh:18000,views:'2.1M',tabs:['foryou','india','verified'],ver:'trusted',cross:'Viewers in 31 countries'},
+{id:7,name:'Neha Prasad',handle:'neha.prasad',av:5,place:'Patna, Bihar',type:'video',g:1,lv:'D1',prog:52,label:'original',cap:'Chhath ghat cleanup — 200 students, 3 hours.',tags:'#Patna #Community',likes:'1.1K',cm:88,sh:140,views:'6.3K',tabs:['near','rising','following'],ver:false,dur:'1:12'},
+{id:8,name:'Chai Sutta Corner',handle:'chai.corner',av:0,place:'Patna, Bihar',type:'photo',g:3,lv:'D1',prog:91,label:'original',cap:'Kulhad chai at ₹10. Come say hi, Boring Road.',tags:'#Patna #Chai',likes:'530',cm:24,sh:60,views:'3.2K',tabs:['near','rising'],biz:true,ver:false,cross:'Almost State level'},
+];
+const FEEDTABS=[['following','Following'],['foryou','For You'],['near','Near You'],['india','India'],['verified','Verified']];
+
+const LABELS={
+ original:['Original Post','check','original'],
+ report:['Community Report · Unverified','flag','report'],
+ src:['Source-Linked','link','src'],
+ pub:['Verified Publisher · Source-Linked','shield','pub'],
+ ai:['AI-Generated / AI-Assisted','sparkle','ai'],
+ disp:['Corrected / Disputed','flag','disp']
+};
+const lbl=k=>{const l=LABELS[k];return `<span class="lbl ${l[2]}">${ic(l[1])}${l[0]}</span>`};
+const badge=v=>v?`<span title="Verified" style="color:${v==='pub'?'#5B3DF5':v==='biz'?'#0FA39A':v==='trusted'?'#F08A00':'#2F6BFF'}">${ic(v==='trusted'?'star':'shield',16)}</span>`:'';
+
+/* ===================== state ===================== */
+const S={screen:'welcome',hist:[],feed:'foryou',liked:new Set(),saved:new Set(),followed:new Set([1,3]),
+ lang:'English',interests:new Set(['Food','Local news']),camp:{obj:'Local Campaign',areas:new Set(['Patna']),budget:2000,days:7,step:0},
+ priv:{private:false,comments:true,mentions:true,dms:true,discover:true,adpers:true},
+ post:{type:'video',ai:false,label:'original',district:'Patna'},aiOn:false,
+ otp:'',vstep:0,liveSafe:{freeze:false},storyIdx:0};
+
+/* ===================== helpers ===================== */
+const $=s=>document.querySelector(s);
+const ladder=(lv,prog,cls='')=>{
+  const cur=LV[lv].i;let h='';
+  for(let i=1;i<=4;i++){
+    if(i<cur)h+=`<i class="f${i}"></i>`;
+    else if(i===cur)h+=`<i class="f${i} ${prog<100?'p':''}" style="--p:${prog<100?prog:100}%;${prog<100?'background:#DAD7EC;':''}color:var(--${LV[lv].c})"></i>`;
+    else h+='<i></i>';
+  }
+  return `<div class="lad ${cls}">${h}</div>`;
+};
+const lvPill=l=>`<span class="lv ${l}">${l} · ${LV[l].n}</span>`;
+const av=(name,i,cls='')=>`<div class="av ${cls}" style="background:${COLORS[i%6]}">${name.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>`;
+const sw=(on,fn)=>`<button class="sw ${on?'on':''}" onclick="${fn}" aria-pressed="${on}"></button>`;
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;$('#phone').appendChild(e);setTimeout(()=>e.remove(),2200)}
+function sheet(html){$('#overlay').innerHTML=`<div class="scrim" onclick="if(event.target===this)closeSheet()"><div class="sheet"><div class="grab"></div>${html}</div></div>`}
+function closeSheet(){$('#overlay').innerHTML=''}
+const bar=(t,o={})=>`<div class="top">${o.noback?'':`<button class="ib" onclick="back()" aria-label="Back">${ic('back')}</button>`}<h2>${t}</h2>${o.right||''}</div>`;
+
+/* ===================== navigation ===================== */
+const TABS=[['home','Home','home'],['rising','Rising','rise'],['create','','plus'],['reach','Reach','bars'],['me','Me','user']];
+const MAIN=['home','rising','reach','me'];
+function go(id,arg){S.hist.push([S.screen,S.arg]);S.screen=id;S.arg=arg;closeSheet();render()}
+function jump(id,arg){S.hist=[];S.screen=id;S.arg=arg;closeSheet();render()}
+function back(){const h=S.hist.pop();if(h){S.screen=h[0];S.arg=h[1]}else{S.screen='home'}closeSheet();render()}
+
+/* ===================== screens ===================== */
+const SCREENS={};
+
+/* ---- onboarding ---- */
+SCREENS.welcome=()=>`
+<div class="pad" style="padding-top:20px;display:flex;flex-direction:column;min-height:100%">
+  <div class="row" style="gap:12px">${logo(46)}<div class="eb" style="font-size:24px;letter-spacing:-.03em">BLOCKS</div></div>
+  <div style="margin:44px 0 24px">
+    <div class="lad big" style="margin-bottom:26px">
+      <i class="f1"></i><i class="f2"></i><i class="f3"></i><i class="f4"></i>
+    </div>
+    <div class="h1" style="font-size:34px">From your block<br>to the world.</div>
+    <p class="muted" style="margin-top:12px;font-size:15px">Post from your district. Watch it climb to your state, the nation and beyond — earned by real people, not follower counts.</p>
+  </div>
+  <div class="row sm b" style="gap:8px;margin-bottom:22px;flex-wrap:wrap">
+    <span class="lv D1">District</span><span class="muted">→</span><span class="lv S1">State</span><span class="muted">→</span><span class="lv N1">National</span><span class="muted">→</span><span class="lv G1">Global</span>
+  </div>
+  <div style="margin-top:auto" class="stack">
+    <label class="field"><span>Mobile number</span>
+      <div class="row"><div class="input" style="width:72px;text-align:center;font-weight:700">+91</div><input class="input" value="98765 43210" inputmode="tel"></div></label>
+    <button class="btn" onclick="go('otp')">Continue with OTP</button>
+    <button class="btn ghost" onclick="go('otp')">Use email instead</button>
+    <p class="xs muted" style="text-align:center;margin-top:4px">By continuing you agree to the Terms and Privacy Policy. You can review every data choice later in Privacy Dashboard.</p>
+  </div>
+</div>`;
+function logo(s=32){return `<div style="width:${s}px;height:${s}px;border-radius:${s*.3}px;background:var(--ink);display:flex;align-items:flex-end;justify-content:center;gap:${s*.07}px;padding:${s*.2}px">
+<i style="width:${s*.15}px;height:${s*.2}px;background:var(--d1);border-radius:2px"></i><i style="width:${s*.15}px;height:${s*.34}px;background:var(--s1);border-radius:2px"></i><i style="width:${s*.15}px;height:${s*.48}px;background:var(--n1);border-radius:2px"></i><i style="width:${s*.15}px;height:${s*.6}px;background:var(--g1);border-radius:2px"></i></div>`}
+
+SCREENS.otp=()=>`
+${bar('Verify your number')}
+<div class="pad stack">
+  <p class="muted">Enter the 6-digit code sent to +91 98765 43210</p>
+  <div class="otp">${[0,1,2,3,4,5].map(i=>`<input maxlength="1" inputmode="numeric" value="${'482913'[i]}" aria-label="digit ${i+1}">`).join('')}</div>
+  <div class="row between sm"><span class="muted">Resend in 0:24</span><span class="b" style="color:var(--brand)">Wrong number?</span></div>
+  <div class="card row" style="background:var(--brand-2);border:0">${ic('shield',22)}<span class="sm">OTP attempts are rate-limited to keep accounts safe. We never share your number publicly.</span></div>
+  <button class="btn" onclick="go('setup')">Verify</button>
+</div>`;
+
+SCREENS.setup=()=>`
+${bar('Make BLOCKS yours')}
+<div class="pad stack">
+  <div class="steps-dots"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+  <div><div class="h3" style="margin-bottom:10px">Language</div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px">${['English','हिन्दी','বাংলা','தமிழ்','తెలుగు','मराठी','ગુજરાતી','ಕನ್ನಡ','മലയാളം','ਪੰਜਾਬੀ','ଓଡ଼ିଆ','اردو'].map(l=>`<button class="chip ${S.lang===l?'on':''}" onclick="S.lang='${l}';render()">${l}</button>`).join('')}</div></div>
+  <div><div class="h3" style="margin-bottom:10px">Interests <span class="muted sm b">pick a few</span></div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px">${['Food','Local news','Music','Education','Cricket','Farming','Fashion','Tech','Travel','Small business','Art','Comedy','Devotion','Fitness'].map(l=>`<button class="chip ${S.interests.has(l)?'on':''}" onclick="S.interests.has('${l}')?S.interests.delete('${l}'):S.interests.add('${l}');render()">${l}</button>`).join('')}</div></div>
+  <button class="btn" onclick="go('location')">Next</button>
+</div>`;
+
+SCREENS.location=()=>`
+${bar('Where is your block?')}
+<div class="pad stack">
+  <div class="steps-dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+  <p class="muted">Your district decides where your posts start their journey. We only store district and state — never your exact location.</p>
+  <label class="field"><span>State</span><select class="input"><option>Bihar</option><option>Maharashtra</option><option>Kerala</option><option>Uttar Pradesh</option></select></label>
+  <label class="field"><span>District</span><select class="input"><option>Patna</option><option>Gaya</option><option>Muzaffarpur</option><option>Bhagalpur</option></select></label>
+  <div class="card" style="background:var(--soft);border:0">
+    <div class="row" style="gap:14px">${ladder('D1',60,'')}
+      <div class="sm"><b>Your posts start in Patna (D1).</b><br><span class="muted">If people across Bihar love them, they move to State level.</span></div></div>
+  </div>
+  <div class="card row">${ic('pin',22)}<div class="grow sm"><b>Near You</b> feed uses district / city only.<div class="muted xs">Change anytime in Privacy Dashboard.</div></div></div>
+  <button class="btn" onclick="go('profileSetup')">Next</button>
+</div>`;
+
+SCREENS.profileSetup=()=>`
+${bar('Set up your profile')}
+<div class="pad stack">
+  <div class="steps-dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+  <div class="row" style="justify-content:center;padding:6px 0">${av(ME.name,0,'lg')}</div>
+  <div style="text-align:center"><button class="chip">${ic('image',16)} Change photo</button></div>
+  <label class="field"><span>Name</span><input class="input" value="${ME.name}"></label>
+  <label class="field"><span>Username</span><input class="input" value="@${ME.handle}"><div class="xs" style="color:var(--good);margin-top:6px">✓ Available</div></label>
+  <label class="field"><span>Bio</span><textarea class="input" style="min-height:70px">Patna ki beti. Food, books and the city I love.</textarea></label>
+  <div class="card row between"><div><b>Private account</b><div class="muted xs">Only approved followers see your posts</div></div>${sw(S.priv.private,"S.priv.private=!S.priv.private;render()")}</div>
+  <button class="btn" onclick="jump('home')">Finish &amp; enter BLOCKS</button>
+</div>`;
+
+/* ---- feed ---- */
+function postCard(p,opts={}){
+  const liked=S.liked.has(p.id),saved=S.saved.has(p.id);
+  const nxt=NEXT[p.lv];
+  const media=p.type==='text'
+   ?`<div class="media textp"><div class="row" style="margin-bottom:10px">${lbl(p.label)}</div><div class="h3" style="line-height:1.35">${p.cap}</div><div class="sm muted" style="margin-top:12px">${ic('link',14)}${p.src||''}</div></div>`
+   :`<div class="media ${p.type==='photo'?'photo':''}" style="background:${GR[p.g]}" onclick="go('journey',${p.id})"><div class="pat"></div>
+      <div class="over"><span class="pill">${ic('pin',12)}${p.place.split(',')[0]}</span>${p.type==='video'?`<span class="pill">${p.dur}</span>`:''}</div>
+      ${p.type==='video'?`<div class="play"><span>${ic('play')}</span></div>`:''}
+      <div class="cap">${p.cap}<div class="xs" style="opacity:.85;margin-top:4px">${p.tags}</div></div></div>`;
+  return `<article class="post">
+   <div class="hd">
+     <button onclick="go('profileView',${p.id})">${av(p.name,p.av)}</button>
+     <div class="grow"><div class="name">${p.name}${badge(p.ver)}</div><div class="xs muted">@${p.handle} · ${p.place}</div></div>
+     ${S.followed.has(p.id)?'':`<button class="btn soft sm" onclick="S.followed.add(${p.id});toast('Following @${p.handle}');render()">Follow</button>`}
+     <button class="ib" style="width:32px;height:32px;border:0;background:none" onclick="reportSheet(${p.id})">${ic('more')}</button>
+   </div>
+   ${p.type==='text'?'':`<div style="padding:0 16px 8px;display:flex;gap:6px;flex-wrap:wrap">${lbl(p.label)}${p.biz?'<span class="lbl src">'+ic('store')+'Business</span>':''}</div>`}
+   ${media}
+   ${nxt||p.lv==='G1'?`<button class="climb" onclick="go('journey',${p.id})">
+      ${ladder(p.lv,p.prog)}
+      <div class="t grow">${nxt?`<b>${lvPill(p.lv).replace('lv ','lv ')}</b> <span class="muted">${p.prog}% to ${LV[nxt].n}</span><div class="muted">${p.cross||'Reach is growing'}</div>`:`${lvPill('G1')}<div class="muted" style="margin-top:2px">${p.cross||'Global reach'}</div>`}</div>
+      <span class="muted">${ic('bars',20)}</span></button>`:''}
+   <div class="acts">
+     <button class="${liked?'on':''}" onclick="toggle('liked',${p.id})">${ic('heart')}${liked?'Liked':p.likes}</button>
+     <button onclick="commentSheet(${p.id})">${ic('msg')}${p.cm}</button>
+     <button onclick="shareSheet(${p.id})">${ic('share')}${p.sh}</button>
+     <span class="grow"></span>
+     <span class="xs muted" style="margin-right:4px">${ic('eye',14)}</span><span class="xs muted" style="margin-right:6px">${p.views}</span>
+     <button class="sv ${saved?'on':''}" onclick="toggle('saved',${p.id})">${ic('save')}</button>
+   </div>
+  </article>`;
+}
+function toggle(k,id){S[k].has(id)?S[k].delete(id):S[k].add(id);if(k==='saved')toast(S.saved.has(id)?'Saved to your collection':'Removed from saved');render()}
+
+SCREENS.home=()=>{
+  const list=POSTS.filter(p=>p.tabs.includes(S.feed));
+  return `
+  <div class="top" style="padding-bottom:4px">${logo(34)}<h2 style="font-size:20px;letter-spacing:-.03em">BLOCKS</h2>
+    <button class="ib" onclick="go('inbox')">${ic('bell')}<span class="dot"></span></button>
+    <button class="ib" onclick="go('inbox','dm')">${ic('msg')}</button></div>
+  <div class="scroll-x" style="padding-bottom:8px">${FEEDTABS.map(t=>`<button class="chip ${S.feed===t[0]?'on':''}" onclick="S.feed='${t[0]}';render()">${t[1]}</button>`).join('')}</div>
+  ${S.feed==='near'?`<div class="pad" style="padding-bottom:8px"><div class="card row" style="padding:10px 12px">${ic('pin',18)}<span class="sm grow"><b>Patna, Bihar</b> · district-level only</span><button class="xs b" style="color:var(--brand)" onclick="go('privacy')">Change</button></div></div>`:''}
+  ${S.feed==='verified'?`<div class="pad" style="padding-bottom:8px"><div class="card sm muted">Verified creators, businesses and publishers. Badges follow published eligibility rules — they can't be bought.</div></div>`:''}
+  <div class="stories">
+    <button class="story" onclick="go('story')"><div class="ring" style="background:var(--line)"><div class="av" style="background:var(--ink)">${ic('plus',22)}</div></div>Your story</button>
+    ${POSTS.slice(0,6).map(p=>`<button class="story" onclick="go('story')"><div class="ring">${av(p.name,p.av)}</div>${p.name.split(' ')[0]}</button>`).join('')}
+  </div>
+  ${list.map(p=>postCard(p)).join('')||'<div class="pad muted">Nothing here yet.</div>'}
+  <div style="height:20px"></div>`;
+};
+
+/* ---- rising ---- */
+SCREENS.rising=()=>{
+  const list=POSTS.filter(p=>p.tabs.includes('rising')).sort((a,b)=>b.prog-a.prog);
+  return `${bar('Rising',{noback:true,right:`<span class="tag brand">${ic('rise',13)} Live</span>`})}
+  <div class="pad stack">
+    <div class="hero"><div style="position:relative;z-index:1;max-width:240px"><div class="eb" style="font-size:19px">Help great posts cross the line.</div><p class="sm" style="opacity:.85;margin-top:6px">These posts are close to their next Reach Level. Watch, comment or share to help them climb.</p></div></div>
+    <div class="scroll-x" style="padding:0">${['All','Near threshold','District → State','State → National','My district'].map((t,i)=>`<button class="chip ${i===0?'on':''}">${t}</button>`).join('')}</div>
+    ${list.map(p=>{const n=NEXT[p.lv];return `<div class="card">
+      <div class="row" style="align-items:flex-start;gap:12px">
+        <div style="width:78px;height:104px;border-radius:14px;background:${p.g!=null?GR[p.g]:GR[0]};flex:none;position:relative"><div class="play" style="position:absolute;inset:0;display:grid;place-items:center;color:#fff">${ic('play',22)}</div></div>
+        <div class="grow">
+          <div class="row" style="gap:6px;margin-bottom:6px">${lvPill(p.lv)}<span class="muted">→</span><span class="lv ${n}" style="opacity:.55">${n}</span></div>
+          <div class="b" style="margin-bottom:4px">${p.cap.slice(0,58)}${p.cap.length>58?'…':''}</div>
+          <div class="xs muted">@${p.handle} · ${p.place.split(',')[0]}</div>
+          <div class="bar" style="margin:10px 0 5px"><i style="width:${p.prog}%;background:var(--${LV[n].c})"></i></div>
+          <div class="row between xs"><b>${p.prog}% to ${LV[n].n}</b><span class="muted">${p.prog>80?'Almost there':'Climbing'}</span></div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px"><button class="btn soft sm grow" onclick="go('journey',${p.id})">${ic('bars',16)} See journey</button><button class="btn sm grow" onclick="shareSheet(${p.id})">${ic('share',16)} Help it rise</button></div>
+    </div>`}).join('')}
+    <p class="xs muted" style="text-align:center">Only qualified views and real engagement count towards a Reach Level.</p>
+  </div>`;
+};
+
+/* ---- post journey (Reach Ladder detail) ---- */
+const SIGNALS=[['Qualified unique viewers',25,82],['Watch time / completion',25,74],['Shares / reposts',15,68],['Saves',10,55],['Comments & conversation',10,61],['Audience geographic expansion',10,88],['Trust & originality',5,96]];
+SCREENS.journey=()=>{
+  const p=POSTS.find(x=>x.id===S.arg)||POSTS[0];const nxt=NEXT[p.lv];const cur=LV[p.lv].i;
+  const steps=[['D1','District','Meaningful reach in '+p.place.split(', ')[0],'District discovery · local ranking'],['S1','State','Cross-district reach within '+(p.place.split(', ')[1]||'your state'),'State discovery · state trending · higher reward multiplier'],['N1','National','Reach across multiple Indian states','National trending · creator spotlight · brand eligibility'],['G1','Global','Qualified international audience','Global discovery · international brand marketplace']];
+  const qrs=Math.round(SIGNALS.reduce((a,s)=>a+s[1]*s[2]/100,0));
+  return `${bar('Reach journey')}
+  <div class="pad stack">
+    <div class="card row" style="gap:12px"><div style="width:54px;height:72px;border-radius:12px;background:${GR[p.g||0]};flex:none"></div><div class="grow"><div class="b">${p.cap.slice(0,70)}${p.cap.length>70?'…':''}</div><div class="xs muted" style="margin-top:4px">@${p.handle} · ${p.place}</div><div style="margin-top:8px">${lbl(p.label)}</div></div></div>
+    <div class="card" style="text-align:center">
+      <div style="display:flex;justify-content:center;margin:4px 0 14px">${ladder(p.lv,p.prog,'big')}</div>
+      <div>${lvPill(p.lv)}</div>
+      <div class="h1" style="margin-top:10px;font-size:28px">${nxt?p.prog+'% to '+LV[nxt].n:'Global reach unlocked'}</div>
+      <div class="muted sm" style="margin-top:4px">Qualified Reach Score <b style="color:var(--ink)">${qrs}/100</b> · updated 6 min ago</div>
+    </div>
+    <div class="card"><div class="h3" style="margin-bottom:14px">The climb</div>
+      ${steps.map((s,i)=>{const st=i+1<cur?'done':i+1===cur?'now':'lock';return `<div class="step ${st}" style="color:var(--${LV[s[0]].c})"><div class="node ${st==='lock'?'':'bg-'+s[0]}">${s[0]}</div><div class="grow" style="color:var(--ink)"><div class="b">${s[1]} ${st==='done'?'<span class="tag good">Reached</span>':st==='now'?'<span class="tag brand">Current</span>':'<span class="tag">Locked</span>'}</div><div class="sm muted">${s[2]}</div><div class="xs" style="margin-top:3px;color:${st==='lock'?'var(--muted)':'var(--ink)'}">Unlocks: ${s[3]}</div></div></div>`}).join('')}
+    </div>
+    <div class="card"><div class="row between" style="margin-bottom:12px"><div class="h3">What's driving it</div><span class="tag">Weights are admin-set</span></div>
+      ${SIGNALS.map(s=>`<div style="margin-bottom:11px"><div class="row between xs"><b>${s[0]}</b><span class="muted">${s[1]}% weight · ${s[2]}</span></div><div class="bar" style="margin-top:5px"><i style="width:${s[2]}%"></i></div></div>`).join('')}
+      <div class="xs muted">Views from bots or repeated plays don't count. Only qualified unique viewers do.</div></div>
+    <div class="card"><div class="h3" style="margin-bottom:10px">Where it's spreading</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${['Patna','Gaya','Nalanda','Muzaffarpur','Ranchi','Varanasi','Kolkata','Delhi'].map((d,i)=>`<span class="chip" style="font-size:12px;padding:4px 10px">${i<4?'● ':'○ '}${d}</span>`).join('')}</div>
+      <div class="xs muted" style="margin-top:8px">● same state · ○ other states (privacy-safe, district level)</div></div>
+    <button class="btn" onclick="shareSheet(${p.id})">${ic('share',18)} Help it rise</button>
+  </div>`;
+};
+
+/* ---- create ---- */
+SCREENS.create=()=>{
+  const t=S.post.type;
+  return `${bar('New post',{right:'<button class="btn sm" onclick="publish()">Post</button>'})}
+  <div class="pad stack">
+    <div class="scroll-x" style="padding:0">${[['video','Reel','video'],['photo','Photo','image'],['text','Text','text'],['story','Story','clock'],['live','Live','live']].map(o=>`<button class="chip ${t===o[0]?'on':''}" onclick="${o[0]==='live'?"go('live')":`S.post.type='${o[0]}';render()`}">${ic(o[2],16)}${o[1]}</button>`).join('')}</div>
+    ${t!=='text'?`<div style="height:230px;border-radius:22px;background:${GR[4]};position:relative;overflow:hidden;color:#fff"><div class="pat" style="position:absolute;inset:0;opacity:.18;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:36px 36px"></div><div style="position:absolute;inset:0;display:grid;place-items:center;text-align:center"><div>${ic(t==='photo'?'image':'video',36)}<div class="b" style="margin-top:8px">${t==='video'?'Record or upload (vertical, up to 90s)':t==='story'?'Add photo or video · disappears in 24h':'Add up to 10 photos'}</div></div></div>
+      ${t==='video'?'<div style="position:absolute;bottom:10px;left:10px;right:10px;display:flex;gap:8px"><span class="pill">'+ic('mic',12)+' Add music</span><span class="pill">Captions: Auto</span><span class="pill">Trim</span></div>':''}</div>`:''}
+    <label class="field"><span>Caption</span><textarea class="input" placeholder="Tell your block what's happening…">Litti chokha behind Gandhi Maidan — same recipe for 40 years.</textarea></label>
+    <label class="field"><span>Hashtags</span><input class="input" value="#PatnaEats #RiseFromYourDistrict"></label>
+    <div class="card row between"><div class="row">${ic('pin',22)}<div><b>Location</b><div class="xs muted">Starts in ${S.post.district} district · no exact GPS</div></div></div><button class="xs b" style="color:var(--brand)">Edit</button></div>
+    <div class="card stack">
+      <div class="b">Content label</div>
+      <div class="scroll-x" style="padding:0">${[['original','Original'],['report','Community Report'],['src','Source-Linked'],['ai','AI-Generated']].map(l=>`<button class="chip ${S.post.label===l[0]?'on':''}" onclick="S.post.label='${l[0]}';S.post.ai=${l[0]==='ai'};render()">${l[1]}</button>`).join('')}</div>
+      <div class="row between"><div><b>Contains AI-generated or synthetic media</b><div class="xs muted">Required disclosure where it applies</div></div>${sw(S.post.ai,"S.post.ai=!S.post.ai;if(S.post.ai)S.post.label='ai';render()")}</div>
+      ${S.post.label==='report'?'<div class="xs" style="color:var(--warn)">Community Reports are marked <b>Unverified</b> until a source is linked.</div>':''}
+      ${S.post.label==='src'?'<input class="input" placeholder="Paste source link (required)">':''}
+    </div>
+    <div class="card row" style="background:var(--brand-2);border:0">${ic('shield',22)}<span class="sm">Before publishing we run automated safety checks. Posts that break <b>Community Guidelines</b> won't be distributed.</span></div>
+    <div class="card row" style="gap:14px"><div>${ladder('D1',0)}</div><div class="sm"><b>Starts at D1 · ${S.post.district}</b><div class="muted">It climbs when real people across districts engage.</div></div></div>
+  </div>`;
+};
+function publish(){sheet(`<div style="text-align:center;padding:10px 0"><div style="display:flex;justify-content:center;margin-bottom:14px">${ladder('D1',8,'big')}</div><div class="h3">Checking your post…</div><p class="muted sm" style="margin:6px 0 16px">Safety scan passed. Your post is live in <b>Patna (D1)</b>.</p>
+ <div class="card" style="text-align:left;margin-bottom:14px"><div class="row">${ic('check',20)}<span class="sm">Media processed</span></div><div class="row" style="margin-top:8px">${ic('check',20)}<span class="sm">Safety checks passed</span></div><div class="row" style="margin-top:8px">${ic('check',20)}<span class="sm">Published to District feed</span></div></div>
+ <button class="btn" onclick="jump('home')">Back to Home</button></div>`)}
+
+/* ---- reach / creator dashboard ---- */
+SCREENS.reach=()=>`
+${bar('Creator dashboard',{noback:true,right:'<span class="tag good">'+ic('shield',13)+' Good standing</span>'})}
+<div class="pad stack">
+  <div class="hero">
+    <div style="position:relative;z-index:1">
+      <div class="xs" style="opacity:.8;font-weight:700;letter-spacing:.06em">YOUR REACH LADDER</div>
+      <div class="row" style="margin:14px 0;gap:18px">${ladder('S1',55,'big')}<div><div class="eb" style="font-size:30px;letter-spacing:-.02em">S1</div><div class="sm" style="opacity:.85">Best post reached State level</div></div></div>
+      <div class="sm" style="opacity:.85">2 posts at State · 11 at District · 1 climbing</div>
+    </div>
+  </div>
+  <div class="kpi">
+    <div class="card"><span class="xs muted b">Qualified reach (30d)</span><b>84.2K</b><span class="xs c-D1 b">▲ 18% vs last 30d</span></div>
+    <div class="card"><span class="xs muted b">Avg. QRS</span><b>61</b><span class="xs c-S1 b">▲ 4 pts</span></div>
+    <div class="card"><span class="xs muted b">New followers</span><b>+1,206</b><span class="xs muted">from 9 districts</span></div>
+    <div class="card"><span class="xs muted b">Conversion D→S</span><b>14%</b><span class="xs muted">of your posts</span></div>
+  </div>
+  <div class="card">
+    <div class="row between"><div class="h3">Earnings</div><button class="xs b" style="color:var(--brand)" onclick="go('earnings')">Open ledger ›</button></div>
+    <div class="row" style="margin:12px 0;gap:18px"><div><div class="xs muted b">ESTIMATED · CYCLE 12</div><div class="eb" style="font-size:28px;letter-spacing:-.02em">₹4,280</div></div><div><div class="xs muted b">FINALISED</div><div class="eb" style="font-size:28px;letter-spacing:-.02em;color:var(--good)">₹12,640</div></div></div>
+    <div class="card" style="background:var(--soft);border:0;padding:10px 12px" ><span class="xs">Estimates can change after fraud and copyright checks. Finalises on <b>20 Oct</b>.</span></div>
+  </div>
+  <div class="card"><div class="h3" style="margin-bottom:10px">Your posts by level</div>
+    ${[['G1',0],['N1',0],['S1',2],['D1',11]].map(l=>`<div class="row" style="margin-bottom:8px">${lvPill(l[0])}<div class="bar grow"><i style="width:${l[1]*7+4}%;background:var(--${LV[l[0]].c})"></i></div><b class="sm" style="width:20px;text-align:right">${l[1]}</b></div>`).join('')}</div>
+  <div class="card"><div class="h3" style="margin-bottom:6px">Next best step</div>
+    <div class="row" style="gap:12px"><div style="width:56px;height:74px;border-radius:12px;background:${GR[0]};flex:none"></div><div class="grow sm"><b>"Litti chokha…"</b> is <b>78%</b> of the way to State.<div class="muted">Reply to comments and share to Bihar districts to help it cross.</div></div></div>
+    <button class="btn soft sm" style="margin-top:12px" onclick="go('journey',1)">View journey</button></div>
+  <div class="card row" style="gap:12px" onclick="go('live')">${ic('live',24)}<div class="grow"><b>Go Live</b><div class="xs muted">3 of 6 requirements met</div></div><span class="muted">›</span></div>
+</div>`;
+
+SCREENS.earnings=()=>{
+  const rows=[['Litti chokha… · S1 post','Estimated',1840,'brand','×1.5'],['Chhath ghat cleanup','Estimated',920,'brand','×1.0'],['Street food map of Patna','Under review',1520,'warn','×1.0'],['Diwali sweets guide','Finalised',3120,'good','×1.5'],['Boring Road thali','Held',620,'bad','×1.0']];
+  return `${bar('Earnings')}
+  <div class="pad stack">
+    <div class="card" style="background:var(--ink);color:#fff;border:0"><div class="xs" style="opacity:.8;font-weight:700;letter-spacing:.06em">AVAILABLE TO WITHDRAW</div><div class="eb" style="font-size:36px;letter-spacing:-.03em;margin:4px 0">₹3,120</div><div class="xs" style="opacity:.8">Minimum payout ₹500 · UPI ****@okhdfc</div><button class="btn sm" style="margin-top:14px;background:#fff;color:var(--ink)" onclick="toast('Payout requested (prototype)')">Withdraw</button></div>
+    <div class="card"><div class="h3" style="margin-bottom:6px">How rewards work</div><p class="sm muted">BLOCKS shares a <b style="color:var(--ink)">Creator Reward Pool</b> funded by ad revenue. Your share depends on qualified views, watch time, engagement, originality and Reach Level — not raw view counts.</p></div>
+    <div class="seg"><button class="on">Cycle 12</button><button>Cycle 11</button><button>All</button></div>
+    <div class="card">${rows.map(r=>`<div class="lrow"><div class="grow"><div class="b sm">${r[0]}</div><div class="xs muted">Reach multiplier ${r[4]}</div></div><div style="text-align:right"><div class="b">₹${r[2].toLocaleString()}</div><span class="tag ${r[3]}">${r[1]}</span></div></div>`).join('')}</div>
+    <div class="card"><div class="h3" style="margin-bottom:8px">Payout eligibility</div>
+      ${[['Account older than 90 days',1],['Good standing — no major violations',1],['Original content',1],['KYC verified (PAN + bank/UPI)',1],['Payout details stored separately from profile',1]].map(c=>chk(c[0],c[1])).join('')}</div>
+    <button class="btn ghost" onclick="toast('Statement downloaded (prototype)')">${ic('download',18)} Download earnings statement</button>
+  </div>`;
+};
+function chk(t,ok,sub){return `<div class="check"><div class="m ${ok===1?'ok':ok===0?'no':'wait'}">${ic(ok===1?'check':ok===0?'x':'clock')}</div><div class="grow"><div class="b sm">${t}</div>${sub?`<div class="xs muted">${sub}</div>`:''}</div></div>`}
+
+/* ---- me / profile ---- */
+SCREENS.me=()=>`
+${bar('Profile',{noback:true,right:`<button class="ib" onclick="go('privacy')">${ic('lock')}</button>`})}
+<div class="pad stack">
+  <div class="row" style="gap:16px"><div class="ring">${av(ME.name,0,'lg')}</div>
+    <div class="grow"><div class="row"><div class="h3">${ME.name}</div><span style="color:#2F6BFF">${ic('shield',18)}</span></div><div class="muted sm">@${ME.handle}</div>
+    <div class="row" style="margin-top:6px;gap:6px;flex-wrap:wrap"><span class="tag brand">${ic('pin',12)}Patna, Bihar</span><span class="tag good">Good standing</span></div></div></div>
+  <p class="sm">Patna ki beti. Food, books and the city I love. 📍</p>
+  <div class="row" style="justify-content:space-around;text-align:center"><div><b style="font-size:18px">14</b><div class="xs muted">Posts</div></div><div><b style="font-size:18px">12.8K</b><div class="xs muted">Followers</div></div><div><b style="font-size:18px">341</b><div class="xs muted">Following</div></div><div>${lvPill('S1')}<div class="xs muted" style="margin-top:2px">Best level</div></div></div>
+  <div class="row"><button class="btn ghost grow" onclick="go('profileSetup')">Edit profile</button><button class="btn dark grow" onclick="jump('reach')">${ic('bars',16)} Dashboard</button></div>
+  <div class="row" style="gap:6px;flex-wrap:wrap"><span class="lbl pub">${ic('shield')}Identity Verified</span><span class="lbl original">${ic('star')}Early Creator</span></div>
+  <div class="seg"><button class="on">Posts</button><button>Reels</button><button>Saved</button></div>
+  <div class="grid3">${[0,1,2,3,4,5,0,1,2].map((g,i)=>`<div class="t" style="background:${GR[g]}"><span class="lv ${['D1','D1','S1','D1','D1','D1','S1','D1','D1'][i]}">${['D1','D1','S1','D1','D1','D1','S1','D1','D1'][i]}</span></div>`).join('')}</div>
+  <div class="card list">
+    <button onclick="go('business')"><span class="ico">${ic('store')}</span><span class="grow b">Business Page</span><span class="muted">›</span></button>
+    <button onclick="go('verify')"><span class="ico">${ic('shield')}</span><span class="grow b">Get verified</span><span class="muted">›</span></button>
+    <button onclick="go('live')"><span class="ico">${ic('live')}</span><span class="grow b">Go Live eligibility</span><span class="muted">›</span></button>
+    <button onclick="go('earnings')"><span class="ico">${ic('rupee')}</span><span class="grow b">Earnings</span><span class="muted">›</span></button>
+    <button onclick="go('privacy')"><span class="ico">${ic('lock')}</span><span class="grow b">Privacy &amp; safety</span><span class="muted">›</span></button>
+    <button onclick="go('policies')"><span class="ico">${ic('doc')}</span><span class="grow b">Rules, appeals &amp; help</span><span class="muted">›</span></button>
+  </div>
+</div>`;
+
+SCREENS.profileView=()=>{
+  const p=POSTS.find(x=>x.id===S.arg)||POSTS[0];
+  return `${bar('@'+p.handle,{right:`<button class="ib" onclick="reportSheet(${p.id})">${ic('more')}</button>`})}
+  <div class="pad stack">
+    <div class="row" style="gap:16px">${av(p.name,p.av,'lg')}<div class="grow"><div class="row"><div class="h3">${p.name}</div>${badge(p.ver)}</div><div class="muted sm">@${p.handle}</div><div class="row" style="margin-top:6px"><span class="tag brand">${ic('pin',12)}${p.place}</span></div></div></div>
+    <div class="row" style="justify-content:space-around;text-align:center"><div><b style="font-size:18px">86</b><div class="xs muted">Posts</div></div><div><b style="font-size:18px">48K</b><div class="xs muted">Followers</div></div><div><b style="font-size:18px">210</b><div class="xs muted">Following</div></div><div>${lvPill(p.lv)}<div class="xs muted" style="margin-top:2px">Best level</div></div></div>
+    <div class="row"><button class="btn grow" onclick="${S.followed.has(p.id)?'':`S.followed.add(${p.id});`}toast('Following');render()">${S.followed.has(p.id)?'Following':'Follow'}</button><button class="btn ghost grow" onclick="go('inbox','dm')">Message</button></div>
+    ${p.ver==='trusted'?'<div class="lbl pub" style="width:fit-content">'+ic('star')+'Trusted Creator — sustained compliance &amp; originality</div>':''}
+    <div class="grid3">${[p.g||0,1,2,3,4,5].map((g,i)=>`<div class="t" style="background:${GR[g%6]}"><span class="lv ${i<2?p.lv:'D1'}">${i<2?p.lv:'D1'}</span></div>`).join('')}</div>
+  </div>`;
+};
+
+/* ---- business ---- */
+SCREENS.business=()=>`
+${bar('Business Page',{right:`<button class="ib" onclick="go('insights')">${ic('bars')}</button>`})}
+<div class="pad stack">
+  <div style="height:120px;border-radius:22px;background:${GR[3]};position:relative"><div class="pat" style="position:absolute;inset:0;opacity:.18;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:30px 30px"></div></div>
+  <div class="row" style="margin-top:-44px;padding:0 10px;gap:12px;align-items:flex-end"><div class="av lg" style="background:var(--ink);border:4px solid var(--bg)">SF</div><div style="padding-bottom:6px"><div class="row"><div class="h3">Sai Footwear</div><span style="color:#0FA39A">${ic('shield',18)}</span></div><div class="xs muted">Footwear store · Charminar, Hyderabad</div></div></div>
+  <div class="row" style="justify-content:space-around;text-align:center"><div><b style="font-size:18px">6.4K</b><div class="xs muted">Followers</div></div><div><b style="font-size:18px">+312</b><div class="xs muted">This month</div></div><div><b style="font-size:18px">38</b><div class="xs muted">Posts</div></div></div>
+  <div class="row"><button class="btn grow" onclick="toast('Opens dialer')">${ic('phone',16)} Call</button><button class="btn ghost grow">WhatsApp</button><button class="btn ghost grow">Website</button></div>
+  <span class="lbl pub" style="width:fit-content">${ic('shield')}Official Business</span>
+  <div class="card" style="border-style:dashed"><div class="row between"><div><span class="tag warn">${ic('tag',12)} Offer</span><div class="b" style="margin-top:6px">20% off kolhapuri this week</div><div class="xs muted">Show this code in store: DIWALI20</div></div><button class="btn soft sm">Edit</button></div></div>
+  <div class="card row" style="background:var(--brand-2);border:0;gap:14px"><div class="grow"><b>Promote your best post</b><div class="xs muted">Diwali offer photo is getting good traction in Hyderabad.</div></div><button class="btn sm" onclick="go('promote')">Boost</button></div>
+  <div class="row"><button class="btn dark grow" onclick="S.camp.step=0;go('campaign')">${ic('plus',16)} Create campaign</button><button class="btn ghost grow" onclick="go('insights')">Insights</button></div>
+  <div class="grid3">${[3,4,5,0,1,2].map(g=>`<div class="t" style="background:${GR[g]}"></div>`).join('')}</div>
+</div>`;
+
+SCREENS.insights=()=>`
+${bar('Business insights')}
+<div class="pad stack">
+  <div class="seg"><button>7d</button><button class="on">30d</button><button>90d</button></div>
+  <div class="card"><div class="row between"><div><div class="xs muted b">FOLLOWERS</div><div class="eb" style="font-size:26px">6,412</div></div><span class="tag good">▲ 5.1%</span></div>
+   <svg class="sparkline" viewBox="0 0 300 80" preserveAspectRatio="none"><defs><linearGradient id="sg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5B3DF5" stop-opacity=".3"/><stop offset="1" stop-color="#5B3DF5" stop-opacity="0"/></linearGradient></defs><path d="M0 62 L30 58 60 60 90 48 120 50 150 38 180 40 210 28 240 30 270 18 300 12 L300 80 0 80Z" fill="url(#sg)"/><path d="M0 62 L30 58 60 60 90 48 120 50 150 38 180 40 210 28 240 30 270 18 300 12" fill="none" stroke="#5B3DF5" stroke-width="2.5" stroke-linejoin="round"/></svg></div>
+  <div class="kpi"><div class="card"><span class="xs muted b">Qualified reach</span><b>41.7K</b></div><div class="card"><span class="xs muted b">Profile visits</span><b>3,180</b></div><div class="card"><span class="xs muted b">Calls &amp; WhatsApp</span><b>214</b></div><div class="card"><span class="xs muted b">Offer redemptions</span><b>67</b></div></div>
+  <div class="card"><div class="h3" style="margin-bottom:10px">Where your audience is</div>
+    ${[['Hyderabad',58],['Secunderabad',17],['Warangal',9],['Other Telangana',11],['Other states',5]].map(a=>`<div class="row" style="margin-bottom:8px"><span class="sm" style="width:110px">${a[0]}</span><div class="bar grow"><i style="width:${a[1]}%;background:var(--d1)"></i></div><b class="xs" style="width:30px;text-align:right">${a[1]}%</b></div>`).join('')}
+    <div class="xs muted">Audience data is shown as privacy-safe cohorts.</div></div>
+</div>`;
+
+SCREENS.promote=()=>`
+${bar('Promote post')}
+<div class="pad stack">
+  <div class="card row" style="gap:12px"><div style="width:60px;height:78px;border-radius:12px;background:${GR[3]};flex:none"></div><div class="grow sm"><b>Diwali offer: 20% off kolhapuri…</b><div class="muted xs">Posted 2 days ago · 9.1K reach</div></div></div>
+  <div><div class="h3" style="margin-bottom:8px">Who to reach</div>
+   <div class="stack">${[['Hyderabad (city)','Best for walk-in offers','~12K–18K people','on'],['Telangana (state)','Wider awareness','~48K–70K people',''],['Local + interests: Fashion','Cohort based, privacy-safe','~8K–11K people','']].map(o=>`<button class="opt ${o[3]}"><span class="ico">${ic('pin',20)}</span><div class="grow"><b>${o[0]}</b><div class="xs muted">${o[1]}</div></div><span class="xs b">${o[2]}</span></button>`).join('')}</div></div>
+  <div class="card"><div class="row between"><b>Budget</b><b>₹500 / 3 days</b></div><input type="range" min="100" max="5000" value="500" style="width:100%;accent-color:#5B3DF5;margin-top:10px"><div class="xs muted">Estimated results are a simulation in this prototype.</div></div>
+  <button class="btn" onclick="toast('Boost scheduled (simulated)');back()">Boost for ₹500</button>
+</div>`;
+
+SCREENS.campaign=()=>{
+  const c=S.camp;const st=c.step;
+  const areaOpts=['Patna','Gaya','Muzaffarpur','Bihar (state)','India'];
+  const mult=c.areas.has('India')?8:c.areas.has('Bihar (state)')?4:1+c.areas.size*.4;
+  const reachLo=Math.round(c.budget*c.days/7*mult*3.2/100)*100,reachHi=Math.round(reachLo*1.5/100)*100;
+  const objs=[['Boost Post','One-click promotion of an existing post','rise'],['Business Awareness','Reach people in chosen districts, cities or states','globe'],['Follower Growth','Optimise for relevant page follows','users'],['Website / Lead','Visits, calls, WhatsApp or form leads','phone'],['Video Views','Qualified video-view objective','video'],['Local Campaign','District/city-first for local businesses','pin']];
+  let body='';
+  if(st===0)body=`<div class="h3">Choose an objective</div><div class="stack">${objs.map(o=>`<button class="opt ${c.obj===o[0]?'on':''}" onclick="S.camp.obj='${o[0]}';render()"><span class="ico">${ic(o[2],20)}</span><div class="grow"><b>${o[0]}</b><div class="xs muted">${o[1]}</div></div></button>`).join('')}</div>`;
+  if(st===1)body=`<div class="h3">Choose your audience</div><div style="display:flex;flex-wrap:wrap;gap:8px">${areaOpts.map(a=>`<button class="chip ${c.areas.has(a)?'on':''}" onclick="S.camp.areas.has('${a}')?S.camp.areas.delete('${a}'):S.camp.areas.add('${a}');render()">${a}</button>`).join('')}</div>
+   <div class="card stack"><b>Interest cohorts</b><div style="display:flex;flex-wrap:wrap;gap:8px">${['Food lovers','Fashion','Students','Families','Fitness'].map((a,i)=>`<span class="chip ${i<2?'on':''}">${a}</span>`).join('')}</div><div class="xs muted">${ic('shield',13)} Advertisers target cohorts only. Sensitive personal attributes are never exposed or targetable.</div></div>
+   <div class="card"><div class="xs muted b">ESTIMATED REACH</div><div class="eb" style="font-size:26px">${reachLo.toLocaleString()} – ${reachHi.toLocaleString()}</div><div class="xs muted">Targeting simulation · not a guarantee</div></div>`;
+  if(st===2)body=`<div class="h3">Budget &amp; schedule</div>
+   <div class="card stack"><div class="row between"><b>Daily budget</b><b>₹${c.budget}</b></div><input type="range" min="200" max="10000" step="100" value="${c.budget}" oninput="S.camp.budget=+this.value;render()" style="width:100%;accent-color:#5B3DF5">
+   <div class="row between"><b>Duration</b><b>${c.days} days</b></div><input type="range" min="1" max="30" value="${c.days}" oninput="S.camp.days=+this.value;render()" style="width:100%;accent-color:#5B3DF5"></div>
+   <div class="card"><div class="row between"><span class="muted">Total spend</span><b class="h3">₹${(c.budget*c.days).toLocaleString()}</b></div><div class="row between" style="margin-top:6px"><span class="muted">Est. reach</span><b>${reachLo.toLocaleString()}+</b></div></div>`;
+  if(st===3)body=`<div class="h3">Review &amp; submit</div><div class="card">${[['Objective',c.obj],['Audience',[...c.areas].join(', ')||'—'],['Budget',`₹${c.budget}/day × ${c.days} days`],['Total',`₹${(c.budget*c.days).toLocaleString()}`],['Billing','Prepaid wallet']].map(r=>`<div class="lrow"><span class="muted">${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>
+   <div class="card row" style="background:var(--soft);border:0">${ic('doc',22)}<span class="sm">Your ad is reviewed against Advertising Policy before it goes live. Usually under 2 hours.</span></div>`;
+  return `${bar('New campaign')}
+  <div class="pad stack"><div class="steps-dots">${[0,1,2,3].map(i=>`<i class="${i<=st?'on':''}"></i>`).join('')}</div>${body}
+  <div class="row">${st>0?`<button class="btn ghost grow" onclick="S.camp.step--;render()">Back</button>`:''}<button class="btn grow" onclick="${st<3?'S.camp.step++;render()':"toast('Submitted for review (simulated)');S.camp.step=0;back()"}">${st<3?'Continue':'Submit for review'}</button></div></div>`;
+};
+
+/* ---- verification ---- */
+SCREENS.verify=()=>{
+  const types=[['Identity Verified','Confirms a person using an approved verification flow.','shield','2F6BFF'],['Official Business','Confirms an organisation or business identity.','store','0FA39A'],['Verified Publisher','For eligible news, media and publisher organisations.','news','5B3DF5'],['Trusted Creator','Earned through sustained compliance and originality, so it cannot be applied for.','star','F08A00']];
+  return `${bar('Verification')}
+  <div class="pad stack">
+    <p class="muted">Badges are earned, never sold. Each has clear eligibility rules and can be revoked if rules are broken.</p>
+    ${types.map(t=>`<div class="card row" style="gap:14px;align-items:flex-start"><div class="av" style="background:#${t[3]}">${ic(t[2],22)}</div><div class="grow"><b>${t[0]}</b><div class="sm muted">${t[1]}</div></div></div>`).join('')}
+    <div class="card stack"><div class="h3">Apply — Identity Verified</div>
+      <div class="steps-dots"><i class="on"></i><i class="on"></i><i></i></div>
+      ${chk('Mobile number verified',1)}${chk('Government ID check (approved provider)',2,'Upload takes ~2 minutes')}${chk('Selfie liveness check',2)}
+      <button class="btn" onclick="toast('Application sent. Typical review: 3 working days.')">Continue</button>
+      <p class="xs muted">ID documents go to the verification provider and are stored separately from your public profile.</p></div>
+    <div class="card"><div class="b">Application status</div><div class="row" style="margin-top:8px"><span class="tag warn">Not submitted</span><span class="xs muted">Admin approval workflow</span></div></div>
+  </div>`;
+};
+
+/* ---- live ---- */
+SCREENS.live=()=>`
+${bar('Go Live')}
+<div class="pad stack">
+  <div class="hero"><div style="position:relative;z-index:1;max-width:250px"><div class="eb" style="font-size:20px">Live is a trusted-creator tool.</div><p class="sm" style="opacity:.85;margin-top:6px">Meet every requirement below to unlock controlled live access.</p></div></div>
+  <div class="card"><div class="row between"><b>Eligibility</b><span class="tag warn">3 of 6 met</span></div>
+    ${chk('Followers ≥ 5,000',1,'You have 12,800')}${chk('Account age ≥ 30 days',1,'Account is 212 days old')}${chk('Two-factor authentication on',0,'Required for live. Turn on now')}${chk('Age 18+',1)}${chk('No active major violations',1)}${chk('Trust &amp; Safety eligibility',2,'Pending review — thresholds are configurable by admins')}
+    <button class="btn soft sm" style="margin-top:6px">Enable 2FA</button></div>
+  <button class="btn" disabled>Go Live</button>
+  <button class="btn ghost" onclick="go('liveRoom')">Preview live room controls</button>
+  <div class="card row" style="background:var(--soft);border:0">${ic('shield',22)}<span class="sm">Live streams are monitored. Dangerous streams are interrupted and may be routed to emergency procedures.</span></div>
+</div>`;
+
+SCREENS.liveRoom=()=>`
+<div class="live-vid">
+  <div class="row" style="position:absolute;top:14px;left:14px;right:14px;gap:8px"><span class="pill" style="background:var(--g1)">● LIVE</span><span class="pill">${ic('eye',12)} 1.2K</span><span class="grow"></span><button class="ib" style="background:rgba(255,255,255,.2);border:0;color:#fff" onclick="back()">${ic('x')}</button></div>
+  <div class="chat" style="position:absolute;left:14px;right:14px;bottom:14px">${S.liveSafe.freeze?'<p style="background:var(--g1)">Comments are frozen by the host</p>':'<p><b>rahul_k</b> Namaste from Gaya 🙏</p><p><b>anita.s</b> Great stream!</p><p><b>patna_foodie</b> Which stall is this?</p>'}</div>
+</div>
+<div class="pad stack" style="padding-top:14px">
+  <div class="b">Safety controls</div>
+  <div class="row"><button class="btn danger grow" onclick="sheet('<div class=&quot;h3&quot;>End live now?</div><p class=&quot;muted sm&quot; style=&quot;margin:6px 0 14px&quot;>The stream stops instantly and a log is saved.</p><button class=&quot;btn danger&quot; onclick=&quot;back()&quot;>End live</button>')">${ic('x',18)} End live</button>
+  <button class="btn ghost grow" onclick="S.liveSafe.freeze=!S.liveSafe.freeze;render()">${ic('snow',18)} ${S.liveSafe.freeze?'Unfreeze':'Freeze'} comments</button></div>
+  <div class="row"><button class="btn ghost grow">${ic('block',18)} Restrict viewer</button><button class="btn ghost grow">${ic('flag',18)} Report incident</button></div>
+  <div class="card row" style="background:var(--soft);border:0">${ic('shield',22)}<span class="sm">Automated audio/video monitoring is on. Evidence is preserved if a stream is stopped.</span></div>
+</div>`;
+
+/* ---- inbox / story ---- */
+SCREENS.inbox=()=>{
+  const dm=S.arg==='dm';
+  return `${bar(dm?'Messages':'Activity')}
+  <div class="pad stack"><div class="seg"><button class="${dm?'':'on'}" onclick="go('inbox')">Activity</button><button class="${dm?'on':''}" onclick="go('inbox','dm')">Messages</button></div>
+  ${dm?`<div class="card list">${[['Riya Sharma','Loved your Chhath post! Collab?','2m',0],['Sai Footwear','Thanks for the follow 🙏','1h',4],['Neha Prasad','Sending the clip now','3h',5]].map(m=>`<button>${av(m[0],m[3])}<div class="grow"><b>${m[0]}</b><div class="xs muted">${m[1]}</div></div><span class="xs muted">${m[2]}</span></button>`).join('')}</div>
+  <div class="card sm muted row">${ic('lock',18)}Messages from people you don't follow go to Requests.</div>`
+  :`<div class="card list">
+    <button><span class="ico bg-S1" style="background:var(--s1);color:#fff">${ic('rise',20)}</span><div class="grow"><b>Your post reached State level!</b><div class="xs muted">"Diwali sweets guide" is now S1 · Bihar</div></div><span class="xs muted">1h</span></button>
+    <button><span class="ico">${ic('heart',20)}</span><div class="grow"><b>Riya Sharma and 48 others liked your post</b><div class="xs muted">Litti chokha…</div></div><span class="xs muted">3h</span></button>
+    <button><span class="ico">${ic('rupee',20)}</span><div class="grow"><b>Cycle 12 estimate updated: ₹4,280</b><div class="xs muted">Not final until 20 Oct</div></div><span class="xs muted">5h</span></button>
+    <button><span class="ico">${ic('users',20)}</span><div class="grow"><b>Neha Prasad started following you</b></div><span class="xs muted">1d</span></button>
+    <button><span class="ico">${ic('shield',20)}</span><div class="grow"><b>Your report was reviewed</b><div class="xs muted">We removed the post. Thanks for keeping BLOCKS safe.</div></div><span class="xs muted">2d</span></button></div>`}
+  </div>`;
+};
+SCREENS.story=()=>{
+  const p=POSTS[S.storyIdx%POSTS.length];
+  return `<div style="position:absolute;inset:0;background:${GR[p.g||0]};color:#fff;z-index:8" onclick="S.storyIdx++;if(S.storyIdx%POSTS.length===0){back()}else render()">
+   <div style="display:flex;gap:4px;padding:14px">${POSTS.map((_,i)=>`<i style="flex:1;height:3px;border-radius:9px;background:rgba(255,255,255,${i<=S.storyIdx%POSTS.length?.95:.35})"></i>`).join('')}</div>
+   <div class="row" style="padding:0 16px;gap:10px">${av(p.name,p.av,'sm')}<b>${p.name}</b><span class="xs" style="opacity:.8">2h · ${p.place.split(',')[0]}</span><span class="grow"></span><button onclick="event.stopPropagation();S.storyIdx=0;back()">${ic('x',24)}</button></div>
+   <div style="position:absolute;bottom:40px;left:20px;right:20px"><div class="eb" style="font-size:24px;line-height:1.2">${p.cap}</div><div class="row" style="margin-top:16px"><div class="input" style="background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3);color:#fff">Send a message…</div></div><div class="xs" style="opacity:.8;margin-top:10px">Stories disappear after 24 hours</div></div></div>`;
+};
+
+/* ---- privacy / policies ---- */
+SCREENS.privacy=()=>{
+  const row=(k,t,d)=>`<div class="row between" style="padding:11px 0;border-bottom:1px solid var(--line)"><div class="grow"><b class="sm">${t}</b><div class="xs muted">${d}</div></div>${sw(S.priv[k],`S.priv.${k}=!S.priv.${k};render()`)}</div>`;
+  return `${bar('Privacy dashboard')}
+  <div class="pad stack">
+    <div class="card row" style="background:var(--brand-2);border:0">${ic('lock',24)}<span class="sm"><b>You're in control.</b> We collect only what BLOCKS needs, and we never sell your personal data.</span></div>
+    <div class="card"><div class="h3" style="margin-bottom:4px">Who can…</div>
+      ${row('private','Private account','Only approved followers see your posts')}${row('comments','Comments','Anyone can comment on your posts')}${row('mentions','Mentions &amp; tags','Allow people to mention you')}${row('dms','Direct messages','Allow messages from people you follow')}${row('discover','Discoverability','Suggest your profile in Rising and Near You')}</div>
+    <div class="card"><div class="h3" style="margin-bottom:4px">Location</div><div class="row between" style="padding-top:8px"><div><b class="sm">Precision</b><div class="xs muted">District &amp; city only — exact GPS is never stored</div></div><span class="tag good">District</span></div></div>
+    <div class="card"><div class="h3" style="margin-bottom:4px">Ads</div>${row('adpers','Interest-based ads','Uses declared and derived interests, never sensitive attributes')}</div>
+    <div class="card list">
+      <button onclick="toast('Preparing your data export (prototype)')"><span class="ico">${ic('download')}</span><span class="grow b">Download my data</span></button>
+      <button><span class="ico">${ic('doc')}</span><span class="grow b">Consent history</span></button>
+      <button><span class="ico">${ic('block')}</span><span class="grow b">Blocked &amp; muted accounts</span></button>
+      <button onclick="sheet('<div class=&quot;h3&quot;>Delete account?</div><p class=&quot;muted sm&quot; style=&quot;margin:6px 0 14px&quot;>Your profile and posts will be removed after a 30-day grace period. Some records are retained where the law requires.</p><button class=&quot;btn danger&quot; onclick=&quot;closeSheet()&quot;>Request deletion</button><button class=&quot;btn ghost&quot; style=&quot;margin-top:8px&quot; onclick=&quot;closeSheet()&quot;>Keep my account</button>')"><span class="ico" style="background:#FDECEE;color:var(--bad)">${ic('trash')}</span><span class="grow b" style="color:var(--bad)">Delete account</span></button></div>
+  </div>`;
+};
+SCREENS.policies=()=>`
+${bar('Rules, appeals & help')}
+<div class="pad stack">
+  <div class="card list">
+    <button><span class="ico">${ic('doc')}</span><div class="grow"><b>Community Guidelines</b><div class="xs muted">What's allowed, restricted and prohibited</div></div></button>
+    <button><span class="ico">${ic('rupee')}</span><div class="grow"><b>Creator Earnings Policy</b><div class="xs muted">Reward pool and revenue-share rules</div></div></button>
+    <button><span class="ico">${ic('rise')}</span><div class="grow"><b>How Reach Levels work</b><div class="xs muted">Signals and thresholds, in plain language</div></div></button>
+    <button><span class="ico">${ic('shield')}</span><div class="grow"><b>Privacy Policy</b></div></button>
+    <button><span class="ico">${ic('help')}</span><div class="grow"><b>Grievance officer &amp; contact</b></div></button>
+  </div>
+  <div class="card"><div class="h3" style="margin-bottom:8px">Your reports &amp; appeals</div>
+    <div class="lrow"><div><b class="sm">Post removed: "Match highlights"</b><div class="xs muted">Copyright complaint</div></div><span class="tag warn">Appeal in review</span></div>
+    <div class="lrow"><div><b class="sm">Your report on @spam_hub</b><div class="xs muted">Spam / fake engagement</div></div><span class="tag good">Action taken</span></div>
+    <button class="btn soft sm" style="margin-top:8px" onclick="toast('Appeal form opens here')">Appeal a decision</button></div>
+</div>`;
+
+/* ---- sheets ---- */
+function commentSheet(id){
+  const p=POSTS.find(x=>x.id===id);
+  sheet(`<div class="h3" style="margin-bottom:12px">${p.cm} comments</div>
+  ${[['Anita Rao','This is exactly how it tastes at home!','12'],['Rahul K','Gaya se hum bhi aaenge 🙌','8'],['Pooja Mishra','Which stall? Please share location','5']].map((c,i)=>`<div class="row" style="align-items:flex-start;margin-bottom:12px">${av(c[0],i+2,'sm')}<div class="grow"><b class="sm">${c[0]}</b><div class="sm">${c[1]}</div><div class="xs muted">${c[2]} likes · Reply</div></div><button onclick="reportSheet(${id})">${ic('flag',16)}</button></div>`).join('')}
+  <div class="row"><input class="input grow" placeholder="Add a comment…"><button class="btn sm">Post</button></div>`);
+}
+function shareSheet(id){
+  sheet(`<div class="h3">Share</div><p class="muted sm" style="margin:4px 0 14px">Every share from a new district helps this post climb.</p>
+  <div class="row" style="justify-content:space-between;text-align:center;margin-bottom:16px">${[['WhatsApp','#12945A','msg'],['Repost','#5B3DF5','repost'],['Copy link','#2F6BFF','link'],['Story','#F08A00','clock'],['More','#6B6A85','more']].map(s=>`<button onclick="toast('${s[0]} — shared');closeSheet()" style="width:60px"><div class="av" style="background:${s[1]};margin:0 auto 5px">${ic(s[2],20)}</div><span class="xs b">${s[0]}</span></button>`).join('')}</div>`);
+}
+function reportSheet(id){
+  const p=POSTS.find(x=>x.id===id);
+  sheet(`<div class="h3" style="margin-bottom:10px">@${p.handle}</div>
+  <div class="list"><button onclick="reportReasons(${id})"><span class="ico" style="background:#FDECEE;color:var(--bad)">${ic('flag')}</span><span class="grow b">Report</span></button>
+  <button onclick="toast('Muted @${p.handle}');closeSheet()"><span class="ico">${ic('mic')}</span><span class="grow b">Mute</span></button>
+  <button onclick="toast('Blocked @${p.handle}');closeSheet()"><span class="ico">${ic('block')}</span><span class="grow b">Block</span></button>
+  <button onclick="toast('We\\'ll show fewer posts like this');closeSheet()"><span class="ico">${ic('eye')}</span><span class="grow b">Not interested</span></button></div>`);
+}
+function reportReasons(id){
+  const rs=['Sexual content or exploitation','Child safety','Graphic violence','Self-harm or suicide','Threats or incitement','Doxxing / private information','Fraud, phishing or impersonation','Illegal goods or services','Fake engagement / bots','Copyright','Deceptive AI / deepfake','Misinformation'];
+  sheet(`<div class="h3" style="margin-bottom:4px">What's wrong with this post?</div><p class="xs muted" style="margin-bottom:8px">Your report is confidential.</p>
+  <div class="list">${rs.map(r=>`<button onclick="sheet('<div style=&quot;text-align:center;padding:10px 0&quot;><div class=&quot;av&quot; style=&quot;background:var(--good);margin:0 auto 12px&quot;>✓</div><div class=&quot;h3&quot;>Thanks for reporting</div><p class=&quot;muted sm&quot; style=&quot;margin:6px 0 14px&quot;>We\\'ll review it against our guidelines and let you know. You can also block this account.</p><button class=&quot;btn&quot; onclick=&quot;closeSheet()&quot;>Done</button></div>')"><span class="grow b sm">${r}</span><span class="muted">›</span></button>`).join('')}</div>`);
+}
+
+/* ===================== render ===================== */
+function render(){
+  const v=$('#view');const keep=v.scrollTop;
+  v.innerHTML=(SCREENS[S.screen]||SCREENS.home)();
+  if(S.screen===prevScreen)v.scrollTop=keep;else v.scrollTop=0;
+  prevScreen=S.screen;
+  const showNav=MAIN.includes(S.screen)||['create'].includes(S.screen)&&false;
+  const nav=$('#nav');
+  nav.style.display=showNav?'flex':'none';
+  nav.innerHTML=TABS.map(t=>t[0]==='create'?`<button onclick="go('create')" aria-label="Create"><span class="plus">${ic('plus')}</span></button>`:`<button class="${S.screen===t[0]?'on':''}" onclick="jump('${t[0]}')">${ic(t[2])}${t[1]}</button>`).join('');
+  document.querySelectorAll('#map button').forEach(b=>b.classList.toggle('on',b.dataset.s===S.screen));
+}
+let prevScreen='';
+
+/* screen map */
+const MAPS=[['Onboarding',[['welcome','Welcome + login'],['otp','OTP verify'],['setup','Language & interests'],['location','District & state'],['profileSetup','Profile setup']]],
+ ['Core loop',[['home','Home feeds'],['rising','Rising feed'],['journey','Reach journey (post)'],['create','Create post'],['story','Story viewer'],['inbox','Activity & messages']]],
+ ['Creator',[['reach','Creator dashboard'],['earnings','Earnings ledger'],['me','My profile'],['profileView','Other profile'],['verify','Verification'],['live','Live eligibility'],['liveRoom','Live room controls']]],
+ ['Business',[['business','Business page'],['insights','Insights'],['promote','Promote post'],['campaign','Campaign wizard']]],
+ ['Trust & privacy',[['privacy','Privacy dashboard'],['policies','Rules & appeals']]]];
+$('#map').innerHTML=`<h1>${logo(34)} BLOCKS</h1><p>Phase 1 mobile prototype. Tap around the phone, or jump to any screen.</p>`+MAPS.map(g=>`<h4>${g[0]}</h4>`+g[1].map(s=>`<button data-s="${s[0]}" onclick="S.hist=[];S.screen='${s[0]}';S.arg=${s[0]==='journey'?1:s[0]==='profileView'?3:'undefined'};closeSheet();render()">${s[1]}</button>`).join('')).join('')+`<a href="admin.html">Open Admin Console →</a>`;
+render();
+</script>
+</body>
+</html>
