@@ -4,6 +4,7 @@ import 'package:blocks_app/app/config/app_config.dart';
 import 'package:blocks_app/core/services/local_store.dart';
 import 'package:blocks_app/data/api/api_auth_repository.dart';
 import 'package:blocks_app/data/api/api_client.dart';
+import 'package:blocks_app/data/api/api_creator_repository.dart';
 import 'package:blocks_app/data/api/api_feed_repository.dart';
 import 'package:blocks_app/data/api/api_moderation_repository.dart';
 import 'package:blocks_app/data/api/api_notification_repository.dart';
@@ -78,6 +79,15 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 // ------------------------------------------------------ API repositories --
 
 final contentKindsProvider = Provider<ContentKinds>((ref) => ContentKinds());
+
+final apiCreatorRepositoryProvider = Provider<ApiCreatorRepository>(
+  (ref) => ApiCreatorRepository(ref.watch(apiClientProvider)),
+);
+
+final apiCreatorInsightsRepositoryProvider =
+    Provider<ApiCreatorInsightsRepository>(
+      (ref) => ApiCreatorInsightsRepository(ref.watch(apiClientProvider)),
+    );
 
 final apiModerationRepositoryProvider = Provider<ApiModerationRepository>(
   (ref) => ApiModerationRepository(ref.watch(apiClientProvider)),

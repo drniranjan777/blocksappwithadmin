@@ -49,7 +49,8 @@ delivery (`docs/SECURITY_PROFILE_REELS.md`) and the reel editor / media / music 
 KYC / bank / payout delivery (`docs/CREATOR_REELS_MONEY.md`): analyzer clean, 1,136 tests (899 before
 the API integration) plus 40 opt-in live tests (last run 2026-10-09). Live integration (Stages 10-11): sign-up/sign-in/two-step
 codes, profile and photo, feed, posts (text and photo), comments, engagement, follows, notifications,
-password, devices, login activity, contacts, and reporting/blocking/muting are connected; stories, messages, business, ads,
+password, devices, login activity, contacts, reporting/blocking/muting, and Creator Studio's overview, Reach and
+Earnings tabs are connected; stories, messages, business, ads,
 explore, appeals, the reel and creator studios, KYC, bank, payouts and turning two-step sign-in on are not
 (they answer "not available" in a live build).
 Production plan, security review and performance review: `docs/PRODUCTION_MIGRATION.md`;

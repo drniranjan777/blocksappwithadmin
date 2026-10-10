@@ -220,7 +220,12 @@ final reachRepositoryProvider = Provider<ReachRepository>(
   ),
 );
 final creatorRepositoryProvider = Provider<CreatorRepository>(
-  (ref) => _resolve(ref, 'CreatorRepository', MockCreatorRepository.new),
+  (ref) => _resolve(
+    ref,
+    'CreatorRepository',
+    MockCreatorRepository.new,
+    api: (ref) => ref.watch(apiCreatorRepositoryProvider),
+  ),
 );
 final adRepositoryProvider = Provider<AdRepository>(
   (ref) => _resolve(ref, 'AdRepository', MockAdRepository.new),
@@ -285,6 +290,7 @@ final creatorInsightsRepositoryProvider = Provider<CreatorInsightsRepository>(
     ref,
     'CreatorInsightsRepository',
     MockCreatorInsightsRepository.new,
+    api: (ref) => ref.watch(apiCreatorInsightsRepositoryProvider),
   ),
 );
 final kycRepositoryProvider = Provider<KycRepository>(

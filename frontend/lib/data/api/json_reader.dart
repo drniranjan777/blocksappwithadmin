@@ -43,6 +43,12 @@ class JsonObject {
     return v is num ? v.toInt() : fallback;
   }
 
+  /// A number that may have a fraction (a share between 0 and 1, say).
+  double decimal(String key, {double fallback = 0}) {
+    final v = _map[key];
+    return v is num ? v.toDouble() : fallback;
+  }
+
   bool boolean(String key, {bool fallback = false}) {
     final v = _map[key];
     return v is bool ? v : fallback;

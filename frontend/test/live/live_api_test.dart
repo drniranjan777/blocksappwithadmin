@@ -23,6 +23,7 @@ import 'package:blocks_app/core/errors/app_failure.dart';
 import 'package:blocks_app/core/services/local_store.dart';
 import 'package:blocks_app/data/api/api_auth_repository.dart';
 import 'package:blocks_app/data/api/api_client.dart';
+import 'package:blocks_app/data/api/api_creator_repository.dart';
 import 'package:blocks_app/data/api/api_feed_repository.dart';
 import 'package:blocks_app/data/api/api_moderation_repository.dart';
 import 'package:blocks_app/data/api/api_notification_repository.dart';
@@ -39,6 +40,8 @@ import 'package:blocks_app/data/api/content_kinds.dart';
 import 'package:blocks_app/data/api/device_identity.dart';
 import 'package:blocks_app/data/api/token_store.dart';
 import 'package:blocks_app/data/models/auth_models.dart';
+import 'package:blocks_app/data/models/creator_models.dart';
+import 'package:blocks_app/features/reach/domain/reach_level.dart';
 import 'package:blocks_app/data/models/business_models.dart';
 import 'package:blocks_app/data/models/content_models.dart';
 import 'package:blocks_app/data/models/discovery_models.dart';
@@ -94,6 +97,8 @@ class _Person {
     reset = ApiPasswordResetRepository(api);
     security = ApiSecurityRepository(api);
     moderation = ApiModerationRepository(api);
+    creator = ApiCreatorRepository(api);
+    insights = ApiCreatorInsightsRepository(api);
     this.reach = reach;
   }
 
@@ -113,6 +118,8 @@ class _Person {
   late final ApiPasswordResetRepository reset;
   late final ApiSecurityRepository security;
   late final ApiModerationRepository moderation;
+  late final ApiCreatorRepository creator;
+  late final ApiCreatorInsightsRepository insights;
   late final ApiReachRepository reach;
 
   String get email => '$username@example.test';
@@ -1075,6 +1082,71 @@ void main() {
       final me = await nina.profile.removeProfilePhoto();
       expect(me.avatarUrl, isNull);
       expect((await nina.users.getCurrentUser()).avatarUrl, isNull);
+    });
+  });
+
+  group('Creator Studio against the running API', skip: run ? false : skip, () {
+    final suffix = Random().nextInt(900000) + 100000;
+    late final _Person creator;
+
+    setUpAll(() async {
+      creator = _Person(origin!, 'qa.creator$suffix');
+      await creator.signUp(origin, displayName: 'Creator Live');
+    });
+
+    test('a new creator has a dashboard of zeros, not an error', () async {
+      final d = await creator.creator.getDashboard();
+      expect(d.followers, 0);
+      expect(d.qualifiedReach30d, 0);
+      expect(d.bestPostQualifiedReach, 0);
+      expect(d.reachLevel, ReachLevel.district);
+      expect(d.coverage.values, everyElement(0));
+    });
+
+    test('earnings start at nothing, with six months to chart', () async {
+      final e = await creator.insights.getEarnings();
+      expect(e.estimatedTotal, 0);
+      expect(e.available, 0);
+      expect(e.pending, 0);
+      expect(e.paid, 0);
+      expect(e.thisMonth, 0);
+      expect(e.months, hasLength(6));
+      expect(e.months.every((m) => m.amount == 0), isTrue);
+      expect(e.metrics.qualifiedViews, 0);
+      expect(e.metrics.engagementRate, 0);
+      expect(e.rewardPool.isEstimate, isFalse);
+    });
+
+    test('a post puts the item on the first rung', () async {
+      await creator.posts.createPost(
+        const PostDraft(
+          type: PostType.text,
+          caption: 'First post for the studio',
+          district: '',
+          state: '',
+          audience: PostAudience.everyone,
+        ),
+      );
+      final d = await creator.creator.getDashboard();
+      expect(d.coverage[ReachLevel.district], 1);
+      expect(d.coverage[ReachLevel.state], 0);
+    });
+
+    test('analytics say plainly they are not available yet', () async {
+      await expectLater(
+        creator.insights.getAnalytics(AnalyticsRange.days28),
+        throwsA(
+          isA<AppFailure>().having((f) => f.code, 'code', 'NOT_AVAILABLE'),
+        ),
+      );
+    });
+
+    test('nothing is shown without signing in', () async {
+      final stranger = _Person(origin!, 'qa.stranger$suffix');
+      await expectLater(
+        stranger.creator.getDashboard(),
+        throwsA(isA<UnauthorizedFailure>()),
+      );
     });
   });
 
