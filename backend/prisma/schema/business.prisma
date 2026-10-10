@@ -1,0 +1,234 @@
+// ---------------------------------------------------------------------------
+// Business pages, verification requests and advertising.
+//
+// There is no ad network here and no charging of money: a campaign is a record
+// that staff review and that a billing provider (not yet configured) would fund.
+// Targeting is stored as coarse, privacy-preserving cohorts only.
+// ---------------------------------------------------------------------------
+
+enum BusinessStatus {
+  DRAFT
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+
+  @@map("business_status")
+}
+
+enum VerificationType {
+  IDENTITY
+  BUSINESS
+  PUBLISHER
+
+  @@map("verification_type")
+}
+
+enum VerificationStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
+
+  @@map("verification_status")
+}
+
+enum AdObjective {
+  AWARENESS
+  TRAFFIC
+  LOCAL_REACH
+  BOOST_CONTENT
+  LEADS
+
+  @@map("ad_objective")
+}
+
+enum AdStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  REJECTED
+  FLAGGED
+  CANCELLED
+
+  @@map("ad_status")
+}
+
+/// Who paused a campaign, which decides who can resume it.
+enum AdPausedBy {
+  OWNER
+  STAFF
+  SYSTEM
+
+  @@map("ad_paused_by")
+}
+
+enum BillingStatus {
+  NOT_CONFIGURED
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+
+  @@map("billing_status")
+}
+
+/// A business's public page, owned by a user.
+model BusinessPage {
+  id                 String             @id @default(uuid(7)) @db.Uuid
+  ownerId            String             @map("owner_id") @db.Uuid
+  slug               String             @unique @db.VarChar(40)
+  name               String             @db.VarChar(120)
+  category           String             @db.VarChar(60)
+  description        String?            @db.VarChar(1000)
+  contactEmail       String?            @map("contact_email") @db.VarChar(254)
+  websiteUrl         String?            @map("website_url") @db.VarChar(200)
+  state              String?            @db.VarChar(80)
+  district           String?            @db.VarChar(80)
+  city               String?            @db.VarChar(80)
+  avatarMediaId      String?            @map("avatar_media_id") @db.Uuid
+  coverMediaId       String?            @map("cover_media_id") @db.Uuid
+  status             BusinessStatus     @default(DRAFT)
+  /// Why staff suspended it, shown to the owner.
+  statusReason       String?            @map("status_reason") @db.VarChar(300)
+  statusChangedAt    DateTime?          @map("status_changed_at") @db.Timestamptz(3)
+  verificationStatus VerificationStatus @default(NONE) @map("verification_status")
+  /// ENCRYPTED.
+  gstinEnc           String?            @map("gstin_enc")
+  gstinLast4         String?            @map("gstin_last4") @db.VarChar(4)
+  followersCount     Int                @default(0) @map("followers_count")
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  owner         User                  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  avatar        MediaAsset?           @relation("BusinessAvatar", fields: [avatarMediaId], references: [id], onDelete: SetNull)
+  cover         MediaAsset?           @relation("BusinessCover", fields: [coverMediaId], references: [id], onDelete: SetNull)
+  offers        BusinessOffer[]
+  followers     BusinessFollow[]
+  posts         Post[]
+  verifications VerificationRequest[]
+  campaigns     AdCampaign[]
+
+  @@index([ownerId])
+  @@index([status, verificationStatus])
+  @@index([state, district])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "business_pages_name_trgm")
+  @@map("business_pages")
+}
+
+/// A user following a business page.
+model BusinessFollow {
+  pageId    String   @map("page_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  page BusinessPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([pageId, userId])
+  @@index([userId])
+  @@map("business_follows")
+}
+
+/// An offer a business publishes on its page.
+model BusinessOffer {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  pageId      String    @map("page_id") @db.Uuid
+  title       String    @db.VarChar(120)
+  description String?   @db.VarChar(400)
+  startsAt    DateTime? @map("starts_at") @db.Timestamptz(3)
+  endsAt      DateTime? @map("ends_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  page BusinessPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId, endsAt])
+  @@map("business_offers")
+}
+
+/// An application for a badge (identity, official business, verified publisher).
+model VerificationRequest {
+  id             String             @id @default(uuid(7)) @db.Uuid
+  userId         String             @map("user_id") @db.Uuid
+  businessPageId String?            @map("business_page_id") @db.Uuid
+  type           VerificationType
+  status         VerificationStatus @default(PENDING)
+  note           String?            @db.VarChar(500)
+  submittedAt    DateTime           @default(now()) @map("submitted_at") @db.Timestamptz(3)
+  reviewedById   String?            @map("reviewed_by_id") @db.Uuid
+  reviewedAt     DateTime?          @map("reviewed_at") @db.Timestamptz(3)
+  decisionNote   String?            @map("decision_note") @db.VarChar(500)
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessPage BusinessPage? @relation(fields: [businessPageId], references: [id], onDelete: SetNull)
+  reviewedBy   AdminUser?    @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([status, type, submittedAt])
+  @@index([userId])
+  @@map("verification_requests")
+}
+
+/// An advertising campaign, from draft through review to completion.
+model AdCampaign {
+  id             String        @id @default(uuid(7)) @db.Uuid
+  advertiserId   String        @map("advertiser_id") @db.Uuid
+  businessPageId String?       @map("business_page_id") @db.Uuid
+  name           String        @db.VarChar(120)
+  objective      AdObjective
+  status         AdStatus      @default(DRAFT)
+  budgetTotal    Decimal       @map("budget_total") @db.Decimal(18, 2)
+  dailyBudget    Decimal?      @map("daily_budget") @db.Decimal(18, 2)
+  spent          Decimal       @default(0) @db.Decimal(18, 2)
+  currency       String        @default("INR") @db.VarChar(3)
+  startsAt       DateTime      @map("starts_at") @db.Timestamptz(3)
+  endsAt         DateTime      @map("ends_at") @db.Timestamptz(3)
+  /// Districts, states, countries, age bands, interest cohorts. Validated.
+  targeting      Json
+  headline       String        @db.VarChar(120)
+  body           String?       @db.VarChar(400)
+  destinationUrl String?       @map("destination_url") @db.VarChar(300)
+  boostPostId    String?       @map("boost_post_id") @db.Uuid
+  boostReelId    String?       @map("boost_reel_id") @db.Uuid
+  /// When it was last sent for review; the review queue is worked oldest first.
+  submittedAt    DateTime?     @map("submitted_at") @db.Timestamptz(3)
+  reviewedById   String?       @map("reviewed_by_id") @db.Uuid
+  reviewedAt     DateTime?     @map("reviewed_at") @db.Timestamptz(3)
+  /// Shown to the advertiser: why it was rejected, flagged or stopped.
+  reviewNote     String?       @map("review_note") @db.VarChar(500)
+  policyFlags    Json?         @map("policy_flags")
+  billingStatus  BillingStatus @default(NOT_CONFIGURED) @map("billing_status")
+  /// The payment provider's reference for the charge, for reconciliation.
+  billingReference String?     @map("billing_reference") @db.VarChar(80)
+  fundedAt       DateTime?     @map("funded_at") @db.Timestamptz(3)
+  pausedBy       AdPausedBy?   @map("paused_by")
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  advertiser   User          @relation(fields: [advertiserId], references: [id], onDelete: Restrict)
+  businessPage BusinessPage? @relation(fields: [businessPageId], references: [id], onDelete: SetNull)
+  boostPost    Post?         @relation(fields: [boostPostId], references: [id], onDelete: SetNull)
+  boostReel    Reel?         @relation(fields: [boostReelId], references: [id], onDelete: SetNull)
+  reviewedBy   AdminUser?    @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
+  dailyStats   AdDailyStat[]
+
+  @@index([status, startsAt])
+  @@index([advertiserId, createdAt])
+  @@index([billingStatus])
+  @@map("ad_campaigns")
+}
+
+/// One day of delivery numbers for a campaign.
+model AdDailyStat {
+  campaignId  String   @map("campaign_id") @db.Uuid
+  day         DateTime @db.Date
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  spend       Decimal  @default(0) @db.Decimal(18, 2)
+
+  campaign AdCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@id([campaignId, day])
+  @@map("ad_daily_stats")
+}

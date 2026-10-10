@@ -1,0 +1,459 @@
+// ---------------------------------------------------------------------------
+// Identity: accounts, profiles, sessions, one-time codes, security events,
+// the social graph and per-user blocks.
+// ---------------------------------------------------------------------------
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  RESTRICTED
+  PENDING_DELETION
+  DELETED
+
+  @@map("user_status")
+}
+
+enum AccountType {
+  PERSONAL
+  CREATOR
+  BUSINESS
+  PUBLISHER
+
+  @@map("account_type")
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+
+  @@map("risk_level")
+}
+
+enum TwoFactorMethod {
+  TOTP
+  SMS
+  EMAIL
+
+  @@map("two_factor_method")
+}
+
+enum VerificationBadge {
+  NONE
+  IDENTITY
+  OFFICIAL_BUSINESS
+  VERIFIED_PUBLISHER
+
+  @@map("verification_badge")
+}
+
+enum DevicePlatform {
+  ANDROID
+  IOS
+  WEB
+  UNKNOWN
+
+  @@map("device_platform")
+}
+
+enum SessionRevokeReason {
+  LOGOUT
+  USER_REVOKED
+  LOGOUT_OTHERS
+  PASSWORD_CHANGED
+  PASSWORD_RESET
+  SECURITY
+  REUSE_DETECTED
+  ADMIN
+  ACCOUNT_DELETED
+
+  @@map("session_revoke_reason")
+}
+
+enum OtpPurpose {
+  EMAIL_VERIFY
+  PHONE_VERIFY
+  PASSWORD_RESET
+  LOGIN_2FA
+  TWO_FACTOR_SETUP
+  CONTACT_CHANGE
+  ACCOUNT_RECOVERY
+  ACCOUNT_DELETION
+  STEP_UP
+
+  @@map("otp_purpose")
+}
+
+enum OtpChannel {
+  EMAIL
+  SMS
+
+  @@map("otp_channel")
+}
+
+enum StepUpPurpose {
+  ADD_BANK_ACCOUNT
+  CHANGE_BANK_ACCOUNT
+  REMOVE_BANK_ACCOUNT
+  REQUEST_PAYOUT
+  UPDATE_TAX_INFO
+
+  @@map("step_up_purpose")
+}
+
+enum SecurityEventType {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGIN_BLOCKED
+  SUSPICIOUS_LOGIN
+  NEW_DEVICE_LOGIN
+  ACCOUNT_LOCKED
+  PASSWORD_CHANGED
+  PASSWORD_RESET
+  EMAIL_CHANGED
+  PHONE_CHANGED
+  TWO_FACTOR_ENABLED
+  TWO_FACTOR_DISABLED
+  SESSION_REVOKED
+  ALL_SESSIONS_REVOKED
+  REFRESH_TOKEN_REUSE
+  ACCOUNT_RECOVERED
+  ACCOUNT_DELETION_REQUESTED
+  ACCOUNT_DELETION_CANCELLED
+  PAYOUT_ACCOUNT_CHANGED
+  IDENTITY_DETAILS_CHANGED
+  ADMIN_ACTION
+
+  @@map("security_event_type")
+}
+
+enum SecuritySeverity {
+  INFO
+  WARNING
+  CRITICAL
+
+  @@map("security_severity")
+}
+
+enum FollowStatus {
+  ACCEPTED
+  PENDING
+
+  @@map("follow_status")
+}
+
+enum BlockKind {
+  BLOCK
+  MUTE
+  RESTRICT
+
+  @@map("block_kind")
+}
+
+/// An account in the BLOCKS app. Admins are a separate realm (AdminUser).
+model User {
+  id                    String           @id @default(uuid(7)) @db.Uuid
+  /// Lower-case, 3-30 chars of a-z 0-9 . _ (enforced by a CHECK).
+  username              String           @unique @db.VarChar(30)
+  /// Lower-case. Null for phone-only accounts.
+  email                 String?          @unique @db.VarChar(254)
+  emailVerifiedAt       DateTime?        @map("email_verified_at") @db.Timestamptz(3)
+  /// E.164, e.g. +919876543210.
+  phone                 String?          @unique @db.VarChar(16)
+  phoneVerifiedAt       DateTime?        @map("phone_verified_at") @db.Timestamptz(3)
+  /// argon2id hash. Never plaintext.
+  passwordHash          String           @map("password_hash") @db.VarChar(255)
+  passwordChangedAt     DateTime?        @map("password_changed_at") @db.Timestamptz(3)
+  status                UserStatus       @default(ACTIVE)
+  statusReason          String?          @map("status_reason") @db.VarChar(300)
+  statusChangedAt       DateTime?        @map("status_changed_at") @db.Timestamptz(3)
+  accountType           AccountType      @default(PERSONAL) @map("account_type")
+  riskLevel             RiskLevel        @default(LOW) @map("risk_level")
+  failedLoginCount      Int              @default(0) @map("failed_login_count")
+  lastFailedLoginAt     DateTime?        @map("last_failed_login_at") @db.Timestamptz(3)
+  /// Temporary protection after too many failed sign-ins or a risky one.
+  lockedUntil           DateTime?        @map("locked_until") @db.Timestamptz(3)
+  twoFactorEnabled      Boolean          @default(false) @map("two_factor_enabled")
+  twoFactorMethod       TwoFactorMethod? @map("two_factor_method")
+  /// ENCRYPTED: TOTP shared secret.
+  twoFactorSecretEnc    String?          @map("two_factor_secret_enc")
+  /// SHA-256 hex of each unused backup code.
+  twoFactorBackupHashes String[]         @map("two_factor_backup_hashes")
+  /// The last TOTP time step accepted, so a code cannot be replayed.
+  twoFactorLastStep     Int?             @map("two_factor_last_step")
+  lastActiveAt          DateTime?        @map("last_active_at") @db.Timestamptz(3)
+  deletionRequestedAt   DateTime?        @map("deletion_requested_at") @db.Timestamptz(3)
+  /// When the account is erased unless the user cancels first.
+  deletionScheduledFor  DateTime?        @map("deletion_scheduled_for") @db.Timestamptz(3)
+  deletedAt             DateTime?        @map("deleted_at") @db.Timestamptz(3)
+  createdAt             DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  profile              Profile?
+  settings             UserSettings?
+  sessions             UserSession[]
+  pushDevices          PushDevice[]
+  otpChallenges        OtpChallenge[]
+  stepUpTokens         StepUpToken[]
+  securityEvents       SecurityEvent[]
+  blocksMade           UserBlock[]           @relation("Blocker")
+  blocksReceived       UserBlock[]           @relation("Blocked")
+  following            Follow[]              @relation("Follower")
+  followers            Follow[]              @relation("Followee")
+  posts                Post[]
+  reels                Reel[]
+  stories              Story[]
+  storyViews           StoryView[]
+  comments             Comment[]
+  likes                Like[]
+  shares               Share[]
+  saves                Save[]
+  mediaAssets          MediaAsset[]
+  uploadSessions       UploadSession[]
+  originalAudios       OriginalAudio[]
+  notifications        Notification[]
+  conversations        ConversationMember[]
+  messagesSent         Message[]
+  reportsFiled         Report[]              @relation("Reporter")
+  reportsAgainst       Report[]              @relation("ReportedUser")
+  actionsAgainst       ModerationAction[]    @relation("ActionSubject")
+  appeals              Appeal[]
+  liveSessions         LiveSession[]
+  safetyIncidents      SafetyIncident[]
+  notes                UserNote[]
+  reachEvents          ReachEvent[]
+  creatorProfile       CreatorProfile?
+  earnings             CreatorEarning[]
+  ledgerAccounts       LedgerAccount[]
+  payoutAccounts       PayoutAccount[]
+  payoutRequests       PayoutRequest[]
+  kycProfiles          KycProfile[]
+  taxProfile           TaxProfile?
+  businessPages        BusinessPage[]
+  businessFollows      BusinessFollow[]
+  verificationRequests VerificationRequest[]
+  adCampaigns          AdCampaign[]
+
+  @@index([status])
+  @@index([accountType, status])
+  @@index([createdAt])
+  @@index([lastActiveAt])
+  @@index([riskLevel])
+  @@index([username(ops: raw("gin_trgm_ops"))], type: Gin, map: "users_username_trgm")
+  @@map("users")
+}
+
+/// Public profile plus the location used to place the user on the Reach Ladder.
+model Profile {
+  userId         String            @id @map("user_id") @db.Uuid
+  displayName    String            @map("display_name") @db.VarChar(80)
+  bio            String?           @db.VarChar(300)
+  websiteUrl     String?           @map("website_url") @db.VarChar(200)
+  avatarMediaId  String?           @unique @map("avatar_media_id") @db.Uuid
+  country        String            @default("IN") @db.VarChar(2)
+  state          String?           @db.VarChar(80)
+  district       String?           @db.VarChar(80)
+  city           String?           @db.VarChar(80)
+  /// Private: never returned to other users.
+  dateOfBirth    DateTime?         @map("date_of_birth") @db.Date
+  gender         String?           @db.VarChar(20)
+  isPrivate      Boolean           @default(false) @map("is_private")
+  badge          VerificationBadge @default(NONE)
+  followersCount Int               @default(0) @map("followers_count")
+  followingCount Int               @default(0) @map("following_count")
+  postsCount     Int               @default(0) @map("posts_count")
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  avatar MediaAsset? @relation("ProfileAvatar", fields: [avatarMediaId], references: [id], onDelete: SetNull)
+
+  @@index([country, state, district])
+  @@index([displayName(ops: raw("gin_trgm_ops"))], type: Gin, map: "profiles_display_name_trgm")
+  @@map("profiles")
+}
+
+/// A user's preferences and notification choices. Defaults are the safe ones.
+model UserSettings {
+  userId               String   @id @map("user_id") @db.Uuid
+  language             String   @default("en") @db.VarChar(8)
+  whoCanComment        String   @default("everyone") @map("who_can_comment") @db.VarChar(20)
+  whoCanMessage        String   @default("followers") @map("who_can_message") @db.VarChar(20)
+  showSensitiveContent Boolean  @default(false) @map("show_sensitive_content")
+  pushEnabled          Boolean  @default(true) @map("push_enabled")
+  emailNotifications   Boolean  @default(true) @map("email_notifications")
+  securityAlertEmail   Boolean  @default(true) @map("security_alert_email")
+  securityAlertPush    Boolean  @default(true) @map("security_alert_push")
+  loginAlerts          Boolean  @default(true) @map("login_alerts")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+/// One signed-in device. The refresh token is opaque and stored only as a hash;
+/// it rotates on every use, and a reused (stolen) token revokes the session.
+model UserSession {
+  id                String               @id @default(uuid(7)) @db.Uuid
+  userId            String               @map("user_id") @db.Uuid
+  /// SHA-256 hex of the current refresh token.
+  refreshTokenHash  String               @unique @map("refresh_token_hash") @db.VarChar(64)
+  /// Hash of the token this one replaced: presenting it again means theft.
+  previousTokenHash String?              @unique @map("previous_token_hash") @db.VarChar(64)
+  rotatedAt         DateTime?            @map("rotated_at") @db.Timestamptz(3)
+  /// Stable id the client generates for this install.
+  deviceId          String?              @map("device_id") @db.VarChar(100)
+  deviceName        String?              @map("device_name") @db.VarChar(120)
+  platform          DevicePlatform       @default(UNKNOWN)
+  appVersion        String?              @map("app_version") @db.VarChar(32)
+  ip                String?              @db.VarChar(45)
+  userAgent         String?              @map("user_agent") @db.VarChar(400)
+  /// Coarse ("Patna, BR"), never precise.
+  locationLabel     String?              @map("location_label") @db.VarChar(120)
+  trusted           Boolean              @default(false)
+  /// 2FA already satisfied for this session.
+  mfaVerifiedAt     DateTime?            @map("mfa_verified_at") @db.Timestamptz(3)
+  createdAt         DateTime             @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUsedAt        DateTime             @default(now()) @map("last_used_at") @db.Timestamptz(3)
+  /// Hard limit: the user must sign in again after this.
+  expiresAt         DateTime             @map("expires_at") @db.Timestamptz(3)
+  revokedAt         DateTime?            @map("revoked_at") @db.Timestamptz(3)
+  revokedReason     SessionRevokeReason? @map("revoked_reason")
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pushDevices PushDevice[]
+
+  @@index([userId, revokedAt])
+  @@index([userId, lastUsedAt])
+  @@index([expiresAt])
+  @@map("user_sessions")
+}
+
+/// A push-notification token for one installed app.
+model PushDevice {
+  id         String         @id @default(uuid(7)) @db.Uuid
+  userId     String         @map("user_id") @db.Uuid
+  sessionId  String?        @map("session_id") @db.Uuid
+  platform   DevicePlatform
+  /// Opaque provider token (FCM / APNs). Unique: a token belongs to one user.
+  token      String         @unique @db.VarChar(512)
+  createdAt  DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastSeenAt DateTime       @default(now()) @map("last_seen_at") @db.Timestamptz(3)
+  disabledAt DateTime?      @map("disabled_at") @db.Timestamptz(3)
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session UserSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, disabledAt])
+  @@map("push_devices")
+}
+
+/// A one-time code sent to an e-mail address or phone number. The code is
+/// stored as a hash with a short life and a small attempt budget.
+model OtpChallenge {
+  id                String     @id @default(uuid(7)) @db.Uuid
+  /// Null before sign-in (registration, recovery by contact).
+  userId            String?    @map("user_id") @db.Uuid
+  purpose           OtpPurpose
+  channel           OtpChannel
+  /// Masked for display ("r***@example.com"). Never the full address.
+  destinationMasked String     @map("destination_masked") @db.VarChar(100)
+  /// HMAC of the destination, so the challenge can be matched without storing it.
+  destinationHash   String     @map("destination_hash") @db.VarChar(64)
+  /// For a contact change: the new address or number being confirmed. Cleared once used.
+  pendingValue      String?    @map("pending_value") @db.VarChar(254)
+  /// HMAC of the code.
+  codeHash          String     @map("code_hash") @db.VarChar(64)
+  attempts          Int        @default(0)
+  maxAttempts       Int        @default(5) @map("max_attempts")
+  resendCount       Int        @default(0) @map("resend_count")
+  ip                String?    @db.VarChar(45)
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt         DateTime   @map("expires_at") @db.Timestamptz(3)
+  /// Set when the right code is entered. The challenge cannot be reused.
+  verifiedAt        DateTime?  @map("verified_at") @db.Timestamptz(3)
+  consumedAt        DateTime?  @map("consumed_at") @db.Timestamptz(3)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose, createdAt])
+  @@index([destinationHash, purpose, createdAt])
+  @@index([expiresAt])
+  @@map("otp_challenges")
+}
+
+/// A single-use token proving the user just re-authenticated for a sensitive
+/// action (bank change, large payout). Bound to one purpose.
+model StepUpToken {
+  id         String        @id @default(uuid(7)) @db.Uuid
+  userId     String        @map("user_id") @db.Uuid
+  purpose    StepUpPurpose
+  tokenHash  String        @unique @map("token_hash") @db.VarChar(64)
+  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt  DateTime      @map("expires_at") @db.Timestamptz(3)
+  consumedAt DateTime?     @map("consumed_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@map("step_up_tokens")
+}
+
+/// Things that happened to an account and that its owner should be able to see.
+/// `details` holds non-sensitive context only: never codes, tokens or passwords.
+model SecurityEvent {
+  id             String            @id @default(uuid(7)) @db.Uuid
+  userId         String            @map("user_id") @db.Uuid
+  type           SecurityEventType
+  severity       SecuritySeverity  @default(INFO)
+  sessionId      String?           @map("session_id") @db.Uuid
+  ip             String?           @db.VarChar(45)
+  deviceLabel    String?           @map("device_label") @db.VarChar(120)
+  locationLabel  String?           @map("location_label") @db.VarChar(120)
+  /// 0-100 sign-in risk at the time.
+  riskScore      Int               @default(0) @map("risk_score")
+  details        Json?
+  acknowledgedAt DateTime?         @map("acknowledged_at") @db.Timestamptz(3)
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, severity, acknowledgedAt])
+  @@index([type, createdAt])
+  @@map("security_events")
+}
+
+/// A directed block, mute or restrict from one user to another.
+model UserBlock {
+  blockerId String    @map("blocker_id") @db.Uuid
+  blockedId String    @map("blocked_id") @db.Uuid
+  kind      BlockKind
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  blocker User @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@id([blockerId, blockedId, kind])
+  @@index([blockedId])
+  @@map("user_blocks")
+}
+
+/// follower -> followee. `PENDING` for private accounts until approved.
+model Follow {
+  followerId  String       @map("follower_id") @db.Uuid
+  followeeId  String       @map("followee_id") @db.Uuid
+  status      FollowStatus @default(ACCEPTED)
+  closeFriend Boolean      @default(false) @map("close_friend")
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  follower User @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followee User @relation("Followee", fields: [followeeId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followeeId])
+  @@index([followeeId, status, createdAt])
+  @@index([followerId, status, createdAt])
+  @@map("follows")
+}

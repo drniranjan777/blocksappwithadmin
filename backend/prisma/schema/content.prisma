@@ -1,0 +1,411 @@
+// ---------------------------------------------------------------------------
+// Content: posts, reels, stories and the engagement on them.
+//
+// Engagement tables (likes, shares, saves, comments, reach events) point at
+// exactly one target through nullable foreign keys; a CHECK in the constraints
+// migration enforces "exactly one", so every row keeps real referential
+// integrity (no polymorphic uuid with no foreign key).
+// ---------------------------------------------------------------------------
+
+enum ContentVisibility {
+  PUBLIC
+  FOLLOWERS
+  CLOSE_FRIENDS
+  PRIVATE
+
+  @@map("content_visibility")
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  RESTRICTED
+  REMOVED
+
+  @@map("moderation_status")
+}
+
+enum ReachLevel {
+  DISTRICT
+  STATE
+  NATIONAL
+  GLOBAL
+
+  @@map("reach_level")
+}
+
+enum PostType {
+  TEXT
+  PHOTO
+
+  @@map("post_type")
+}
+
+enum ContentLabel {
+  ORIGINAL
+  COMMUNITY_REPORT
+  UNVERIFIED
+  SOURCE_LINKED
+  VERIFIED_PUBLISHER
+  CORRECTED
+  AI_GENERATED
+
+  @@map("content_label")
+}
+
+enum PublishStatus {
+  PROCESSING
+  MODERATION
+  PUBLISHED
+  FAILED
+  REMOVED
+
+  @@map("publish_status")
+}
+
+enum CommentStatus {
+  VISIBLE
+  HIDDEN
+  REMOVED
+
+  @@map("comment_status")
+}
+
+enum ShareChannel {
+  LINK
+  MESSAGE
+  EXTERNAL
+  REPOST
+
+  @@map("share_channel")
+}
+
+enum TrendScope {
+  DISTRICT
+  STATE
+  NATIONAL
+  GLOBAL
+
+  @@map("trend_scope")
+}
+
+/// A text or photo post.
+model Post {
+  id               String            @id @default(uuid(7)) @db.Uuid
+  authorId         String            @map("author_id") @db.Uuid
+  /// Set when posted on behalf of a business page.
+  businessPageId   String?           @map("business_page_id") @db.Uuid
+  type             PostType          @default(TEXT)
+  caption          String            @db.VarChar(2200)
+  visibility       ContentVisibility @default(PUBLIC)
+  /// Lower-case tags without the '#'. GIN-indexed.
+  hashtags         String[]
+  mentionedUserIds String[]          @map("mentioned_user_ids") @db.Uuid
+  country          String            @default("IN") @db.VarChar(2)
+  state            String?           @db.VarChar(80)
+  district         String?           @db.VarChar(80)
+  city             String?           @db.VarChar(80)
+  label            ContentLabel      @default(ORIGINAL)
+  moderationStatus ModerationStatus  @default(PENDING) @map("moderation_status")
+  /// Computed by the Reach Engine. Never accepted from a client.
+  reachLevel       ReachLevel        @default(DISTRICT) @map("reach_level")
+  qualifiedReach   Int               @default(0) @map("qualified_reach")
+  likesCount       Int               @default(0) @map("likes_count")
+  commentsCount    Int               @default(0) @map("comments_count")
+  sharesCount      Int               @default(0) @map("shares_count")
+  savesCount       Int               @default(0) @map("saves_count")
+  viewsCount       Int               @default(0) @map("views_count")
+  allowComments    Boolean           @default(true) @map("allow_comments")
+  allowSharing     Boolean           @default(true) @map("allow_sharing")
+  publishedAt      DateTime          @default(now()) @map("published_at") @db.Timestamptz(3)
+  editedAt         DateTime?         @map("edited_at") @db.Timestamptz(3)
+  deletedAt        DateTime?         @map("deleted_at") @db.Timestamptz(3)
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  author         User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  businessPage   BusinessPage? @relation(fields: [businessPageId], references: [id], onDelete: SetNull)
+  media          PostMedia[]
+  comments       Comment[]
+  likes          Like[]
+  shares         Share[]
+  saves          Save[]
+  reachEvents    ReachEvent[]
+  reachScores    ReachScore[]
+  boostCampaigns AdCampaign[]
+
+  @@index([authorId, publishedAt(sort: Desc)])
+  @@index([visibility, moderationStatus, publishedAt(sort: Desc)])
+  @@index([state, publishedAt(sort: Desc)])
+  @@index([district, publishedAt(sort: Desc)])
+  @@index([reachLevel, publishedAt(sort: Desc)])
+  @@index([hashtags], type: Gin)
+  @@map("posts")
+}
+
+/// The images attached to a post, in order.
+model PostMedia {
+  postId       String @map("post_id") @db.Uuid
+  mediaAssetId String @map("media_asset_id") @db.Uuid
+  position     Int    @default(0)
+
+  post       Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  mediaAsset MediaAsset @relation(fields: [mediaAssetId], references: [id], onDelete: Restrict)
+
+  @@id([postId, mediaAssetId])
+  @@index([mediaAssetId])
+  @@map("post_media")
+}
+
+/// A short video, created in the reel editor and processed by the media pipeline.
+model Reel {
+  id               String            @id @default(uuid(7)) @db.Uuid
+  authorId         String            @map("author_id") @db.Uuid
+  /// The processed (transcoded) video. Null until processing finishes.
+  mediaAssetId     String?           @unique @map("media_asset_id") @db.Uuid
+  coverMediaId     String?           @map("cover_media_id") @db.Uuid
+  caption          String            @db.VarChar(2200)
+  visibility       ContentVisibility @default(PUBLIC)
+  hashtags         String[]
+  mentionedUserIds String[]          @map("mentioned_user_ids") @db.Uuid
+  country          String            @default("IN") @db.VarChar(2)
+  state            String?           @db.VarChar(80)
+  district         String?           @db.VarChar(80)
+  city             String?           @db.VarChar(80)
+  durationMs       Int               @map("duration_ms")
+  clipCount        Int               @default(1) @map("clip_count")
+  musicTrackId     String?           @map("music_track_id") @db.Uuid
+  musicStartMs     Int?              @map("music_start_ms")
+  musicEndMs       Int?              @map("music_end_ms")
+  /// Another creator's original audio this reel reuses.
+  reusedAudioId    String?           @map("reused_audio_id") @db.Uuid
+  /// Overlays, filters, adjustments, transitions: what the editor produced.
+  editMetadata     Json?             @map("edit_metadata")
+  publishStatus    PublishStatus     @default(PROCESSING) @map("publish_status")
+  moderationStatus ModerationStatus  @default(PENDING) @map("moderation_status")
+  failureCode      String?           @map("failure_code") @db.VarChar(60)
+  label            ContentLabel      @default(ORIGINAL)
+  reachLevel       ReachLevel        @default(DISTRICT) @map("reach_level")
+  qualifiedReach   Int               @default(0) @map("qualified_reach")
+  likesCount       Int               @default(0) @map("likes_count")
+  commentsCount    Int               @default(0) @map("comments_count")
+  sharesCount      Int               @default(0) @map("shares_count")
+  savesCount       Int               @default(0) @map("saves_count")
+  viewsCount       Int               @default(0) @map("views_count")
+  allowComments    Boolean           @default(true) @map("allow_comments")
+  allowRemix       Boolean           @default(true) @map("allow_remix")
+  allowSharing     Boolean           @default(true) @map("allow_sharing")
+  publishedAt      DateTime?         @map("published_at") @db.Timestamptz(3)
+  deletedAt        DateTime?         @map("deleted_at") @db.Timestamptz(3)
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  author         User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  video          MediaAsset?    @relation("ReelVideo", fields: [mediaAssetId], references: [id], onDelete: SetNull)
+  cover          MediaAsset?    @relation("ReelCover", fields: [coverMediaId], references: [id], onDelete: SetNull)
+  music          MusicTrack?    @relation(fields: [musicTrackId], references: [id], onDelete: SetNull)
+  reusedAudio    OriginalAudio? @relation("ReusedAudio", fields: [reusedAudioId], references: [id], onDelete: SetNull)
+  originalAudio  OriginalAudio? @relation("SourceReel")
+  clips          ReelClip[]
+  comments       Comment[]
+  likes          Like[]
+  shares         Share[]
+  saves          Save[]
+  reachEvents    ReachEvent[]
+  reachScores    ReachScore[]
+  boostCampaigns AdCampaign[]
+
+  @@index([authorId, createdAt(sort: Desc)])
+  @@index([publishStatus, moderationStatus, visibility, publishedAt(sort: Desc)])
+  @@index([state, publishedAt(sort: Desc)])
+  @@index([district, publishedAt(sort: Desc)])
+  @@index([reachLevel, publishedAt(sort: Desc)])
+  @@index([musicTrackId])
+  @@index([hashtags], type: Gin)
+  @@map("reels")
+}
+
+/// One segment of a reel's timeline: a video clip or a still photo.
+model ReelClip {
+  id              String  @id @default(uuid(7)) @db.Uuid
+  reelId          String  @map("reel_id") @db.Uuid
+  mediaAssetId    String  @map("media_asset_id") @db.Uuid
+  position        Int
+  isPhoto         Boolean @default(false) @map("is_photo")
+  /// Trim window inside the source, in milliseconds.
+  startMs         Int     @default(0) @map("start_ms")
+  endMs           Int     @map("end_ms")
+  volume          Decimal @default(1) @db.Decimal(3, 2)
+  filterId        String? @map("filter_id") @db.VarChar(40)
+  filterIntensity Decimal @default(1) @map("filter_intensity") @db.Decimal(3, 2)
+  transitionId    String? @map("transition_id") @db.VarChar(40)
+  adjustments     Json?
+
+  reel       Reel       @relation(fields: [reelId], references: [id], onDelete: Cascade)
+  mediaAsset MediaAsset @relation(fields: [mediaAssetId], references: [id], onDelete: Restrict)
+
+  @@unique([reelId, position])
+  @@index([mediaAssetId])
+  @@map("reel_clips")
+}
+
+/// Audio a creator recorded in a reel. Others can reuse it only if `reusable`.
+model OriginalAudio {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  ownerId      String   @map("owner_id") @db.Uuid
+  sourceReelId String   @unique @map("source_reel_id") @db.Uuid
+  title        String   @db.VarChar(120)
+  durationMs   Int      @map("duration_ms")
+  reusable     Boolean  @default(false)
+  usesCount    Int      @default(0) @map("uses_count")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  owner      User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  sourceReel Reel   @relation("SourceReel", fields: [sourceReelId], references: [id], onDelete: Cascade)
+  reusedBy   Reel[] @relation("ReusedAudio")
+
+  @@index([ownerId])
+  @@map("original_audios")
+}
+
+/// A photo or video that disappears after its expiry time.
+model Story {
+  id               String            @id @default(uuid(7)) @db.Uuid
+  authorId         String            @map("author_id") @db.Uuid
+  mediaAssetId     String            @map("media_asset_id") @db.Uuid
+  caption          String?           @db.VarChar(200)
+  visibility       ContentVisibility @default(FOLLOWERS)
+  moderationStatus ModerationStatus  @default(PENDING) @map("moderation_status")
+  viewsCount       Int               @default(0) @map("views_count")
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// 24 hours after creation unless the policy says otherwise.
+  expiresAt        DateTime          @map("expires_at") @db.Timestamptz(3)
+  deletedAt        DateTime?         @map("deleted_at") @db.Timestamptz(3)
+
+  author     User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  mediaAsset MediaAsset  @relation(fields: [mediaAssetId], references: [id], onDelete: Restrict)
+  views      StoryView[]
+
+  @@index([authorId, expiresAt])
+  @@index([expiresAt])
+  @@map("stories")
+}
+
+/// Who has seen a story.
+model StoryView {
+  storyId  String   @map("story_id") @db.Uuid
+  viewerId String   @map("viewer_id") @db.Uuid
+  viewedAt DateTime @default(now()) @map("viewed_at") @db.Timestamptz(3)
+
+  story  Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  viewer User  @relation(fields: [viewerId], references: [id], onDelete: Cascade)
+
+  @@id([storyId, viewerId])
+  @@index([viewerId, viewedAt])
+  @@map("story_views")
+}
+
+/// A comment on a post or reel, or a reply to one.
+model Comment {
+  id           String        @id @default(uuid(7)) @db.Uuid
+  postId       String?       @map("post_id") @db.Uuid
+  reelId       String?       @map("reel_id") @db.Uuid
+  authorId     String        @map("author_id") @db.Uuid
+  /// Set for a reply. Replies are one level deep.
+  parentId     String?       @map("parent_id") @db.Uuid
+  body         String        @db.VarChar(1000)
+  status       CommentStatus @default(VISIBLE)
+  likesCount   Int           @default(0) @map("likes_count")
+  repliesCount Int           @default(0) @map("replies_count")
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt    DateTime?     @map("deleted_at") @db.Timestamptz(3)
+
+  post    Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reel    Reel?     @relation(fields: [reelId], references: [id], onDelete: Cascade)
+  author  User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("Replies")
+  likes   Like[]
+
+  @@index([postId, createdAt])
+  @@index([reelId, createdAt])
+  @@index([parentId, createdAt])
+  @@index([authorId, createdAt])
+  @@map("comments")
+}
+
+/// A like on a post, reel or comment.
+model Like {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  postId    String?  @map("post_id") @db.Uuid
+  reelId    String?  @map("reel_id") @db.Uuid
+  commentId String?  @map("comment_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reel    Reel?    @relation(fields: [reelId], references: [id], onDelete: Cascade)
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@unique([userId, reelId])
+  @@unique([userId, commentId])
+  @@index([postId])
+  @@index([reelId])
+  @@index([commentId])
+  @@map("likes")
+}
+
+/// A share of a post or reel.
+model Share {
+  id        String       @id @default(uuid(7)) @db.Uuid
+  userId    String       @map("user_id") @db.Uuid
+  postId    String?      @map("post_id") @db.Uuid
+  reelId    String?      @map("reel_id") @db.Uuid
+  channel   ShareChannel @default(LINK)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reel Reel? @relation(fields: [reelId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+  @@index([reelId, createdAt])
+  @@index([userId, createdAt])
+  @@map("shares")
+}
+
+/// A post or reel a user bookmarked.
+model Save {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  postId    String?  @map("post_id") @db.Uuid
+  reelId    String?  @map("reel_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reel Reel? @relation(fields: [reelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@unique([userId, reelId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("saves")
+}
+
+/// Hashtag ranking per place, recomputed by a background job.
+model TrendingTopic {
+  id         String     @id @default(uuid(7)) @db.Uuid
+  scope      TrendScope
+  /// The district or state name, or '' for national / global.
+  scopeKey   String     @default("") @map("scope_key") @db.VarChar(80)
+  tag        String     @db.VarChar(60)
+  score      Float
+  postsCount Int        @default(0) @map("posts_count")
+  computedAt DateTime   @default(now()) @map("computed_at") @db.Timestamptz(3)
+
+  @@unique([scope, scopeKey, tag])
+  @@index([scope, scopeKey, score(sort: Desc)])
+  @@map("trending_topics")
+}

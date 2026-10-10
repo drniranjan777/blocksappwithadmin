@@ -1,0 +1,331 @@
+// ---------------------------------------------------------------------------
+// Trust and safety: reports, moderation actions, appeals, live-session safety
+// and internal notes about users.
+// ---------------------------------------------------------------------------
+
+enum ReportTargetType {
+  POST
+  REEL
+  STORY
+  COMMENT
+  USER
+  LIVE
+  MESSAGE
+
+  @@map("report_target_type")
+}
+
+enum ReportCategory {
+  MISINFORMATION
+  VIOLENCE
+  FRAUD
+  HARASSMENT
+  SPAM
+  COPYRIGHT
+  NUDITY
+  SELF_HARM
+  CHILD_SAFETY
+  FAKE_ENGAGEMENT
+  DEEPFAKE
+  OTHER
+
+  @@map("report_category")
+}
+
+enum ReportSource {
+  USER
+  AUTOMATED
+  ADMIN
+
+  @@map("report_source")
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+
+  @@map("severity")
+}
+
+enum ReportStatus {
+  OPEN
+  IN_REVIEW
+  ESCALATED
+  RESOLVED
+  DISMISSED
+
+  @@map("report_status")
+}
+
+enum ModerationActionType {
+  APPROVE
+  RESTRICT
+  REMOVE
+  RESTORE
+  LABEL
+  WARN
+  SUSPEND_USER
+  RESTRICT_USER
+  REACTIVATE_USER
+  ESCALATE
+  DISMISS_REPORT
+
+  @@map("moderation_action_type")
+}
+
+enum AppealKind {
+  MODERATION
+  EARNINGS
+  ACCOUNT
+
+  @@map("appeal_kind")
+}
+
+enum AppealStatus {
+  OPEN
+  IN_REVIEW
+  UPHELD
+  OVERTURNED
+  REJECTED
+
+  @@map("appeal_status")
+}
+
+enum LiveStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  TERMINATED
+
+  @@map("live_status")
+}
+
+enum IncidentType {
+  SELF_HARM
+  VIOLENCE
+  SCAM
+  CHILD_SAFETY
+  HARASSMENT
+  OTHER
+
+  @@map("incident_type")
+}
+
+enum IncidentStatus {
+  OPEN
+  ESCALATED
+  RESOLVED
+
+  @@map("incident_status")
+}
+
+/// A complaint, or an automated flag, about one thing. User reports and
+/// automated flags share this table, so there is a single moderation queue.
+model Report {
+  id           String           @id @default(uuid(7)) @db.Uuid
+  /// Null for automated flags.
+  reporterId   String?          @map("reporter_id") @db.Uuid
+  source       ReportSource     @default(USER)
+  targetType   ReportTargetType @map("target_type")
+  targetId     String           @map("target_id") @db.Uuid
+  /// The account responsible for the content, for per-user history.
+  targetUserId String?          @map("target_user_id") @db.Uuid
+  category     ReportCategory
+  description  String?          @db.VarChar(1000)
+  /// References only (object keys, ids); never inline media.
+  evidence     Json?
+  severity     Severity         @default(MEDIUM)
+  priority     Int              @default(0)
+  status       ReportStatus     @default(OPEN)
+  assignedToId String?          @map("assigned_to_id") @db.Uuid
+  /// When the report breaches its response target.
+  slaDueAt     DateTime?        @map("sla_due_at") @db.Timestamptz(3)
+  resolvedAt   DateTime?        @map("resolved_at") @db.Timestamptz(3)
+  resolution   String?          @db.VarChar(500)
+  createdAt    DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  reporter   User?              @relation("Reporter", fields: [reporterId], references: [id], onDelete: SetNull)
+  targetUser User?              @relation("ReportedUser", fields: [targetUserId], references: [id], onDelete: SetNull)
+  assignedTo AdminUser?         @relation("ReportAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  actions    ModerationAction[]
+  incidents  SafetyIncident[]
+
+  @@index([status, severity, slaDueAt])
+  @@index([targetType, targetId])
+  @@index([targetUserId, createdAt])
+  @@index([assignedToId, status])
+  @@index([reporterId, createdAt])
+  @@map("reports")
+}
+
+/// A decision taken on a report or directly on content / an account.
+/// Append-only in practice: a mistake is reversed by a new action.
+model ModerationAction {
+  id           String               @id @default(uuid(7)) @db.Uuid
+  reportId     String?              @map("report_id") @db.Uuid
+  /// Null for automated actions.
+  adminId      String?              @map("admin_id") @db.Uuid
+  source       ReportSource         @default(ADMIN)
+  targetType   ReportTargetType     @map("target_type")
+  targetId     String               @map("target_id") @db.Uuid
+  targetUserId String?              @map("target_user_id") @db.Uuid
+  action       ModerationActionType
+  /// Which published rule this enforces.
+  policyReason String               @map("policy_reason") @db.VarChar(200)
+  notes        String?              @db.VarChar(1000)
+  reversalOfId String?              @unique @map("reversal_of_id") @db.Uuid
+  createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  report     Report?           @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  admin      AdminUser?        @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  targetUser User?             @relation("ActionSubject", fields: [targetUserId], references: [id], onDelete: SetNull)
+  reversalOf ModerationAction? @relation("Reversal", fields: [reversalOfId], references: [id], onDelete: SetNull)
+  reversedBy ModerationAction? @relation("Reversal")
+  appeals    Appeal[]
+
+  @@index([targetType, targetId, createdAt])
+  @@index([targetUserId, createdAt])
+  @@index([adminId, createdAt])
+  @@map("moderation_actions")
+}
+
+/// A creator disputing a moderation decision, an earnings figure or an account
+/// action. Decided by someone other than the person who made the original call.
+model Appeal {
+  id                 String       @id @default(uuid(7)) @db.Uuid
+  userId             String       @map("user_id") @db.Uuid
+  kind               AppealKind
+  moderationActionId String?      @map("moderation_action_id") @db.Uuid
+  /// For earnings / account appeals: what is disputed (e.g. 'creator_earning').
+  subjectType        String?      @map("subject_type") @db.VarChar(40)
+  subjectId          String?      @map("subject_id") @db.Uuid
+  reason             String       @db.VarChar(2000)
+  status             AppealStatus @default(OPEN)
+  assignedToId       String?      @map("assigned_to_id") @db.Uuid
+  decidedById        String?      @map("decided_by_id") @db.Uuid
+  decisionNote       String?      @map("decision_note") @db.VarChar(1000)
+  slaDueAt           DateTime?    @map("sla_due_at") @db.Timestamptz(3)
+  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  decidedAt          DateTime?    @map("decided_at") @db.Timestamptz(3)
+
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moderationAction ModerationAction? @relation(fields: [moderationActionId], references: [id], onDelete: SetNull)
+  assignedTo       AdminUser?        @relation("AppealAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  decidedBy        AdminUser?        @relation("AppealDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+
+  /// One appeal per decision: a second attempt on the same decision is refused, and the database
+  /// enforces it so two requests racing each other cannot both succeed. (A null action, as on an
+  /// earnings appeal, is not constrained.)
+  @@unique([moderationActionId])
+  @@index([status, slaDueAt])
+  @@index([userId, createdAt])
+  @@index([kind, status])
+  @@map("appeals")
+}
+
+/// Live-stream session state. Streaming itself is out of scope until a live
+/// provider is integrated; this table lets staff see sessions, end them and log
+/// what happened.
+model LiveSession {
+  id                String     @id @default(uuid(7)) @db.Uuid
+  hostId            String     @map("host_id") @db.Uuid
+  title             String     @db.VarChar(120)
+  status            LiveStatus @default(SCHEDULED)
+  startedAt         DateTime?  @map("started_at") @db.Timestamptz(3)
+  endedAt           DateTime?  @map("ended_at") @db.Timestamptz(3)
+  peakViewers       Int        @default(0) @map("peak_viewers")
+  /// Automated risk signals raised during the session.
+  riskFlags         Json?      @map("risk_flags")
+  terminatedById    String?    @map("terminated_by_id") @db.Uuid
+  terminationReason String?    @map("termination_reason") @db.VarChar(300)
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  host         User             @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  terminatedBy AdminUser?       @relation(fields: [terminatedById], references: [id], onDelete: SetNull)
+  incidents    SafetyIncident[]
+
+  @@index([status, startedAt])
+  @@index([hostId, createdAt])
+  @@map("live_sessions")
+}
+
+/// A safety event that needs a human: self-harm risk, violence, scams, child
+/// safety. Always logged with who was told and what was done.
+model SafetyIncident {
+  id            String         @id @default(uuid(7)) @db.Uuid
+  type          IncidentType
+  severity      Severity       @default(HIGH)
+  status        IncidentStatus @default(OPEN)
+  userId        String?        @map("user_id") @db.Uuid
+  liveSessionId String?        @map("live_session_id") @db.Uuid
+  /// The report this was raised from, if any.
+  reportId      String?        @map("report_id") @db.Uuid
+  summary       String         @db.VarChar(1000)
+  actionTaken   String?        @map("action_taken") @db.VarChar(500)
+  /// Who outside the platform was contacted, if anyone (e.g. a helpline).
+  escalatedTo   String?        @map("escalated_to") @db.VarChar(160)
+  /// The person looking after it now.
+  ownerId       String?        @map("owner_id") @db.Uuid
+  createdById   String?        @map("created_by_id") @db.Uuid
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  resolvedAt    DateTime?      @map("resolved_at") @db.Timestamptz(3)
+
+  user        User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  liveSession LiveSession?          @relation(fields: [liveSessionId], references: [id], onDelete: SetNull)
+  report      Report?               @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  owner       AdminUser?            @relation("IncidentOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  createdBy   AdminUser?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  events      SafetyIncidentEvent[]
+
+  @@index([status, severity, createdAt])
+  @@index([userId])
+  @@index([reportId])
+  @@map("safety_incidents")
+}
+
+enum IncidentEventKind {
+  OPENED
+  NOTE
+  ASSIGNED
+  ESCALATED
+  RESOLVED
+  REOPENED
+
+  @@map("incident_event_kind")
+}
+
+/// What happened on an incident, in order, and who did it. Append-only: a correction is a new
+/// entry, so the log can be relied on afterwards.
+model SafetyIncidentEvent {
+  id         String            @id @default(uuid(7)) @db.Uuid
+  incidentId String            @map("incident_id") @db.Uuid
+  /// Null when the system wrote it.
+  adminId    String?           @map("admin_id") @db.Uuid
+  kind       IncidentEventKind
+  note       String?           @db.VarChar(1000)
+  createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  incident SafetyIncident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  admin    AdminUser?     @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@index([incidentId, createdAt])
+  @@map("safety_incident_events")
+}
+
+/// A private note staff keep about a user. Reading it needs its own permission.
+model UserNote {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  authorId  String   @map("author_id") @db.Uuid
+  body      String   @db.VarChar(2000)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  author AdminUser @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("user_notes")
+}

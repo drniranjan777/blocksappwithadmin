@@ -1,0 +1,114 @@
+// ---------------------------------------------------------------------------
+// The Reach Ladder: raw signals, versioned scoring configuration and scores.
+//
+// A client never supplies a reach level. Signals are recorded as events,
+// scored by a worker with a stored configuration version, and the resulting
+// level is written back to the content by the server.
+// ---------------------------------------------------------------------------
+
+enum ReachEventType {
+  IMPRESSION
+  QUALIFIED_VIEW
+  WATCH
+  COMPLETE
+  SHARE
+  SAVE
+  COMMENT
+  LIKE
+
+  @@map("reach_event_type")
+}
+
+enum ConfigStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+
+  @@map("config_status")
+}
+
+/// One thing that happened to a post or reel. High volume: partition by month
+/// before launch (see docs/architecture.md).
+model ReachEvent {
+  id             String         @id @default(uuid(7)) @db.Uuid
+  postId         String?        @map("post_id") @db.Uuid
+  reelId         String?        @map("reel_id") @db.Uuid
+  /// Null for signed-out views.
+  viewerId       String?        @map("viewer_id") @db.Uuid
+  /// HMAC of the device id, for velocity checks without keeping the id.
+  deviceHash     String?        @map("device_hash") @db.VarChar(64)
+  type           ReachEventType
+  watchMs        Int?           @map("watch_ms")
+  /// Where the viewer is, coarse: this is how audience spread is measured.
+  viewerCountry  String?        @map("viewer_country") @db.VarChar(2)
+  viewerState    String?        @map("viewer_state") @db.VarChar(80)
+  viewerDistrict String?        @map("viewer_district") @db.VarChar(80)
+  /// Makes the same view count once (e.g. viewer + content + day).
+  dedupeKey      String?        @unique @map("dedupe_key") @db.VarChar(160)
+  /// 0-100 from the fraud checks; flagged events do not count towards reach.
+  fraudScore     Int            @default(0) @map("fraud_score")
+  excluded       Boolean        @default(false)
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  post   Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reel   Reel? @relation(fields: [reelId], references: [id], onDelete: Cascade)
+  viewer User? @relation(fields: [viewerId], references: [id], onDelete: SetNull)
+
+  @@index([reelId, createdAt])
+  @@index([postId, createdAt])
+  @@index([viewerId, createdAt])
+  @@index([deviceHash, createdAt])
+  @@map("reach_events")
+}
+
+/// A complete, validated set of weights, thresholds and multipliers. Versions
+/// are immutable once activated, so any past score can be reproduced.
+model ReachConfigVersion {
+  id            String       @id @default(uuid(7)) @db.Uuid
+  version       Int          @unique
+  status        ConfigStatus @default(DRAFT)
+  /// Validated against a schema before it is stored.
+  config        Json
+  note          String?      @db.VarChar(500)
+  /// Null for the default version the system creates itself.
+  createdById   String?      @map("created_by_id") @db.Uuid
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  activatedById String?      @map("activated_by_id") @db.Uuid
+  activatedAt   DateTime?    @map("activated_at") @db.Timestamptz(3)
+
+  createdBy AdminUser?    @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  scores    ReachScore[]
+  cycles    RewardCycle[]
+
+  @@index([status])
+  @@map("reach_config_versions")
+}
+
+/// The result of scoring one piece of content under one configuration version.
+model ReachScore {
+  id                String      @id @default(uuid(7)) @db.Uuid
+  postId            String?     @map("post_id") @db.Uuid
+  reelId            String?     @map("reel_id") @db.Uuid
+  configVersionId   String      @map("config_version_id") @db.Uuid
+  qualifiedReach    Int         @map("qualified_reach")
+  /// Qualified Reach Score, 0-100.
+  score             Decimal     @db.Decimal(5, 2)
+  /// Per-signal contribution, so the number can be explained and audited.
+  signals           Json
+  distinctDistricts Int         @default(0) @map("distinct_districts")
+  distinctStates    Int         @default(0) @map("distinct_states")
+  distinctCountries Int         @default(0) @map("distinct_countries")
+  excludedEvents    Int         @default(0) @map("excluded_events")
+  level             ReachLevel
+  previousLevel     ReachLevel? @map("previous_level")
+  computedAt        DateTime    @default(now()) @map("computed_at") @db.Timestamptz(3)
+
+  post          Post?              @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reel          Reel?              @relation(fields: [reelId], references: [id], onDelete: Cascade)
+  configVersion ReachConfigVersion @relation(fields: [configVersionId], references: [id], onDelete: Restrict)
+
+  @@index([reelId, computedAt(sort: Desc)])
+  @@index([postId, computedAt(sort: Desc)])
+  @@index([configVersionId])
+  @@map("reach_scores")
+}

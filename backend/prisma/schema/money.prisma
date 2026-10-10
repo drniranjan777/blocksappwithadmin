@@ -1,0 +1,538 @@
+// ---------------------------------------------------------------------------
+// Creator money: estimates, the append-only ledger, payout accounts, payouts,
+// identity verification (KYC) and tax identity.
+//
+// Rules that hold across this file:
+//   * Estimated earnings (creator_earnings.estimated_amount) are NOT money.
+//     Only finalised rewards enter the ledger.
+//   * Every movement of money is a balanced journal of ledger entries written in
+//     one transaction. Journals and entries are never updated or deleted
+//     (triggers enforce it) and each journal has a unique idempotency key.
+//   * Account balances are maintained by a database trigger from the entries,
+//     and a CHECK prevents a creator balance going negative.
+//   * Sensitive identifiers are ENCRYPTED, BLIND-INDEXED for duplicate checks,
+//     and shown only as the last four characters.
+//   * Aadhaar numbers are never stored in any form (no ciphertext, no blind
+//     index): only the last four digits and the provider's reference.
+// ---------------------------------------------------------------------------
+
+enum MonetizationStatus {
+  NOT_ELIGIBLE
+  ELIGIBLE
+  ACTIVE
+  SUSPENDED
+
+  @@map("monetization_status")
+}
+
+enum CycleStatus {
+  OPEN
+  CALCULATING
+  CLOSED
+  FINALIZED
+
+  @@map("cycle_status")
+}
+
+enum EarningStatus {
+  ESTIMATED
+  FINALIZED
+  ADJUSTED
+  VOID
+
+  @@map("earning_status")
+}
+
+enum LedgerAccountType {
+  CREATOR_PAYABLE
+  REWARD_POOL
+  PAYOUT_CLEARING
+  BANK_SETTLEMENT
+  ADJUSTMENTS
+
+  @@map("ledger_account_type")
+}
+
+enum LedgerDirection {
+  DEBIT
+  CREDIT
+
+  @@map("ledger_direction")
+}
+
+enum LedgerJournalType {
+  REWARD_FINALIZED
+  REWARD_REVERSED
+  PAYOUT_REQUESTED
+  PAYOUT_COMPLETED
+  PAYOUT_FAILED
+  PAYOUT_REVERSED
+  ADJUSTMENT
+
+  @@map("ledger_journal_type")
+}
+
+enum ActorType {
+  ADMIN
+  USER
+  SYSTEM
+
+  @@map("actor_type")
+}
+
+enum BankAccountType {
+  SAVINGS
+  CURRENT
+
+  @@map("bank_account_type")
+}
+
+enum PayoutAccountStatus {
+  PENDING_VERIFICATION
+  VERIFIED
+  FAILED
+  DISABLED
+
+  @@map("payout_account_status")
+}
+
+enum NameMatch {
+  MATCH
+  PARTIAL
+  NO_MATCH
+  UNKNOWN
+
+  @@map("name_match")
+}
+
+enum PayoutStatus {
+  REQUESTED
+  PENDING_REVIEW
+  APPROVED
+  PROCESSING
+  COMPLETED
+  FAILED
+  REVERSED
+  ON_HOLD
+  REJECTED
+  CANCELLED
+
+  @@map("payout_status")
+}
+
+enum ApprovalDecision {
+  APPROVE
+  REJECT
+
+  @@map("approval_decision")
+}
+
+enum KycSubject {
+  INDIVIDUAL
+  BUSINESS
+
+  @@map("kyc_subject")
+}
+
+enum KycStatus {
+  NOT_STARTED
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+  ACTION_REQUIRED
+  EXPIRED
+
+  @@map("kyc_status")
+}
+
+enum KycDocType {
+  AADHAAR
+  PAN
+  PASSPORT
+  VOTER_ID
+  DRIVING_LICENCE
+  GST_CERTIFICATE
+  UDYAM
+  BUSINESS_PAN
+  INCORPORATION
+
+  @@map("kyc_doc_type")
+}
+
+enum KycDocRole {
+  PRIMARY
+  SIGNATORY
+
+  @@map("kyc_doc_role")
+}
+
+enum KycDocStatus {
+  RECEIVED
+  ACCEPTED
+  REJECTED
+
+  @@map("kyc_doc_status")
+}
+
+enum KycDecision {
+  APPROVE
+  REJECT
+  REQUEST_INFO
+
+  @@map("kyc_decision")
+}
+
+enum TaxStatus {
+  NOT_PROVIDED
+  PROVIDED
+  VERIFIED
+
+  @@map("tax_status")
+}
+
+/// Per-creator monetisation state. Eligibility is decided by the server.
+model CreatorProfile {
+  userId             String             @id @map("user_id") @db.Uuid
+  monetizationStatus MonetizationStatus @default(NOT_ELIGIBLE) @map("monetization_status")
+  eligibleSince      DateTime?          @map("eligible_since") @db.Timestamptz(3)
+  suspendedAt        DateTime?          @map("suspended_at") @db.Timestamptz(3)
+  suspendedReason    String?            @map("suspended_reason") @db.VarChar(300)
+  suspendedById      String?            @map("suspended_by_id") @db.Uuid
+  /// Payouts are paused until this time (e.g. after a bank-account change).
+  payoutHoldUntil    DateTime?          @map("payout_hold_until") @db.Timestamptz(3)
+  payoutHoldReason   String?            @map("payout_hold_reason") @db.VarChar(200)
+  bestReachLevel     ReachLevel         @default(DISTRICT) @map("best_reach_level")
+  qualifiedReach30d  Int                @default(0) @map("qualified_reach30d")
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  suspendedBy AdminUser? @relation(fields: [suspendedById], references: [id], onDelete: SetNull)
+
+  @@index([monetizationStatus])
+  @@map("creator_profiles")
+}
+
+/// A reward period. The pool is shared among eligible creators by qualified
+/// performance, not by a per-view rate.
+model RewardCycle {
+  id              String      @id @default(uuid(7)) @db.Uuid
+  label           String      @unique @db.VarChar(40)
+  startsAt        DateTime    @map("starts_at") @db.Timestamptz(3)
+  endsAt          DateTime    @map("ends_at") @db.Timestamptz(3)
+  status          CycleStatus @default(OPEN)
+  poolAmount      Decimal     @default(0) @map("pool_amount") @db.Decimal(18, 2)
+  configVersionId String?     @map("config_version_id") @db.Uuid
+  finalizedAt     DateTime?   @map("finalized_at") @db.Timestamptz(3)
+  /// What the finalisation did: creators paid, amount shared, amount left unspent, and why.
+  summary         Json?
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  configVersion ReachConfigVersion? @relation(fields: [configVersionId], references: [id], onDelete: SetNull)
+  earnings      CreatorEarning[]
+
+  @@index([status, startsAt])
+  @@map("reward_cycles")
+}
+
+/// A creator's reward for one cycle. One row per creator per cycle, which is
+/// what stops a reward being paid twice. `estimatedAmount` moves during the
+/// cycle; `finalizedAmount` is set once, when the ledger is credited.
+model CreatorEarning {
+  id              String        @id @default(uuid(7)) @db.Uuid
+  creatorId       String        @map("creator_id") @db.Uuid
+  cycleId         String        @map("cycle_id") @db.Uuid
+  status          EarningStatus @default(ESTIMATED)
+  estimatedAmount Decimal       @default(0) @map("estimated_amount") @db.Decimal(18, 2)
+  finalizedAmount Decimal?      @map("finalized_amount") @db.Decimal(18, 2)
+  qualifiedReach  Int           @default(0) @map("qualified_reach")
+  reachLevel      ReachLevel    @default(DISTRICT) @map("reach_level")
+  /// Which configuration version produced the figures.
+  scoringVersion  Int           @map("scoring_version")
+  /// Per-level and per-signal breakdown, for the creator's earnings screen.
+  breakdown       Json
+  /// The ledger journal that credited the creator, once finalised.
+  journalId       String?       @unique @map("journal_id") @db.Uuid
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  creator User           @relation(fields: [creatorId], references: [id], onDelete: Restrict)
+  cycle   RewardCycle    @relation(fields: [cycleId], references: [id], onDelete: Restrict)
+  journal LedgerJournal? @relation(fields: [journalId], references: [id], onDelete: Restrict)
+
+  @@unique([creatorId, cycleId])
+  @@index([cycleId, status])
+  @@map("creator_earnings")
+}
+
+/// A ledger account. Creators have one CREATOR_PAYABLE account (what the
+/// platform owes them); the platform has a few fixed accounts.
+model LedgerAccount {
+  id          String            @id @default(uuid(7)) @db.Uuid
+  type        LedgerAccountType
+  ownerUserId String?           @map("owner_user_id") @db.Uuid
+  /// The side that increases this account's balance.
+  normalSide  LedgerDirection   @map("normal_side")
+  currency    String            @default("INR") @db.VarChar(3)
+  /// Kept in step with the entries by a database trigger. Never written by the app.
+  balance     Decimal           @default(0) @db.Decimal(18, 2)
+  version     Int               @default(0)
+  createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  owner   User?                  @relation(fields: [ownerUserId], references: [id], onDelete: Restrict)
+  entries FinancialLedgerEntry[]
+
+  @@unique([ownerUserId, type])
+  @@map("ledger_accounts")
+}
+
+/// A set of entries that happen together and balance to zero.
+model LedgerJournal {
+  id             String            @id @default(uuid(7)) @db.Uuid
+  type           LedgerJournalType
+  /// The same key can never post twice: this is the double-spend guard.
+  idempotencyKey String            @unique @map("idempotency_key") @db.VarChar(160)
+  memo           String?           @db.VarChar(300)
+  referenceType  String?           @map("reference_type") @db.VarChar(40)
+  referenceId    String?           @map("reference_id") @db.Uuid
+  /// For a reversal: the journal it reverses.
+  reversalOfId   String?           @unique @map("reversal_of_id") @db.Uuid
+  createdByType  ActorType         @default(SYSTEM) @map("created_by_type")
+  createdById    String?           @map("created_by_id") @db.Uuid
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  entries         FinancialLedgerEntry[]
+  reversalOf      LedgerJournal?         @relation("Reversal", fields: [reversalOfId], references: [id], onDelete: Restrict)
+  reversedBy      LedgerJournal?         @relation("Reversal")
+  earning         CreatorEarning?
+  holdForPayout   PayoutRequest?         @relation("PayoutHold")
+  settleForPayout PayoutRequest?         @relation("PayoutSettle")
+
+  @@index([referenceType, referenceId])
+  @@index([createdAt])
+  @@map("ledger_journals")
+}
+
+/// One line of a journal. Append-only.
+model FinancialLedgerEntry {
+  id           String          @id @default(uuid(7)) @db.Uuid
+  journalId    String          @map("journal_id") @db.Uuid
+  accountId    String          @map("account_id") @db.Uuid
+  direction    LedgerDirection
+  /// Always positive; the direction says which way it moves.
+  amount       Decimal         @db.Decimal(18, 2)
+  /// Filled in by the balance trigger when the entry is inserted.
+  balanceAfter Decimal         @default(0) @map("balance_after") @db.Decimal(18, 2)
+  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  journal LedgerJournal @relation(fields: [journalId], references: [id], onDelete: Restrict)
+  account LedgerAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([journalId])
+  @@index([accountId, createdAt(sort: Desc)])
+  @@map("financial_ledger_entries")
+}
+
+/// A bank account a creator can be paid into.
+model PayoutAccount {
+  id                 String              @id @default(uuid(7)) @db.Uuid
+  userId             String              @map("user_id") @db.Uuid
+  /// ENCRYPTED.
+  holderNameEnc      String              @map("holder_name_enc")
+  /// ENCRYPTED.
+  accountNumberEnc   String              @map("account_number_enc")
+  accountNumberLast4 String              @map("account_number_last4") @db.VarChar(4)
+  /// BLIND INDEX of the account number: detects the same account added twice.
+  accountNumberIndex String              @map("account_number_index") @db.VarChar(64)
+  ifsc               String              @db.VarChar(11)
+  bankName           String              @map("bank_name") @db.VarChar(120)
+  branch             String?             @db.VarChar(120)
+  accountType        BankAccountType     @default(SAVINGS) @map("account_type")
+  status             PayoutAccountStatus @default(PENDING_VERIFICATION)
+  /// The verification provider's finding. The app never decides this.
+  nameMatch          NameMatch?          @map("name_match")
+  verifiedAt         DateTime?           @map("verified_at") @db.Timestamptz(3)
+  providerRef        String?             @map("provider_ref") @db.VarChar(120)
+  failureCode        String?             @map("failure_code") @db.VarChar(60)
+  isPrimary          Boolean             @default(false) @map("is_primary")
+  removedAt          DateTime?           @map("removed_at") @db.Timestamptz(3)
+  createdAt          DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user    User            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  payouts PayoutRequest[]
+
+  @@index([userId, removedAt])
+  @@index([accountNumberIndex])
+  @@map("payout_accounts")
+}
+
+/// A creator's request to be paid, from request through approval to settlement.
+model PayoutRequest {
+  id                String       @id @default(uuid(7)) @db.Uuid
+  userId            String       @map("user_id") @db.Uuid
+  payoutAccountId   String       @map("payout_account_id") @db.Uuid
+  amount            Decimal      @db.Decimal(18, 2)
+  currency          String       @default("INR") @db.VarChar(3)
+  status            PayoutStatus @default(REQUESTED)
+  /// Client-supplied, unique per user: a retry of the same request is the same payout.
+  idempotencyKey    String       @map("idempotency_key") @db.VarChar(100)
+  /// The journal that moved the money out of the creator's balance.
+  holdJournalId     String?      @unique @map("hold_journal_id") @db.Uuid
+  /// The journal that settled it (or reversed the hold).
+  settleJournalId   String?      @unique @map("settle_journal_id") @db.Uuid
+  providerReference String?      @map("provider_reference") @db.VarChar(120)
+  failureCode       String?      @map("failure_code") @db.VarChar(60)
+  holdReason        String?      @map("hold_reason") @db.VarChar(200)
+  /// Why a human looked at it (large amount, new account, risk signals).
+  riskFlags         Json?        @map("risk_flags")
+  estimatedFrom     DateTime?    @map("estimated_from") @db.Timestamptz(3)
+  estimatedTo       DateTime?    @map("estimated_to") @db.Timestamptz(3)
+  requestedAt       DateTime     @default(now()) @map("requested_at") @db.Timestamptz(3)
+  approvedById      String?      @map("approved_by_id") @db.Uuid
+  approvedAt        DateTime?    @map("approved_at") @db.Timestamptz(3)
+  processingAt      DateTime?    @map("processing_at") @db.Timestamptz(3)
+  completedAt       DateTime?    @map("completed_at") @db.Timestamptz(3)
+  createdAt         DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user          User             @relation(fields: [userId], references: [id], onDelete: Restrict)
+  payoutAccount PayoutAccount    @relation(fields: [payoutAccountId], references: [id], onDelete: Restrict)
+  approvedBy    AdminUser?       @relation("PayoutApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  holdJournal   LedgerJournal?   @relation("PayoutHold", fields: [holdJournalId], references: [id], onDelete: Restrict)
+  settleJournal LedgerJournal?   @relation("PayoutSettle", fields: [settleJournalId], references: [id], onDelete: Restrict)
+  approvals     PayoutApproval[]
+
+  @@unique([userId, idempotencyKey])
+  @@index([status, requestedAt])
+  @@index([userId, requestedAt(sort: Desc)])
+  @@map("payout_requests")
+}
+
+/// A reviewer's decision on a payout. A large payout needs two different
+/// reviewers (separation of duties); the unique key stops one person voting twice.
+model PayoutApproval {
+  id              String           @id @default(uuid(7)) @db.Uuid
+  payoutRequestId String           @map("payout_request_id") @db.Uuid
+  adminId         String           @map("admin_id") @db.Uuid
+  decision        ApprovalDecision
+  note            String?          @db.VarChar(500)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  payoutRequest PayoutRequest @relation(fields: [payoutRequestId], references: [id], onDelete: Cascade)
+  admin         AdminUser     @relation(fields: [adminId], references: [id], onDelete: Restrict)
+
+  @@unique([payoutRequestId, adminId])
+  @@map("payout_approvals")
+}
+
+/// A user's identity verification case.
+model KycProfile {
+  id                String     @id @default(uuid(7)) @db.Uuid
+  userId            String     @map("user_id") @db.Uuid
+  subject           KycSubject
+  status            KycStatus  @default(PENDING)
+  /// ENCRYPTED.
+  legalNameEnc      String     @map("legal_name_enc")
+  /// For display ("A*** K***").
+  legalNameMasked   String     @map("legal_name_masked") @db.VarChar(80)
+  /// ENCRYPTED. Individuals only.
+  dateOfBirthEnc    String?    @map("date_of_birth_enc")
+  /// ENCRYPTED. Businesses only.
+  businessNameEnc   String?    @map("business_name_enc")
+  businessType      String?    @map("business_type") @db.VarChar(60)
+  /// ENCRYPTED.
+  panEnc            String?    @map("pan_enc")
+  panLast4          String?    @map("pan_last4") @db.VarChar(4)
+  /// BLIND INDEX.
+  panIndex          String?    @map("pan_index") @db.VarChar(64)
+  /// The KYC provider's case id.
+  providerReference String?    @map("provider_reference") @db.VarChar(120)
+  submittedAt       DateTime   @default(now()) @map("submitted_at") @db.Timestamptz(3)
+  reviewedAt        DateTime?  @map("reviewed_at") @db.Timestamptz(3)
+  reviewedById      String?    @map("reviewed_by_id") @db.Uuid
+  /// Why it was rejected or needs action; mapped to words by the app.
+  reasonCode        String?    @map("reason_code") @db.VarChar(60)
+  /// Verification lapses and must be renewed.
+  expiresAt         DateTime?  @map("expires_at") @db.Timestamptz(3)
+  /// Documents are deleted by a worker after this date.
+  retentionUntil    DateTime?  @map("retention_until") @db.Timestamptz(3)
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user       User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  reviewedBy AdminUser?    @relation("KycReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  documents  KycDocument[]
+  reviews    KycReview[]
+
+  @@index([userId, status])
+  @@index([status, submittedAt])
+  @@index([panIndex])
+  @@map("kyc_profiles")
+}
+
+/// One identity or registration document submitted for a KYC case.
+model KycDocument {
+  id              String       @id @default(uuid(7)) @db.Uuid
+  kycProfileId    String       @map("kyc_profile_id") @db.Uuid
+  type            KycDocType
+  role            KycDocRole   @default(PRIMARY)
+  /// ENCRYPTED. Null for Aadhaar, which is never stored.
+  numberEnc       String?      @map("number_enc")
+  numberLast4     String?      @map("number_last4") @db.VarChar(4)
+  /// BLIND INDEX. Null for Aadhaar.
+  numberIndex     String?      @map("number_index") @db.VarChar(64)
+  /// The scan, in the private KYC bucket.
+  fileAssetId     String?      @map("file_asset_id") @db.Uuid
+  backFileAssetId String?      @map("back_file_asset_id") @db.Uuid
+  status          KycDocStatus @default(RECEIVED)
+  rejectionCode   String?      @map("rejection_code") @db.VarChar(60)
+  retentionUntil  DateTime?    @map("retention_until") @db.Timestamptz(3)
+  deletedAt       DateTime?    @map("deleted_at") @db.Timestamptz(3)
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  kycProfile KycProfile @relation(fields: [kycProfileId], references: [id], onDelete: Cascade)
+
+  @@index([kycProfileId])
+  @@index([type, numberIndex])
+  @@index([retentionUntil])
+  @@map("kyc_documents")
+}
+
+/// Each reviewer decision, kept for audit.
+model KycReview {
+  id           String      @id @default(uuid(7)) @db.Uuid
+  kycProfileId String      @map("kyc_profile_id") @db.Uuid
+  adminId      String      @map("admin_id") @db.Uuid
+  decision     KycDecision
+  reasonCode   String?     @map("reason_code") @db.VarChar(60)
+  note         String?     @db.VarChar(1000)
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  kycProfile KycProfile @relation(fields: [kycProfileId], references: [id], onDelete: Cascade)
+  admin      AdminUser  @relation(fields: [adminId], references: [id], onDelete: Restrict)
+
+  @@index([kycProfileId, createdAt])
+  @@map("kyc_reviews")
+}
+
+/// The PAN the payout provider needs for tax purposes. BLOCKS collects it; it
+/// does not calculate tax.
+model TaxProfile {
+  userId     String    @id @map("user_id") @db.Uuid
+  status     TaxStatus @default(NOT_PROVIDED)
+  /// ENCRYPTED.
+  panEnc     String?   @map("pan_enc")
+  panLast4   String?   @map("pan_last4") @db.VarChar(4)
+  /// BLIND INDEX.
+  panIndex   String?   @map("pan_index") @db.VarChar(64)
+  verifiedAt DateTime? @map("verified_at") @db.Timestamptz(3)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@map("tax_profiles")
+}

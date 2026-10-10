@@ -1,0 +1,231 @@
+// ---------------------------------------------------------------------------
+// Staff accounts, roles and permissions, the audit log, system settings and
+// request idempotency.
+//
+// Admins are a separate realm from app users: separate table, separate
+// sessions, separate sign-in, mandatory two-factor. Nothing a mobile user
+// can send grants an admin permission.
+// ---------------------------------------------------------------------------
+
+enum AdminStatus {
+  INVITED
+  ACTIVE
+  DISABLED
+
+  @@map("admin_status")
+}
+
+enum IdempotencyStatus {
+  IN_PROGRESS
+  COMPLETED
+
+  @@map("idempotency_status")
+}
+
+/// A staff account for the admin console.
+model AdminUser {
+  id                    String      @id @default(uuid(7)) @db.Uuid
+  email                 String      @unique @db.VarChar(254)
+  name                  String      @db.VarChar(120)
+  passwordHash          String      @map("password_hash") @db.VarChar(255)
+  status                AdminStatus @default(INVITED)
+  mustChangePassword    Boolean     @default(true) @map("must_change_password")
+  /// While INVITED, the temporary password stops working after this time.
+  inviteExpiresAt       DateTime?   @map("invite_expires_at") @db.Timestamptz(3)
+  twoFactorEnabled      Boolean     @default(false) @map("two_factor_enabled")
+  /// ENCRYPTED TOTP secret.
+  twoFactorSecretEnc    String?     @map("two_factor_secret_enc")
+  /// SHA-256 hex of each unused recovery code.
+  twoFactorBackupHashes String[]    @map("two_factor_backup_hashes")
+  /// The last TOTP time step accepted, so a code cannot be replayed.
+  twoFactorLastStep     Int?        @map("two_factor_last_step")
+  failedLoginCount      Int         @default(0) @map("failed_login_count")
+  lockedUntil           DateTime?   @map("locked_until") @db.Timestamptz(3)
+  lastLoginAt           DateTime?   @map("last_login_at") @db.Timestamptz(3)
+  createdById           String?     @map("created_by_id") @db.Uuid
+  createdAt             DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  roles                 AdminUserRole[]
+  sessions              AdminSession[]
+  reportsAssigned       Report[]              @relation("ReportAssignee")
+  moderationActions     ModerationAction[]
+  appealsAssigned       Appeal[]              @relation("AppealAssignee")
+  appealsDecided        Appeal[]              @relation("AppealDecider")
+  payoutApprovals       PayoutApproval[]
+  payoutsApproved       PayoutRequest[]       @relation("PayoutApprover")
+  kycReviews            KycReview[]
+  kycReviewed           KycProfile[]          @relation("KycReviewer")
+  notesWritten          UserNote[]
+  reachConfigs          ReachConfigVersion[]
+  verificationsReviewed VerificationRequest[]
+  adsReviewed           AdCampaign[]
+  licencesCreated       MusicLicence[]
+  liveTerminations      LiveSession[]
+  incidentsCreated      SafetyIncident[]
+  incidentsOwned        SafetyIncident[]      @relation("IncidentOwner")
+  incidentEvents        SafetyIncidentEvent[]
+  creatorSuspensions    CreatorProfile[]
+
+  @@index([status])
+  @@map("admin_users")
+}
+
+/// A staff sign-in. Shorter-lived than a user session, with an idle timeout.
+model AdminSession {
+  id                String               @id @default(uuid(7)) @db.Uuid
+  adminId           String               @map("admin_id") @db.Uuid
+  refreshTokenHash  String               @unique @map("refresh_token_hash") @db.VarChar(64)
+  previousTokenHash String?              @unique @map("previous_token_hash") @db.VarChar(64)
+  rotatedAt         DateTime?            @map("rotated_at") @db.Timestamptz(3)
+  ip                String?              @db.VarChar(45)
+  userAgent         String?              @map("user_agent") @db.VarChar(400)
+  /// Set once the second factor has been satisfied. Privileged calls need it.
+  mfaVerifiedAt     DateTime?            @map("mfa_verified_at") @db.Timestamptz(3)
+  createdAt         DateTime             @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUsedAt        DateTime             @default(now()) @map("last_used_at") @db.Timestamptz(3)
+  /// Signed out after this long without use.
+  idleExpiresAt     DateTime             @map("idle_expires_at") @db.Timestamptz(3)
+  /// Hard limit, however active.
+  expiresAt         DateTime             @map("expires_at") @db.Timestamptz(3)
+  revokedAt         DateTime?            @map("revoked_at") @db.Timestamptz(3)
+  revokedReason     SessionRevokeReason? @map("revoked_reason")
+
+  admin AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, revokedAt])
+  @@index([expiresAt])
+  @@map("admin_sessions")
+}
+
+/// A named bundle of permissions assigned to staff.
+model Role {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  /// Stable machine key, e.g. 'kyc_reviewer'.
+  key         String   @unique @db.VarChar(60)
+  name        String   @db.VarChar(80)
+  description String?  @db.VarChar(300)
+  /// Built-in roles cannot be deleted.
+  isSystem    Boolean  @default(false) @map("is_system")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  permissions RolePermission[]
+  admins      AdminUserRole[]
+
+  @@map("roles")
+}
+
+/// The permission catalogue. The code defines it; the database holds a copy so
+/// roles can reference it by foreign key.
+model Permission {
+  id          String  @id @default(uuid(7)) @db.Uuid
+  /// 'module.action', e.g. 'payout.approve'.
+  key         String  @unique @db.VarChar(80)
+  module      String  @db.VarChar(40)
+  description String? @db.VarChar(300)
+
+  roles RolePermission[]
+
+  @@index([module])
+  @@map("permissions")
+}
+
+/// Which permissions a role grants.
+model RolePermission {
+  roleId       String @map("role_id") @db.Uuid
+  permissionId String @map("permission_id") @db.Uuid
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+/// Which roles a staff member holds.
+model AdminUserRole {
+  adminId   String   @map("admin_id") @db.Uuid
+  roleId    String   @map("role_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  admin AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  role  Role      @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  @@id([adminId, roleId])
+  @@index([roleId])
+  @@map("admin_user_roles")
+}
+
+/// Who did what, to what, when, and why. Append-only: triggers refuse UPDATE,
+/// DELETE and TRUNCATE. `before` / `after` hold redacted snapshots, never secrets.
+model AuditLog {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  actorType  ActorType @map("actor_type")
+  actorId    String?   @map("actor_id") @db.Uuid
+  /// Name and role at the time, so the log stays readable if the account changes.
+  actorLabel String?   @map("actor_label") @db.VarChar(160)
+  /// 'module.action', e.g. 'user.suspend'.
+  action     String    @db.VarChar(80)
+  targetType String?   @map("target_type") @db.VarChar(40)
+  targetId   String?   @map("target_id") @db.VarChar(64)
+  reason     String?   @db.VarChar(500)
+  before     Json?
+  after      Json?
+  ip         String?   @db.VarChar(45)
+  userAgent  String?   @map("user_agent") @db.VarChar(400)
+  requestId  String?   @map("request_id") @db.VarChar(64)
+  /// Access to KYC or other protected data: reviewed separately.
+  sensitive  Boolean   @default(false)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([actorId, createdAt(sort: Desc)])
+  @@index([targetType, targetId, createdAt(sort: Desc)])
+  @@index([action, createdAt(sort: Desc)])
+  @@index([sensitive, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+/// Runtime configuration an admin can change (policy, live gate, payout rules).
+/// Every change is also written to the audit log with before and after values.
+model SystemSetting {
+  key         String   @id @db.VarChar(80)
+  value       Json
+  version     Int      @default(1)
+  updatedById String?  @map("updated_by_id") @db.Uuid
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("system_settings")
+}
+
+/// Makes a mutating request safe to retry: the same key and body replays the
+/// stored response; the same key with a different body is refused.
+model IdempotencyKey {
+  id             String            @id @default(uuid(7)) @db.Uuid
+  scope          String            @db.VarChar(120)
+  key            String            @db.VarChar(160)
+  requestHash    String            @map("request_hash") @db.VarChar(64)
+  status         IdempotencyStatus @default(IN_PROGRESS)
+  responseStatus Int?              @map("response_status")
+  responseBody   Json?             @map("response_body")
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt      DateTime          @map("expires_at") @db.Timestamptz(3)
+
+  @@unique([scope, key])
+  @@index([expiresAt])
+  @@map("idempotency_keys")
+}
+
+/// Pre-aggregated numbers for the dashboard, written by a daily job.
+model DailyMetric {
+  day   DateTime @db.Date
+  key   String   @db.VarChar(60)
+  /// 'global', or e.g. 'state:Telangana'.
+  scope String   @default("global") @db.VarChar(80)
+  value Decimal  @db.Decimal(20, 4)
+
+  @@id([day, key, scope])
+  @@index([key, day])
+  @@map("daily_metrics")
+}

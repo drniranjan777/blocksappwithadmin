@@ -1,0 +1,141 @@
+// ---------------------------------------------------------------------------
+// Notifications (in-app records plus a delivery log for e-mail / push / SMS)
+// and direct messaging.
+// ---------------------------------------------------------------------------
+
+enum NotificationType {
+  NEW_FOLLOWER
+  FOLLOW_REQUEST
+  LIKE
+  COMMENT
+  MENTION
+  REACH_MILESTONE
+  EARNINGS
+  SECURITY_ALERT
+  PASSWORD_CHANGED
+  NEW_DEVICE_LOGIN
+  KYC_STATUS
+  PAYOUT_STATUS
+  MODERATION_DECISION
+  CAMPAIGN_STATUS
+  SYSTEM
+
+  @@map("notification_type")
+}
+
+enum DeliveryChannel {
+  EMAIL
+  PUSH
+  SMS
+
+  @@map("delivery_channel")
+}
+
+enum DeliveryStatus {
+  QUEUED
+  SENT
+  FAILED
+  SKIPPED
+
+  @@map("delivery_status")
+}
+
+/// What the user sees in their notification list. `data` holds ids only (never
+/// personal content), so the app can open the right screen.
+model Notification {
+  id        String           @id @default(uuid(7)) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  type      NotificationType
+  title     String           @db.VarChar(120)
+  body      String           @db.VarChar(400)
+  data      Json?
+  /// Stops the same event notifying twice (e.g. one like per post per person).
+  dedupeKey String?          @map("dedupe_key") @db.VarChar(160)
+  readAt    DateTime?        @map("read_at") @db.Timestamptz(3)
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries NotificationDelivery[]
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+/// One attempt to deliver a notification through a provider, kept so failures
+/// are retried and the user can see which security e-mails were sent.
+model NotificationDelivery {
+  id                String          @id @default(uuid(7)) @db.Uuid
+  notificationId    String?         @map("notification_id") @db.Uuid
+  userId            String          @map("user_id") @db.Uuid
+  channel           DeliveryChannel
+  status            DeliveryStatus  @default(QUEUED)
+  /// Template key, never the rendered body.
+  template          String          @db.VarChar(60)
+  subject           String?         @db.VarChar(200)
+  /// Non-secret template variables, kept so a failed delivery can be re-rendered and retried.
+  /// Never holds a code, token or password.
+  payload           Json?
+  /// Masked destination ("r***@example.com").
+  toMasked          String?         @map("to_masked") @db.VarChar(100)
+  attempts          Int             @default(0)
+  lastError         String?         @map("last_error") @db.VarChar(500)
+  providerMessageId String?         @map("provider_message_id") @db.VarChar(120)
+  nextAttemptAt     DateTime?       @map("next_attempt_at") @db.Timestamptz(3)
+  createdAt         DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  sentAt            DateTime?       @map("sent_at") @db.Timestamptz(3)
+
+  notification Notification? @relation(fields: [notificationId], references: [id], onDelete: SetNull)
+
+  @@index([userId, channel, createdAt(sort: Desc)])
+  @@index([status, nextAttemptAt])
+  @@map("notification_deliveries")
+}
+
+/// A direct-message conversation.
+model Conversation {
+  id            String    @id @default(uuid(7)) @db.Uuid
+  /// "<smaller user id>:<larger user id>" for a direct chat, so a pair has one.
+  directKey     String?   @unique @map("direct_key") @db.VarChar(80)
+  lastMessageAt DateTime? @map("last_message_at") @db.Timestamptz(3)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  members  ConversationMember[]
+  messages Message[]
+
+  @@index([lastMessageAt(sort: Desc)])
+  @@map("conversations")
+}
+
+/// A participant in a conversation, with their read position.
+model ConversationMember {
+  conversationId String    @map("conversation_id") @db.Uuid
+  userId         String    @map("user_id") @db.Uuid
+  lastReadAt     DateTime? @map("last_read_at") @db.Timestamptz(3)
+  mutedAt        DateTime? @map("muted_at") @db.Timestamptz(3)
+  joinedAt       DateTime  @default(now()) @map("joined_at") @db.Timestamptz(3)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+  @@index([userId])
+  @@map("conversation_members")
+}
+
+/// One direct message.
+model Message {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  conversationId String    @map("conversation_id") @db.Uuid
+  senderId       String    @map("sender_id") @db.Uuid
+  body           String    @db.VarChar(2000)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt(sort: Desc)])
+  @@map("messages")
+}

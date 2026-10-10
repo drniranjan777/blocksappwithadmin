@@ -1,0 +1,324 @@
+// ---------------------------------------------------------------------------
+// Media pipeline and the music library.
+//
+// Originals are uploaded to private object storage through signed URLs, then
+// validated, transcoded and moderated by background workers. Nothing here is
+// ever served from a public bucket; deliveries use signed or CDN URLs.
+// ---------------------------------------------------------------------------
+
+enum MediaKind {
+  VIDEO
+  IMAGE
+  AUDIO
+  DOCUMENT
+
+  @@map("media_kind")
+}
+
+enum MediaPurpose {
+  POST_IMAGE
+  REEL_VIDEO
+  REEL_CLIP
+  REEL_COVER
+  STORY
+  AVATAR
+  BUSINESS_IMAGE
+  AD_CREATIVE
+  MUSIC_PREVIEW
+  MUSIC_COVER
+  KYC_DOCUMENT
+
+  @@map("media_purpose")
+}
+
+enum MediaStatus {
+  PENDING_UPLOAD
+  UPLOADED
+  VALIDATING
+  PROCESSING
+  READY
+  REJECTED
+  FAILED
+  DELETED
+
+  @@map("media_status")
+}
+
+enum MediaProfileKey {
+  DATA_SAVER
+  BALANCED
+  HIGH
+
+  @@map("media_profile_key")
+}
+
+enum UploadStatus {
+  OPEN
+  COMPLETED
+  CANCELLED
+  EXPIRED
+  FAILED
+
+  @@map("upload_status")
+}
+
+enum MediaJobType {
+  VALIDATE
+  TRANSCODE
+  THUMBNAIL
+  MODERATE
+  DELETE
+  COMPOSE
+
+  @@map("media_job_type")
+}
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  RETRYING
+  CANCELLED
+
+  @@map("job_status")
+}
+
+enum MusicRightsType {
+  PLATFORM_OWNED
+  LICENSED
+  CREATOR_OWNED
+  ROYALTY_FREE
+  RESTRICTED
+
+  @@map("music_rights_type")
+}
+
+enum MusicStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+
+  @@map("music_status")
+}
+
+enum MusicCategory {
+  TRENDING
+  POPULAR
+  NEW_RELEASES
+  HINDI
+  TELUGU
+  TAMIL
+  BENGALI
+  MARATHI
+  PUNJABI
+  KANNADA
+  MALAYALAM
+  INSTRUMENTAL
+  DEVOTIONAL
+  TRAVEL
+  FITNESS
+  ROMANTIC
+  COMEDY
+
+  @@map("music_category")
+}
+
+enum MusicUse {
+  REEL
+  STORY
+  POST
+  ADVERTISING
+
+  @@map("music_use")
+}
+
+enum LicenceStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  REVOKED
+
+  @@map("licence_status")
+}
+
+/// A file the user uploaded, with everything the pipeline learns about it.
+/// The client's claims (MIME type, size, duration) are stored separately from
+/// what the server verified.
+model MediaAsset {
+  id                String           @id @default(uuid(7)) @db.Uuid
+  ownerId           String           @map("owner_id") @db.Uuid
+  kind              MediaKind
+  purpose           MediaPurpose
+  status            MediaStatus      @default(PENDING_UPLOAD)
+  /// Private bucket the original lives in.
+  bucket            String           @db.VarChar(63)
+  /// Server-generated key. The user's filename is never part of it.
+  storageKey        String           @unique @map("storage_key") @db.VarChar(512)
+  /// Sanitised display name only.
+  originalFilename  String?          @map("original_filename") @db.VarChar(255)
+  declaredMime      String           @map("declared_mime") @db.VarChar(100)
+  declaredSizeBytes Int              @map("declared_size_bytes")
+  /// What the magic-number check actually found.
+  detectedMime      String?          @map("detected_mime") @db.VarChar(100)
+  sizeBytes         Int?             @map("size_bytes")
+  sha256            String?          @db.VarChar(64)
+  durationMs        Int?             @map("duration_ms")
+  width             Int?
+  height            Int?
+  /// Container / codec facts from probing the file.
+  probe             Json?
+  profile           MediaProfileKey?
+  /// Delivery renditions: [{ profile, key, width, height, bitrateKbps, bytes }].
+  renditions        Json?
+  thumbnailKey      String?          @map("thumbnail_key") @db.VarChar(512)
+  posterKey         String?          @map("poster_key") @db.VarChar(512)
+  /// HLS master playlist, once adaptive renditions exist.
+  manifestKey       String?          @map("manifest_key") @db.VarChar(512)
+  moderationStatus  ModerationStatus @default(PENDING) @map("moderation_status")
+  failureCode       String?          @map("failure_code") @db.VarChar(60)
+  failureDetail     String?          @map("failure_detail") @db.VarChar(500)
+  attempts          Int              @default(0)
+  uploadedAt        DateTime?        @map("uploaded_at") @db.Timestamptz(3)
+  processedAt       DateTime?        @map("processed_at") @db.Timestamptz(3)
+  /// Retention: the object is deleted by a worker after this date.
+  deleteAfter       DateTime?        @map("delete_after") @db.Timestamptz(3)
+  deletedAt         DateTime?        @map("deleted_at") @db.Timestamptz(3)
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  owner           User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  uploadSession   UploadSession?
+  jobs            MediaJob[]
+  avatarFor       Profile?       @relation("ProfileAvatar")
+  postLinks       PostMedia[]
+  clips           ReelClip[]
+  reelVideo       Reel?          @relation("ReelVideo")
+  reelCovers      Reel[]         @relation("ReelCover")
+  stories         Story[]
+  businessAvatars BusinessPage[] @relation("BusinessAvatar")
+  businessCovers  BusinessPage[] @relation("BusinessCover")
+
+  @@index([ownerId, createdAt(sort: Desc)])
+  @@index([status, updatedAt])
+  @@index([purpose, status])
+  @@index([deleteAfter])
+  @@map("media_assets")
+}
+
+/// The resumable / multipart upload for one asset.
+model UploadSession {
+  id                String       @id @default(uuid(7)) @db.Uuid
+  assetId           String       @unique @map("asset_id") @db.Uuid
+  userId            String       @map("user_id") @db.Uuid
+  status            UploadStatus @default(OPEN)
+  /// S3 multipart upload id, or the dev storage's equivalent.
+  multipartUploadId String?      @map("multipart_upload_id") @db.VarChar(255)
+  partSizeBytes     Int          @map("part_size_bytes")
+  totalBytes        Int          @map("total_bytes")
+  uploadedBytes     Int          @default(0) @map("uploaded_bytes")
+  /// [{ partNumber, etag, bytes }] for the parts the server has confirmed.
+  parts             Json         @default("[]")
+  createdAt         DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// Signed URLs stop working at this moment.
+  expiresAt         DateTime     @map("expires_at") @db.Timestamptz(3)
+  completedAt       DateTime?    @map("completed_at") @db.Timestamptz(3)
+  cancelledAt       DateTime?    @map("cancelled_at") @db.Timestamptz(3)
+
+  asset MediaAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([status, expiresAt])
+  @@map("upload_sessions")
+}
+
+/// A durable record of background work on an asset, so staff can see failures
+/// even though the queue itself is ephemeral.
+model MediaJob {
+  id          String       @id @default(uuid(7)) @db.Uuid
+  assetId     String       @map("asset_id") @db.Uuid
+  type        MediaJobType
+  status      JobStatus    @default(QUEUED)
+  attempts    Int          @default(0)
+  maxAttempts Int          @default(3) @map("max_attempts")
+  lastError   String?      @map("last_error") @db.VarChar(1000)
+  queueJobId  String?      @map("queue_job_id") @db.VarChar(100)
+  /// Not started before this time (retry back-off).
+  runAfter    DateTime     @default(now()) @map("run_after") @db.Timestamptz(3)
+  /// What the job needs besides the asset (e.g. how to assemble a reel).
+  payload     Json?
+  queuedAt    DateTime     @default(now()) @map("queued_at") @db.Timestamptz(3)
+  startedAt   DateTime?    @map("started_at") @db.Timestamptz(3)
+  finishedAt  DateTime?    @map("finished_at") @db.Timestamptz(3)
+
+  asset MediaAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId, type])
+  @@index([status, queuedAt])
+  @@index([status, runAfter])
+  @@map("media_jobs")
+}
+
+/// Track metadata. `rightsType`, `allowedCountries`, `allowedUses` and
+/// `licenceExpiresAt` are what the server checks before a track can be offered
+/// or attached; the full licence record is in MusicLicence.
+model MusicTrack {
+  id               String          @id @default(uuid(7)) @db.Uuid
+  title            String          @db.VarChar(160)
+  artist           String          @db.VarChar(120)
+  language         String          @db.VarChar(40)
+  genre            String          @default("") @db.VarChar(60)
+  durationMs       Int             @map("duration_ms")
+  categories       MusicCategory[]
+  rightsType       MusicRightsType @map("rights_type")
+  status           MusicStatus     @default(DRAFT)
+  /// ISO 3166-1 alpha-2 territories where the track may be played.
+  allowedCountries String[]        @map("allowed_countries")
+  allowedUses      MusicUse[]      @map("allowed_uses")
+  /// Denormalised from the active licence so listing queries stay cheap.
+  licenceExpiresAt DateTime?       @map("licence_expires_at") @db.Timestamptz(3)
+  /// Storage keys (private bucket); previews are served by signed URL.
+  coverKey         String?         @map("cover_key") @db.VarChar(512)
+  previewKey       String?         @map("preview_key") @db.VarChar(512)
+  audioKey         String?         @map("audio_key") @db.VarChar(512)
+  reelsCount       Int             @default(0) @map("reels_count")
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  licences MusicLicence[]
+  reels    Reel[]
+
+  @@index([status, rightsType])
+  @@index([categories], type: Gin)
+  @@index([reelsCount(sort: Desc)])
+  @@map("music_tracks")
+}
+
+/// The licence behind a track. The document itself is in private storage and is
+/// visible only to staff with the music-licensing permission.
+model MusicLicence {
+  id           String          @id @default(uuid(7)) @db.Uuid
+  trackId      String          @map("track_id") @db.Uuid
+  licensor     String          @db.VarChar(160)
+  /// Internal contract reference. No terms or amounts are stored here.
+  reference    String          @db.VarChar(120)
+  rightsType   MusicRightsType @map("rights_type")
+  territories  String[]
+  status       LicenceStatus   @default(PENDING)
+  startsAt     DateTime        @map("starts_at") @db.Timestamptz(3)
+  expiresAt    DateTime?       @map("expires_at") @db.Timestamptz(3)
+  restrictions Json?
+  documentKey  String?         @map("document_key") @db.VarChar(512)
+  createdById  String          @map("created_by_id") @db.Uuid
+  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  track     MusicTrack @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  createdBy AdminUser  @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([trackId, status])
+  @@index([status, expiresAt])
+  @@map("music_licences")
+}
