@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "nextjs", "jsx-a11y", "import"],
+  "categories": { "correctness": "error", "suspicious": "warn" },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/no-danger": "warn",
+    "jsx-a11y/label-has-associated-control": ["error", { "depth": 4 }],
+    "jsx-a11y/no-autofocus": ["error", { "ignoreNonDOM": true }],
+    "import/no-unassigned-import": "off",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "nextjs/no-img-element": "off"
+  },
+  "overrides": [
+    {
+      "files": ["src/components/auth/**"],
+      "rules": { "jsx-a11y/no-autofocus": "off" }
+    }
+  ],
+  "ignorePatterns": [".next", "node_modules", "next-env.d.ts"]
+}

@@ -1,0 +1,99 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens, taken from the Phase-1 prototype (UI/admin.html): ink sidebar, violet brand,
+ * and one colour per Reach level. Light only: the console is a work tool used in bright rooms.
+ */
+:root {
+  --ink: #14142b;
+  --canvas: #f4f3fa;
+  --card: #ffffff;
+  --line: #e7e5f2;
+  --muted: #6b6a85;
+  --soft: #f0eefa;
+  --brand: #5b3df5;
+  --brand-2: #ede9ff;
+  --brand-ink: #3a22c4;
+  --d1: #0fa39a;
+  --s1: #2f6bff;
+  --n1: #f08a00;
+  --g1: #d6246e;
+  --good: #12945a;
+  --good-bg: #e3f6ec;
+  --warn: #8a5a0b;
+  --warn-bg: #fff1d6;
+  --bad: #d92d3a;
+  --bad-bg: #fdecee;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-canvas: var(--canvas);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-soft: var(--soft);
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
+  --color-brand-ink: var(--brand-ink);
+  --color-d1: var(--d1);
+  --color-s1: var(--s1);
+  --color-n1: var(--n1);
+  --color-g1: var(--g1);
+  --color-good: var(--good);
+  --color-good-bg: var(--good-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-bad: var(--bad);
+  --color-bad-bg: var(--bad-bg);
+  --font-sans: 'Plus Jakarta Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, Consolas, 'Cascadia Mono', monospace;
+}
+
+html {
+  background: var(--canvas);
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.45;
+  min-height: 100vh;
+}
+
+/* Visible keyboard focus everywhere, in the brand colour. */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+button,
+[role='button'],
+select,
+summary {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* The native dialog element backs both the centred dialogs and the side drawer. */
+dialog {
+  color: var(--ink);
+}
+dialog::backdrop {
+  background: rgb(20 20 43 / 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
