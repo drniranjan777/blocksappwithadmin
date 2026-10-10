@@ -690,25 +690,39 @@ export class EarningsService {
    *   available  what the ledger says the platform owes them now.
    */
   async summary(userId: string) {
-    const [available, finalized, pending, open, eligibility] = await Promise.all([
-      this.ledger.balanceOf(userId),
-      this.prisma.creatorEarning.aggregate({
-        where: { creatorId: userId, status: 'FINALIZED' },
-        _sum: { finalizedAmount: true },
-      }),
-      this.prisma.creatorEarning.aggregate({
-        where: { creatorId: userId, status: 'ESTIMATED', cycle: { status: 'CLOSED' } },
-        _sum: { estimatedAmount: true },
-      }),
-      this.prisma.creatorEarning.findFirst({
-        where: { creatorId: userId, status: 'ESTIMATED', cycle: { status: 'OPEN' } },
-        orderBy: { cycle: { startsAt: 'desc' } },
-        include: { cycle: { select: { label: true, startsAt: true, endsAt: true } } },
-      }),
-      this.creators.eligibility(userId),
-    ]);
+    const [available, finalized, pending, open, eligibility, paidOut, performance, profile] =
+      await Promise.all([
+        this.ledger.balanceOf(userId),
+        this.prisma.creatorEarning.aggregate({
+          where: { creatorId: userId, status: 'FINALIZED' },
+          _sum: { finalizedAmount: true },
+        }),
+        this.prisma.creatorEarning.aggregate({
+          where: { creatorId: userId, status: 'ESTIMATED', cycle: { status: 'CLOSED' } },
+          _sum: { estimatedAmount: true },
+        }),
+        this.prisma.creatorEarning.findFirst({
+          where: { creatorId: userId, status: 'ESTIMATED', cycle: { status: 'OPEN' } },
+          orderBy: { cycle: { startsAt: 'desc' } },
+          include: { cycle: { select: { label: true, startsAt: true, endsAt: true } } },
+        }),
+        this.creators.eligibility(userId),
+        // Money that has actually left: payouts the bank side has completed. A request that is
+        // still waiting, on hold or failed is not "paid".
+        this.prisma.payoutRequest.aggregate({
+          where: { userId, status: 'COMPLETED' },
+          _sum: { amount: true },
+        }),
+        this.creators.performance30d(userId),
+        this.prisma.creatorProfile.findUnique({
+          where: { userId },
+          select: { bestReachLevel: true },
+        }),
+      ]);
     return {
       currency: 'INR',
+      /** The highest Reach Ladder rung any of the creator's items has reached. */
+      bestLevel: profile?.bestReachLevel ?? 'DISTRICT',
       estimated: open
         ? {
             amount: money(open.estimatedAmount),
@@ -725,6 +739,9 @@ export class EarningsService {
       pending: formatRupees(fromDatabase(pending._sum.estimatedAmount)),
       finalized: formatRupees(fromDatabase(finalized._sum.finalizedAmount)),
       available: formatRupees(available),
+      paidOut: formatRupees(fromDatabase(paidOut._sum.amount)),
+      /** What the audience did in the last 30 days, counted like qualified reach. */
+      metrics30d: performance,
       eligibility,
       notice: 'ESTIMATE_NOT_GUARANTEED',
     };

@@ -209,6 +209,10 @@ describe('creator earnings and the ledger', () => {
       expect(d.monetization).toMatchObject({ status: 'ELIGIBLE', eligible: true });
       expect(d.reach).toMatchObject({ qualifiedReach30d: 4, bestLevel: 'DISTRICT' });
       expect(d.reach.itemsByLevel).toEqual({ district: 1, state: 0, national: 0, global: 0 });
+      // One item, on the first rung: it has "reached" District and nothing higher.
+      expect(d.reach.coverage).toEqual({ district: 1, state: 0, national: 0, global: 0 });
+      expect(d.reach.bestItemQualifiedReach).toBe(4);
+      expect(typeof d.followers).toBe('number');
       expect(d.earnings).toMatchObject({
         estimated: null,
         pending: '0.00',
@@ -217,6 +221,22 @@ describe('creator earnings and the ledger', () => {
         currency: 'INR',
         notice: 'ESTIMATE_NOT_GUARANTEED',
       });
+    });
+
+    it('reports what the audience did, the same way qualified reach is counted', async () => {
+      const s = (await ana.api('get', '/earnings/summary').expect(200)).body.data;
+      expect(s.paidOut).toBe('0.00');
+      expect(s.metrics30d).toMatchObject({ qualifiedViews: 4, bestItemQualifiedReach: 4 });
+      for (const key of ['watchSeconds', 'shares', 'saves', 'likes', 'comments'] as const) {
+        expect(Number.isInteger(s.metrics30d[key])).toBe(true);
+        expect(s.metrics30d[key]).toBeGreaterThanOrEqual(0);
+      }
+      expect(s.metrics30d.engagementRate).toBeGreaterThanOrEqual(0);
+      expect(s.metrics30d.engagementRate).toBeLessThanOrEqual(1);
+      // Someone else's audience is not counted for this creator.
+      const other = (await cy.api('get', '/earnings/summary').expect(200)).body.data;
+      expect(other.metrics30d.qualifiedViews).toBe(0);
+      expect(other.metrics30d.engagementRate).toBe(0);
       const items = (await ana.api('get', '/creator/content').expect(200)).body.data;
       expect(items[0]).toMatchObject({
         kind: 'reel',

@@ -388,4 +388,97 @@ export class CreatorProfileService {
     for (const g of [...reels, ...posts]) out[toKey(g.reachLevel)] += g._count;
     return out;
   }
+
+  /**
+   * Share (0..1) of the creator's published items that have reached *at least* each rung, so
+   * the District figure is 1 for anyone who has published, and Global is the share that went
+   * all the way. An empty profile has no coverage anywhere.
+   */
+  coverageOf(counts: Record<LevelKey, number>): Record<LevelKey, number> {
+    const total = counts.district + counts.state + counts.national + counts.global;
+    const share = (n: number): number =>
+      total === 0 ? 0 : Math.round((n / total) * 10_000) / 10_000;
+    return {
+      district: share(total),
+      state: share(counts.state + counts.national + counts.global),
+      national: share(counts.national + counts.global),
+      global: share(counts.global),
+    };
+  }
+
+  /**
+   * What the creator's audience did in the last 30 days, counted the same way as qualified
+   * reach (fake engagement excluded). Watch time is the time the qualifying views were watched.
+   * `engagementRate` is likes + comments + shares + saves per qualified view, capped at 1.
+   * `bestItemQualifiedReach` is the most qualified views any one reel or post got.
+   */
+  async performance30d(userId: string): Promise<{
+    qualifiedViews: number;
+    watchSeconds: number;
+    shares: number;
+    saves: number;
+    likes: number;
+    comments: number;
+    engagementRate: number;
+    bestItemQualifiedReach: number;
+  }> {
+    const [totals] = await this.prisma.$queryRaw<
+      {
+        qualified_views: bigint;
+        watch_ms: bigint;
+        shares: bigint;
+        saves: bigint;
+        likes: bigint;
+        comments: bigint;
+      }[]
+    >`
+      WITH mine AS (
+        SELECT e.type, e.watch_ms FROM reach_events e JOIN reels r ON r.id = e.reel_id
+         WHERE r.author_id = ${userId}::uuid AND NOT e.excluded
+           AND e.created_at > now() - interval '30 days'
+        UNION ALL
+        SELECT e.type, e.watch_ms FROM reach_events e JOIN posts p ON p.id = e.post_id
+         WHERE p.author_id = ${userId}::uuid AND NOT e.excluded
+           AND e.created_at > now() - interval '30 days'
+      )
+      SELECT
+        count(*) FILTER (WHERE type = 'QUALIFIED_VIEW')::bigint AS qualified_views,
+        coalesce(sum(watch_ms) FILTER (WHERE type = 'QUALIFIED_VIEW'), 0)::bigint AS watch_ms,
+        count(*) FILTER (WHERE type = 'SHARE')::bigint AS shares,
+        count(*) FILTER (WHERE type = 'SAVE')::bigint AS saves,
+        count(*) FILTER (WHERE type = 'LIKE')::bigint AS likes,
+        count(*) FILTER (WHERE type = 'COMMENT')::bigint AS comments
+      FROM mine`;
+    const [best] = await this.prisma.$queryRaw<{ n: bigint }[]>`
+      SELECT coalesce(max(n), 0)::bigint AS n FROM (
+        SELECT count(*) AS n FROM reach_events e JOIN reels r ON r.id = e.reel_id
+         WHERE r.author_id = ${userId}::uuid AND e.type = 'QUALIFIED_VIEW' AND NOT e.excluded
+           AND e.created_at > now() - interval '30 days'
+         GROUP BY e.reel_id
+        UNION ALL
+        SELECT count(*) AS n FROM reach_events e JOIN posts p ON p.id = e.post_id
+         WHERE p.author_id = ${userId}::uuid AND e.type = 'QUALIFIED_VIEW' AND NOT e.excluded
+           AND e.created_at > now() - interval '30 days'
+         GROUP BY e.post_id
+      ) t`;
+    const qualifiedViews = Number(totals?.qualified_views ?? 0);
+    const shares = Number(totals?.shares ?? 0);
+    const saves = Number(totals?.saves ?? 0);
+    const likes = Number(totals?.likes ?? 0);
+    const comments = Number(totals?.comments ?? 0);
+    const interactions = shares + saves + likes + comments;
+    return {
+      qualifiedViews,
+      watchSeconds: Math.round(Number(totals?.watch_ms ?? 0) / 1000),
+      shares,
+      saves,
+      likes,
+      comments,
+      engagementRate:
+        qualifiedViews === 0
+          ? 0
+          : Math.min(1, Math.round((interactions / qualifiedViews) * 10_000) / 10_000),
+      bestItemQualifiedReach: Number(best?.n ?? 0),
+    };
+  }
 }
