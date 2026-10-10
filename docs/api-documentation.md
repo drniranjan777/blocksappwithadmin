@@ -5,7 +5,7 @@
 > [`openapi.json`](openapi.json); a running server also serves it at `/api/docs-json` and a browsable
 > version at `/api/docs` (development and staging only: production serves neither unless asked to).
 
-319 operations, 47 groups. Version 1.0.
+320 operations, 47 groups. Version 1.0.
 
 ## How the API behaves
 
@@ -40,7 +40,7 @@
 * [posts](#posts) (5)
 * [profiles](#profiles) (4)
 * [reach](#reach) (3)
-* [reels](#reels) (6)
+* [reels](#reels) (7)
 * [reports](#reports) (2)
 * [security](#security) (12)
 * [sessions](#sessions) (3)
@@ -2179,6 +2179,16 @@ Only what you are allowed to see. A private account lists nothing (403) until yo
 | `ref` | path | string | yes |  |
 | `cursor` | query | string (0–512 chars) | no |  |
 | `limit` | query | integer (1–50) | no |  |
+
+*Answers:* `200`
+
+#### `GET /api/v1/creator/reel-config`
+
+**The limits the reel editor works within**
+
+Read from the same constants the server enforces when a reel is made, so the editor can never offer more than will be accepted. Lengths are in milliseconds unless the name says seconds; sizes are in megabytes.
+
+*Access:* Signed-in person
 
 *Answers:* `200`
 

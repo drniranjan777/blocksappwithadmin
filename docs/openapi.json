@@ -7376,6 +7376,27 @@
         ]
       }
     },
+    "/api/v1/creator/reel-config": {
+      "get": {
+        "description": "Read from the same constants the server enforces when a reel is made, so the editor can never offer more than will be accepted. Lengths are in milliseconds unless the name says seconds; sizes are in megabytes.",
+        "operationId": "ReelsController_config_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ],
+        "summary": "The limits the reel editor works within",
+        "tags": [
+          "reels"
+        ]
+      }
+    },
     "/api/v1/reels": {
       "post": {
         "description": "Upload each clip or photo first (`purpose: REEL_CLIP`), wait until it is being processed, then send the edit: which parts, in what order, with which filter, adjustments and transition, over which music. The server renders the video itself and queues it; poll `GET /reels/{id}` and watch `status.publish` (`PROCESSING`, `MODERATION`, `PUBLISHED`, `FAILED`, `REMOVED`). Hashtags and mentions are read from the caption. Reach level, counters, moderation state, location and the finished file are never accepted from the client. Music is checked against your country and its licence.",
