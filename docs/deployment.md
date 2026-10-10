@@ -55,7 +55,8 @@ All configuration is environment variables, validated once at start-up (`backend
 | `CORS_ORIGINS` | The staff console's origin (browser clients only; the mobile app sends no `Origin`). No wildcard. |
 | `TRUST_PROXY_HOPS` | How many reverse proxies sit in front. Wrong values make every client look like the proxy (rate limits and the audit log then see one address) or let a client forge its address. |
 | `PUBLIC_API_URL`, `PUBLIC_WEB_URL`, `ADMIN_CONSOLE_URL` | Used to build signed media links and the links in e-mail. |
-| `EMAIL_PROVIDER`, `SMTP_URL`, `EMAIL_FROM`, `SMS_PROVIDER`, `PUSH_PROVIDER` | Sign-in codes and security alerts. `dev` is refused in production. **No real adapter for e-mail, SMS or push is written yet:** only the development ones exist, and a setting that names any other provider stops the process at start-up (it never falls back to the development outbox). Until the adapters are added, production cannot start. See section 12. |
+| `EMAIL_PROVIDER`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM_EMAIL`, `SMTP_FROM_NAME` | Sign-in codes and security alerts by e-mail. `EMAIL_PROVIDER=smtp` needs the host, user, password and sender, or the process refuses to start; `dev` is refused in production. `SMTP_PASS` goes only in the server's protected `.env` (section 7.1). `OTP_TTL_MINUTES` is 15 and the e-mail says so. |
+| `SMS_PROVIDER`, `PUSH_PROVIDER` | **No real adapter for SMS or push is written yet:** only the development ones exist, and a setting that names any other provider stops the process at start-up (it never falls back to the development outbox). `SMS_PROVIDER=dev` is refused in production. **`SMS_PROVIDER=none` is the supported way to run production on e-mail alone:** no text message is ever sent, sign-up requires an e-mail address (a phone-only sign-up is refused with `email_required`), and start-up prints a warning. `PUSH_PROVIDER=dev` is allowed in production with a warning: nothing is delivered. See section 12. |
 | `STORAGE_DRIVER=s3`, `S3_REGION`, `S3_ENDPOINT`, `S3_BUCKET_PRIVATE`, `S3_BUCKET_KYC`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Buckets private, no public ACLs, server-side encryption on. `CDN_BASE_URL` if a CDN serves processed media. |
 | `FFMPEG_PATH`, `FFPROBE_PATH` | The host's own supported builds. The npm ffmpeg packages are old, development-only, and must never be shipped. |
 | `MODERATION_PROVIDER=manual` | Every upload waits for a person. `dev` approves everything and is refused in production. |
@@ -176,13 +177,92 @@ rule above; rolling back the schema is not routine (section 10).
 
 | Provider | Today | To go live |
 |---|---|---|
-| E-mail | Development adapter only (`smtp` is accepted by the settings but has no adapter, so it stops start-up). | Write the SMTP or API adapter (one class and one line in `providers.module.ts`); check SPF/DKIM/DMARC for the sending domain. |
+| E-mail | `dev` (outbox) or `smtp` (Nodemailer, section 7.1). The SMTP adapter is tested against a local SMTP server; **it has not been run against a real mail host by the people who wrote it.** | Set the `SMTP_*` values, run `npm run smtp:check`, and check SPF/DKIM/DMARC for the sending domain so the mail is not filed as spam. |
 | SMS | Development adapter only. | Write the adapter for the chosen gateway (a DLT-registered sender and templates are required for India). |
 | Push | Development adapter only. | Write the FCM/APNs adapter; upload credentials to the secret store. |
 | Moderation (media) | `manual` (a person approves everything) or `dev`. | Connect an automated service by adding a provider; nothing else changes. |
 | Identity (KYC), bank verification, payouts | Mock only. | Choose, contract and integrate real providers (webhooks with signature checks are not built; a worker polls). Needs legal review first. |
 | Ad billing | None; a development stand-in. | A payment gateway integration, GST invoicing and the accounting for it. |
 | Live video | None. | A live service, built against `LiveProvider` (section 12). |
+
+
+### 7.1 E-mail by SMTP (one-time codes)
+
+The API sends e-mail through any SMTP server with Nodemailer. For the BLOCKS production mailbox:
+
+| Variable | Value |
+|---|---|
+| `EMAIL_PROVIDER` | `smtp` |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` | `smtp.hostinger.com` / `465` / `true` (TLS from the first byte) |
+| `SMTP_USER` / `SMTP_FROM_EMAIL` / `SMTP_FROM_NAME` | the mailbox, the same address, `BLOCKS` |
+| `SMTP_PASS` | the mailbox password: **only** in the server's `.env` |
+
+**Putting the password on the server.** The quickest safe way is `bash scripts/set-smtp-env.sh` in
+`backend/` on the server: it asks for the password (hidden, twice), writes the SMTP settings to `.env`
+(mode 600), sets `EMAIL_PROVIDER=smtp` and `OTP_TTL_MINUTES=15`, and runs the login check. Whichever way,
+do it on the server itself, not through chat, a ticket, a shell
+history or a command line (arguments are visible to every user of the machine in `ps`). The `.env` file
+is already in `.gitignore`; give it owner-only permissions too:
+
+```bash
+cd /path/to/BLOCKS/backend
+touch .env && chmod 600 .env
+read -r -s -p "SMTP password: " P; echo      # typed, not echoed, not saved in history
+printf 'SMTP_PASS=%s\n' "$P" >> .env
+unset P
+```
+
+Add the other `SMTP_*` lines (everything except the password may be written in the editor). If the
+password contains `#`, quotes, a backtick or spaces, edit the line afterwards and wrap the value in
+single quotes. Rotate the password if it was ever pasted anywhere else.
+
+**Checking it, before and after a restart.** These need `npm run build` to have been run. Neither
+prints the password.
+
+```bash
+npm run smtp:check                           # connects and logs in; sends nothing
+npm run smtp:check -- --to someone@example.com   # also sends one real code e-mail (a random, unsaved code)
+```
+
+`OK` after `--to` means the mail server *accepted* the message. It does not mean it arrived: confirm in
+the mailbox (and the spam folder). `FAILED` names the kind of failure: `auth` (wrong user or password),
+`connection` (cannot reach the host or port; firewall, DNS, wrong port), `rejected` (the server refused the
+sender or the recipient).
+
+**Process manager (PM2).** The API reads `process.env` and has no `.env` loader of its own, so start it
+with Node's own: the secret stays in the file, never in an argument. Adapt the existing process; do not add a
+second one (two processes cannot share the port).
+
+```js
+// ecosystem.config.cjs: adapt the name and path to what `pm2 list` already shows
+module.exports = {
+  apps: [{
+    name: 'blocks-api',
+    cwd: '/path/to/BLOCKS/backend',
+    script: 'dist/main.js',
+    node_args: '--env-file=.env',
+    env: { NODE_ENV: 'production' },
+  }],
+};
+```
+
+```bash
+pm2 list                               # find the BLOCKS API process only; leave the others alone
+pm2 restart blocks-api                 # re-reads .env (or: pm2 start ecosystem.config.cjs once, then restart)
+pm2 logs blocks-api --lines 50 --nostream | grep -i smtp
+```
+
+A healthy start logs `SMTP connection verified`; a bad setting logs `SMTP check failed` with the kind of
+failure, and the API still starts (a mail outage must not take the API down), so read the log after a restart.
+
+**What the code does.** Every code e-mail has the subject `Your BLOCKS App Verification Code` and the same
+four lines, as plain text and as responsive HTML. The code is 6 digits from the server's CSPRNG, stored only
+as an HMAC, valid for 15 minutes, limited to 5 attempts, resendable after 30 seconds (at most 3 times), and
+limited to 5 codes per address and 10 per account per hour; routes are also throttled per IP address. A new
+code makes the previous one for the same address and purpose unusable. Sending runs in the background so
+the response time cannot tell a stranger which addresses have accounts; a failed send is logged (kind and
+SMTP code only, never the password, the code or the full address) and recorded as `FAILED` in the delivery
+log, and the person simply asks for another code. SMS codes have no real provider yet.
 
 ## 8. Network, TLS and proxies
 
@@ -285,7 +365,7 @@ people who were erased reappear.
   payout rail, an ad payment gateway, an object-storage account and CDN, a secrets manager/KMS.
 * **Infrastructure:** managed PostgreSQL and Redis, container images and an orchestrator, TLS and DNS, a
   WAF, a log store, metrics, alerting and an on-call rota, backup storage in a second region.
-* **Code not written:** the e-mail, SMS and push adapters (so production cannot start today); webhook receivers for providers; a metrics endpoint; a
+* **Code not written:** the SMS and push adapters (production runs on e-mail alone with `SMS_PROVIDER=none`; push is not delivered); webhook receivers for providers; a metrics endpoint; a
   re-encryption job for rotated keys; a live-video service; any ad-serving service (so campaigns record no
   delivery); the Flutter screens for business pages, verification, advertising, appeals and messaging.
 * **Legal and policy decisions** (see `security.md`, last section): minimum age and parental consent,
