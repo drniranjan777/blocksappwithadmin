@@ -1,0 +1,3079 @@
+{
+  "@@locale": "en",
+  "appName": "BLOCKS",
+  "tagline": "From Your Block to the World.",
+  "madeInIndia": "Made in India",
+  "splashLoadingSemantics": "BLOCKS is loading. Made in India.",
+  "skip": "Skip",
+  "next": "Next",
+  "getStarted": "Get Started",
+  "exploreDemo": "Explore Demo",
+  "continueAsDemoUser": "Continue as Demo User",
+  "pageIndicatorSemantics": "Page {current} of {total}",
+  "@pageIndicatorSemantics": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "onboarding1Title": "Welcome to BLOCKS",
+  "onboarding1Body": "Your voice starts local and can reach the world.",
+  "onboarding2Title": "From District to the World",
+  "onboarding2Body": "Great posts earn their way up through qualified reach, not follower counts.",
+  "onboarding3Title": "Create. Share. Grow.",
+  "onboarding3Body": "Share posts, reels and stories with your community and watch them travel.",
+  "onboarding4Title": "Earn from Your Impact",
+  "onboarding4Body": "Rewards follow qualified reach and trust, never raw view counts.",
+  "onboarding5Title": "Build Your Business",
+  "onboarding5Body": "Create a business page, reach nearby customers and promote what matters.",
+  "levelDistrict": "District",
+  "levelState": "State",
+  "levelNational": "National",
+  "levelGlobal": "Global",
+  "levelBadgeSemantics": "Reach level {code}, {name}",
+  "@levelBadgeSemantics": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "navHome": "Home",
+  "navExplore": "Explore",
+  "navCreate": "Create",
+  "navReels": "Reels",
+  "navProfile": "Profile",
+  "authTitle": "Welcome to BLOCKS",
+  "authSubtitle": "This is a demo experience. No account or internet connection is needed.",
+  "authDemoCardCaption": "Signing in as the demo creator",
+  "authFootnote": "Demo data is generated on your device.",
+  "close": "Close",
+  "retry": "Try again",
+  "emptyTitle": "Nothing here yet",
+  "emptyBody": "Be the first to create something.",
+  "errorTitle": "Something went wrong",
+  "errorBody": "Please check your connection and try again.",
+  "loading": "Loading",
+  "feedFollowing": "Following",
+  "feedForYou": "For You",
+  "feedRising": "Rising",
+  "feedNearYou": "Near You",
+  "feedIndia": "India",
+  "searchTooltip": "Search",
+  "notificationsTooltip": "Notifications",
+  "profileTooltip": "Your profile",
+  "messagesTooltip": "Messages",
+  "yourStory": "Your story",
+  "storyOfSemantics": "{name}'s story",
+  "@storyOfSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "addToStorySemantics": "Add to your story",
+  "postMoreOptions": "More options",
+  "actionLike": "Like",
+  "actionUnlike": "Unlike",
+  "actionComment": "Comment",
+  "actionShare": "Share",
+  "actionSave": "Save",
+  "actionUnsave": "Remove from saved",
+  "likeSemantics": "{label}, {count} likes",
+  "@likeSemantics": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "commentSemantics": "Comments, {count}",
+  "@commentSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "shareSemantics": "Share, {count} shares",
+  "@shareSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "captionMore": "more",
+  "captionLess": "less",
+  "postSaved": "Saved to your collection",
+  "postUnsaved": "Removed from saved",
+  "postCardSemantics": "Post by {name} from {location}",
+  "@postCardSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "videoLabel": "Video",
+  "risingBadge": "RISING",
+  "risingOwn": "Your post is {percent}% toward {level} level",
+  "@risingOwn": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "risingOther": "This post is {percent}% toward {level} level",
+  "@risingOther": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "risingCurrent": "Current",
+  "risingNext": "Next",
+  "risingRemaining": "{count} more qualified interactions needed",
+  "@risingRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "risingTopLevel": "Top of the ladder reached",
+  "ladderSemantics": "Reach ladder. {summary}",
+  "@ladderSemantics": {
+    "placeholders": {
+      "summary": {
+        "type": "String"
+      }
+    }
+  },
+  "ladderReachedSemantics": "{level} reached",
+  "@ladderReachedSemantics": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "ladderProgressSemantics": "{level} {percent} percent",
+  "@ladderProgressSemantics": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "ladderLockedSemantics": "{level} locked",
+  "@ladderLockedSemantics": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "reachJourney": "Reach journey",
+  "reachQualifiedLabel": "Qualified reach",
+  "reachSimulateBoost": "Simulate reach boost (demo)",
+  "reachBoostDone": "Reach boosted for the demo",
+  "reachExplain": "Only qualified reach counts: real, distinct viewers and meaningful engagement.",
+  "statViews": "Views",
+  "statLikes": "Likes",
+  "statComments": "Comments",
+  "statShares": "Shares",
+  "statSaves": "Saves",
+  "levelUnlockedTitle": "You reached {level} level!",
+  "@levelUnlockedTitle": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "levelUnlockedBody": "Your content is now eligible for {level} discovery.",
+  "@levelUnlockedBody": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "celebrationContinue": "Awesome",
+  "commentsTitle": "Comments",
+  "commentsHint": "Add a comment…",
+  "commentPost": "Post",
+  "commentsEmptyTitle": "No comments yet",
+  "commentsEmptyBody": "Start the conversation.",
+  "viewAllComments": "View all {count} comments",
+  "@viewAllComments": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "shareTitle": "Share",
+  "shareSubtitle": "Every share from a new district helps this post climb.",
+  "shareCopyLink": "Copy link",
+  "shareToStory": "Add to story",
+  "shareInMessage": "Send in message",
+  "shareMore": "More",
+  "linkCopied": "Link copied",
+  "sharedToast": "Shared",
+  "actionReport": "Report",
+  "actionMute": "Mute {username}",
+  "@actionMute": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "actionBlock": "Block {username}",
+  "@actionBlock": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "actionRestrict": "Restrict {username}",
+  "@actionRestrict": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmBlockTitle": "Block {username}?",
+  "@confirmBlockTitle": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmBlockBody": "They won't be able to find your profile, and you won't see their posts.",
+  "cancel": "Cancel",
+  "mutedToast": "{username} muted",
+  "@mutedToast": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "blockedToast": "{username} blocked",
+  "@blockedToast": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "restrictedToast": "{username} restricted",
+  "@restrictedToast": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "reportTitle": "Why are you reporting this?",
+  "reportSubtitle": "Your report is confidential.",
+  "reasonSpam": "Spam",
+  "reasonHarassment": "Harassment",
+  "reasonNudity": "Nudity / Sexual content",
+  "reasonViolence": "Violence",
+  "reasonSelfHarm": "Self-harm",
+  "reasonMisinformation": "Misinformation",
+  "reasonScam": "Scam / Fraud",
+  "reasonOther": "Other",
+  "reportDetailsHint": "Add details (optional)",
+  "reportSubmit": "Submit report",
+  "reportThanksTitle": "Thanks for letting us know",
+  "reportThanksBody": "We'll review this against our Community Guidelines.",
+  "done": "Done",
+  "timeNow": "now",
+  "timeMinutes": "{n}m",
+  "@timeMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "timeHours": "{n}h",
+  "@timeHours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "timeDays": "{n}d",
+  "@timeDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "timeWeeks": "{n}w",
+  "@timeWeeks": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "storyReplyHint": "Send a message…",
+  "storyClose": "Close story",
+  "storyDemoReaction": "Reaction sent",
+  "promoteTitle": "Promote your post",
+  "postScreenTitle": "Post",
+  "exploreTitle": "Explore",
+  "exploreSearchHint": "Search people, places and hashtags",
+  "exploreClearSearch": "Clear search",
+  "exploreLocationNote": "Showing {place}. District-level only, never your exact location.",
+  "@exploreLocationNote": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "exploreTrendingIn": "Trending in {place}",
+  "@exploreTrendingIn": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "exploreTrendPosts": "{count} posts",
+  "@exploreTrendPosts": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "exploreCategories": "Categories",
+  "exploreAll": "All",
+  "placeWorld": "the world",
+  "exploreNoResults": "No results for “{query}”",
+  "@exploreNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "exploreNoResultsBody": "Try a different name, place or hashtag.",
+  "exploreResultsPeople": "People",
+  "exploreResultsHashtags": "Hashtags",
+  "exploreResultsPosts": "Posts",
+  "catNews": "News",
+  "catEntertainment": "Entertainment",
+  "catEducation": "Education",
+  "catBusiness": "Business",
+  "catFood": "Food",
+  "catTravel": "Travel",
+  "catTechnology": "Technology",
+  "catSports": "Sports",
+  "catAgriculture": "Agriculture",
+  "catFashion": "Fashion",
+  "catLocal": "Local",
+  "catJobs": "Jobs",
+  "catEvents": "Events",
+  "reelMute": "Mute",
+  "reelUnmute": "Unmute",
+  "reelPlay": "Play",
+  "reelPause": "Pause",
+  "reelMusic": "Music: {title}",
+  "@reelMusic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "reelCreate": "Create a reel",
+  "actionFollow": "Follow",
+  "actionFollowing": "Following",
+  "actionMessage": "Message",
+  "createTitle": "Create",
+  "createOptionPost": "Post",
+  "createOptionPostBody": "Share a photo or a text update",
+  "createOptionReel": "Reel",
+  "createOptionReelBody": "A short vertical video",
+  "createOptionStory": "Story",
+  "createOptionStoryBody": "Disappears after 24 hours",
+  "createOptionLive": "Go Live",
+  "createOptionLiveBody": "For eligible creators",
+  "createPostTitle": "New post",
+  "createReelTitle": "New reel",
+  "createStoryTitle": "New story",
+  "createTypePhoto": "Photo",
+  "createTypeText": "Text",
+  "createPickPhoto": "Choose a photo",
+  "createPickVideo": "Choose a video",
+  "createGalleryNote": "Demo gallery — in the real app this opens your device gallery.",
+  "createCaptionLabel": "Caption",
+  "createCaptionHint": "What's happening in your block?",
+  "createHashtags": "Suggested hashtags",
+  "createLocation": "Location",
+  "createLocationNote": "District-level only. Your exact location is never shared.",
+  "createChangeLocation": "Change",
+  "createSearchDistrict": "Search districts",
+  "createAudience": "Audience",
+  "audienceEveryone": "Everyone",
+  "audienceFollowers": "Followers",
+  "audienceCloseFriends": "Close friends",
+  "createPublish": "Post",
+  "createPublishing": "Posting…",
+  "createPosted": "Your post is live in {district}",
+  "@createPosted": {
+    "placeholders": {
+      "district": {
+        "type": "String"
+      }
+    }
+  },
+  "createReelPosted": "Your reel is live",
+  "createStoryPosted": "Added to your story",
+  "createErrorCaptionTooLong": "Caption is too long (max 2,200 characters)",
+  "createErrorCaptionRequired": "Write something to share",
+  "createErrorMediaRequired": "Choose a photo or video first",
+  "createErrorTooManyHashtags": "Too many hashtags (max 30)",
+  "createErrorLocationRequired": "Choose a location",
+  "createStartsAt": "Starts at {level} · {district}",
+  "@createStartsAt": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      },
+      "district": {
+        "type": "String"
+      }
+    }
+  },
+  "createStartsBody": "It climbs the Reach Ladder when people across districts engage.",
+  "createMusic": "Music",
+  "createChooseMusic": "Choose music",
+  "createCover": "Cover",
+  "createStoryText": "Add text to your story",
+  "createStoryShare": "Share to story",
+  "createStoryTextHint": "Say something…",
+  "liveTitle": "Go Live",
+  "liveAccessTitle": "LIVE ACCESS",
+  "liveFollowersRule": "Followers: {required} required",
+  "@liveFollowersRule": {
+    "placeholders": {
+      "required": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "liveFollowersYours": "Your followers: {current}",
+  "@liveFollowersYours": {
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "liveAgeRule": "Account age: {required} days required",
+  "@liveAgeRule": {
+    "placeholders": {
+      "required": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "liveAgeYours": "Your account: {current} days",
+  "@liveAgeYours": {
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "liveTrustRule": "Trust status",
+  "liveTrustEligible": "Eligible",
+  "liveTrustReview": "Under review",
+  "liveTrustRestricted": "Restricted",
+  "liveTwoFactorRule": "Two-factor authentication",
+  "liveEnabled": "Enabled",
+  "liveNotEnabled": "Not enabled",
+  "liveViolationRule": "No major violations",
+  "liveAgeRuleEligible": "Age eligibility",
+  "liveMet": "Met",
+  "liveNotMet": "Not met",
+  "liveGranted": "LIVE ACCESS GRANTED",
+  "liveGrantedBody": "You meet every requirement. Live streaming is not available in this demo.",
+  "liveNotYet": "Not eligible yet",
+  "liveNotYetBody": "Complete the requirements below to unlock Live.",
+  "liveEnableTwoFactor": "Turn on two-factor authentication",
+  "liveStart": "Start live",
+  "liveRequirementMet": "Requirement met",
+  "liveRequirementNotMet": "Requirement not met",
+  "profilePosts": "Posts",
+  "profileFollowers": "Followers",
+  "profileFollowing": "Following",
+  "profileTabPosts": "Posts",
+  "profileTabReels": "Reels",
+  "profileTabTagged": "Tagged",
+  "profileReachLevel": "Reach level",
+  "profileLevelLine": "{code} — {level}",
+  "@profileLevelLine": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "profileShare": "Share",
+  "profileMenu": "Menu",
+  "profileCreatorStudio": "Creator Studio",
+  "profileBusiness": "Business profile",
+  "profileVerification": "Verification",
+  "profileSafetyCenter": "Safety Center",
+  "profileSettings": "Settings",
+  "profileMessages": "Messages",
+  "profileBestPost": "Based on your best post",
+  "verifiedIdentity": "Verified Identity",
+  "verifiedBusiness": "Verified Business",
+  "verifiedCreator": "Verified Creator",
+  "verifiedPublisher": "Verified Publisher",
+  "backTooltip": "Back",
+  "studioTitle": "Creator Studio",
+  "studioSubtitle": "Reach, growth and earnings at a glance",
+  "studioEstimatedEarnings": "Estimated earnings",
+  "studioEarningsNote": "Estimates come from qualified reach and can change after quality checks. Demo values, not a payout promise.",
+  "studioFollowers": "Followers",
+  "studioQualifiedReach": "Qualified reach",
+  "studioLast30": "Last 30 days",
+  "studioLevelReach": "{level} reach",
+  "@studioLevelReach": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "studioReachPerformance": "Reach performance",
+  "studioReachPerformanceBody": "How much of your audience footprint each level covers.",
+  "studioNextMilestone": "Next milestone",
+  "studioMilestoneProgress": "{percent}% complete",
+  "@studioMilestoneProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "studioMilestoneBody": "Keep growing your cross-state audience.",
+  "studioMilestoneTop": "You are at the top of the ladder. Keep the momentum going.",
+  "studioTopPosts": "Top posts",
+  "studioOpenPost": "Open post",
+  "businessLabel": "BLOCKS Business",
+  "businessTabPosts": "Posts",
+  "businessTabReels": "Reels",
+  "businessTabOffers": "Offers",
+  "businessTabAbout": "About",
+  "businessFollowers": "{count} followers",
+  "@businessFollowers": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "businessContact": "Contact",
+  "businessPromote": "Promote",
+  "businessCall": "Call",
+  "businessWhatsApp": "WhatsApp",
+  "businessWebsite": "Website",
+  "businessCopied": "{what} copied",
+  "@businessCopied": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "businessHours": "Opening hours",
+  "businessCategory": "Category",
+  "businessLocation": "Location",
+  "businessOfferCode": "Code: {code}",
+  "@businessOfferCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "businessOfferValid": "Valid until {date}",
+  "@businessOfferValid": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "businessCopyCode": "Copy code",
+  "businessAbout": "About",
+  "promoteStepOf": "Step {current} of {total}",
+  "@promoteStepOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "promoteStepPost": "Select post",
+  "promoteStepGoal": "Choose a goal",
+  "promoteStepAudience": "Select audience",
+  "promoteStepLocation": "Select location",
+  "promoteStepBudget": "Set budget",
+  "promoteStepReview": "Review",
+  "promoteStepPublish": "Publish",
+  "goalFollowers": "More followers",
+  "goalFollowersBody": "Grow your audience with people likely to follow.",
+  "goalReach": "More reach",
+  "goalReachBody": "Show your post to as many people as possible.",
+  "goalWebsite": "Website visits",
+  "goalWebsiteBody": "Send people to your website.",
+  "goalContact": "WhatsApp / Contact",
+  "goalContactBody": "Get calls and WhatsApp messages.",
+  "goalVideoViews": "Video views",
+  "goalVideoViewsBody": "Get more people to watch your video.",
+  "promoteAudienceNote": "We target interest groups. Personal details are never shared with advertisers.",
+  "promoteInterests": "Interests",
+  "promoteLocationsHint": "Where should your post be shown? Pick one or more districts.",
+  "promoteAddDistrict": "Add district",
+  "promoteDailyBudget": "Daily budget",
+  "promoteDuration": "Duration",
+  "promoteDays": "{n} days",
+  "@promoteDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "promoteTotal": "Total budget",
+  "promoteEstimatedReach": "Estimated reach",
+  "promoteReachRange": "{min} – {max} people",
+  "@promoteReachRange": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "promoteDemoBanner": "Demo campaign. No real money is processed.",
+  "promoteContinue": "Continue",
+  "promoteBack": "Back",
+  "promotePublish": "Publish demo campaign",
+  "promoteSuccessTitle": "Demo campaign created",
+  "promoteSuccessBody": "In the real app your post would now start reaching new people. No money was charged.",
+  "promoteDone": "Done",
+  "promoteReviewPost": "Post",
+  "promoteReviewGoal": "Goal",
+  "promoteReviewAudience": "Audience",
+  "promoteReviewLocation": "Locations",
+  "promoteReviewBudget": "Budget",
+  "promoteNoPosts": "Create a post first, then promote it.",
+  "campErrPost": "Select a post to promote",
+  "campErrGoal": "Choose a goal",
+  "campErrLocation": "Pick at least one location",
+  "campErrBudgetLow": "Minimum daily budget is ₹100",
+  "campErrBudgetHigh": "Maximum daily budget is ₹50,000",
+  "campErrDuration": "Duration must be 1 to 30 days",
+  "notifTitle": "Notifications",
+  "notifMarkAllRead": "Mark all as read",
+  "notifAllMarked": "All notifications marked as read",
+  "notifAll": "All",
+  "notifCatLikes": "Likes",
+  "notifCatComments": "Comments",
+  "notifCatFollowers": "New followers",
+  "notifCatShares": "Shares",
+  "notifCatReach": "Reach levels",
+  "notifCatEarnings": "Earnings",
+  "notifCatBusiness": "Business",
+  "notifCatSafety": "Safety",
+  "notifUnread": "Unread",
+  "notifEmptyTitle": "You're all caught up",
+  "notifEmptyBody": "New activity will show up here.",
+  "messagesTitle": "Messages",
+  "messagesSearchHint": "Search conversations",
+  "messagesEmptyTitle": "No conversations yet",
+  "messagesEmptyBody": "Start one from someone's profile.",
+  "messagesNoMatch": "No conversations match “{query}”",
+  "@messagesNoMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "chatOnline": "Online",
+  "chatOffline": "Offline",
+  "chatMessageHint": "Message…",
+  "chatSend": "Send",
+  "chatAttach": "Attach photo",
+  "chatVoice": "Record voice message",
+  "chatPhoto": "Photo",
+  "chatVoiceMessage": "Voice message, {duration}",
+  "@chatVoiceMessage": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "chatUnavailableDemo": "Not available in this demo",
+  "chatEmptyTitle": "Say hello",
+  "chatEmptyBody": "Messages you send will appear here.",
+  "conversationUnread": "{count} unread",
+  "@conversationUnread": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyTitle": "Verification",
+  "verifyStatusTitle": "Verification status",
+  "verifyStatusNone": "Not verified",
+  "verifyStatusPending": "Pending review",
+  "verifyStatusVerified": "Verified",
+  "verifyStatusRejected": "Not approved",
+  "verifyIntro": "Badges are earned, never bought. Each has clear eligibility rules and can be revoked.",
+  "verifyBodyIdentity": "Confirms you are a real person using an approved ID check.",
+  "verifyBodyBusiness": "Confirms a business or organisation is genuine.",
+  "verifyBodyCreator": "Recognises sustained, original and compliant creators.",
+  "verifyBodyPublisher": "For news and media organisations that cite sources and publish corrections.",
+  "verifyRequest": "Request",
+  "verifyRequested": "Requested",
+  "verifyCurrent": "Current badge",
+  "verifySubmitted": "Verification requested",
+  "verifyDemoAdminTitle": "Demo admin",
+  "verifyDemoAdminBody": "In the real app a trust team reviews your request. In this demo you can approve it yourself.",
+  "verifyApprove": "Approve (demo)",
+  "verifyApproved": "You're verified",
+  "safetyTitle": "Safety Center",
+  "safetyIntro": "Tools to control who can reach you and what you see.",
+  "safetySectionReport": "Report",
+  "safetyReportContent": "Report content or a problem",
+  "safetyReportContentBody": "You can also tap the three dots on any post, reel or profile.",
+  "safetySectionPeople": "People",
+  "safetyBlocked": "Blocked accounts",
+  "safetyMuted": "Muted accounts",
+  "safetyRestricted": "Restricted accounts",
+  "safetyRestrictedBody": "Restricted people can't see when you are active. Restrict someone from their profile menu.",
+  "safetySectionControls": "Controls",
+  "safetySensitive": "Sensitive content",
+  "safetySensitiveBody": "Choose how much sensitive content appears in your feeds.",
+  "safetySensitiveLess": "Less",
+  "safetySensitiveStandard": "Standard",
+  "safetySensitiveMore": "More",
+  "safetyComments": "Who can comment",
+  "safetyMessages": "Who can message you",
+  "safetyEveryone": "Everyone",
+  "safetyFollowers": "Followers",
+  "safetyNobody": "No one",
+  "safetyPrivateAccount": "Private account",
+  "safetyPrivateAccountBody": "Only approved followers can see your posts.",
+  "safetySectionSecurity": "Security",
+  "safetyTwoFactor": "Two-factor authentication",
+  "safetyTwoFactorBody": "Adds a second step when you sign in. Required for Live.",
+  "safetyLoginSecurity": "Login security",
+  "safetyLoginBody": "This device · {place} · active now",
+  "@safetyLoginBody": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "safetyLoginAlerts": "Alert me about new sign-ins",
+  "blockedTitle": "Blocked accounts",
+  "mutedTitle": "Muted accounts",
+  "blockedEmptyBody": "People you block can't find your profile.",
+  "mutedEmptyBody": "Muted people's posts are hidden from your feeds.",
+  "unblock": "Unblock",
+  "unmute": "Unmute",
+  "unblockedToast": "{username} unblocked",
+  "@unblockedToast": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "unmutedToast": "{username} unmuted",
+  "@unmutedToast": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTitle": "Settings",
+  "settingsSectionAccount": "Account",
+  "settingsSectionPreferences": "Preferences",
+  "settingsSectionSupport": "Support",
+  "settingsAppearance": "Appearance",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "settingsAccount": "Account details",
+  "settingsPrivacy": "Privacy",
+  "settingsSecurity": "Security",
+  "settingsNotifications": "Notifications",
+  "settingsLanguage": "Language",
+  "settingsLanguageSystem": "System default",
+  "settingsContent": "Content preferences",
+  "settingsCreator": "Creator settings",
+  "settingsBusiness": "Business settings",
+  "settingsHelp": "Help & support",
+  "settingsGuidelines": "Community guidelines",
+  "settingsPrivacyPolicy": "Privacy policy",
+  "settingsTerms": "Terms of service",
+  "settingsLogout": "Log out",
+  "settingsLogoutTitle": "Log out of BLOCKS?",
+  "settingsLogoutBody": "You can sign back in as the demo user any time.",
+  "settingsDemoMode": "Demo mode · all data is generated on this device",
+  "settingsAccountName": "Name",
+  "settingsAccountUsername": "Username",
+  "settingsAccountLocation": "Location",
+  "settingsAccountAge": "Time on BLOCKS",
+  "settingsAccountDays": "{days} days",
+  "@settingsAccountDays": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "prefNotifLikes": "Likes",
+  "prefNotifComments": "Comments",
+  "prefNotifFollowers": "New followers",
+  "prefNotifReach": "Reach level unlocks",
+  "prefNotifEarnings": "Creator earnings",
+  "prefNotifBusiness": "Business activity",
+  "prefNotifSafety": "Safety and security",
+  "prefAlwaysOn": "Always on",
+  "prefAutoplay": "Autoplay videos",
+  "prefDataSaver": "Data saver",
+  "prefDataSaverBody": "Loads smaller images and limits preloading.",
+  "prefShowReachBadge": "Show Reach Level on my profile",
+  "prefCreatorEarnings": "Show earnings in Creator Studio",
+  "prefWeeklySummary": "Weekly performance summary",
+  "prefBusinessAutoReply": "Auto-reply to messages",
+  "prefBusinessContact": "Show Contact button",
+  "prefOpenBusiness": "Open business profile",
+  "infoGuidelinesTitle": "Community guidelines",
+  "infoGuidelinesBody": "# Be real\nShare your own work and say when content is AI-generated or taken from a source.\n\n# Be kind\nNo harassment, hate or threats. Disagree without attacking people.\n\n# Keep it safe\nNo sexual exploitation, graphic violence, self-harm promotion, scams or illegal goods. Content involving minors is removed immediately.\n\n# Earn reach fairly\nFake engagement, bots and view manipulation are not allowed. Reach Levels count qualified viewers only.\n\n# Appeals\nIf we remove something you can appeal and a person will review it.",
+  "infoPrivacyTitle": "Privacy policy",
+  "infoPrivacyBody": "# What we collect\nOnly what BLOCKS needs: your profile, your posts and your district — never your exact GPS location.\n\n# What we never do\nWe do not sell your personal data. Advertisers reach interest groups, not individuals.\n\n# Your controls\nUse Safety Center and Settings to control privacy, messages and notifications. You can request your data or delete your account.\n\n# Payments and identity\nPayout and identity details are stored separately from your public profile.\n\n# Demo note\nThis is summary copy for the prototype, not a legal policy.",
+  "infoTermsTitle": "Terms of service",
+  "infoTermsBody": "# Using BLOCKS\nYou must be old enough to use social media in your country and follow the Community Guidelines.\n\n# Your content\nYou own what you post and let BLOCKS show it to other people.\n\n# Creator rewards\nRewards come from a pool shared by qualified reach. They are estimates until finalised and are never a promise of a rupee amount per view.\n\n# Demo note\nThis is summary copy for the prototype, not legal terms.",
+  "infoHelpTitle": "Help & support",
+  "infoHelpBody": "# How do Reach Levels work?\nPosts climb District, State, National and Global as real people in more places engage with them.\n\n# Why is my post still at District level?\nOnly qualified views count. Open the Rising tab to see how close it is.\n\n# How do I get verified?\nOpen Profile, then Menu, then Verification and request a badge.\n\n# How do I report something?\nTap the three dots on a post, reel or profile and choose Report.\n\n# Need a person?\nThis is a demo, so there is no live support.",
+  "reelsTabForYou": "For You",
+  "reelsTabFollowing": "Following",
+  "reelsFollowingEmptyTitle": "No reels from people you follow yet",
+  "reelsFollowingEmptyBody": "Follow creators to see their reels here.",
+  "reelsFeedSemantics": "Reels feed",
+  "prefReelsSound": "Reels sound",
+  "prefReelsSoundBody": "Reels always start muted in a new session.",
+  "secAlertEmail": "Security alerts by email",
+  "secAlertPush": "Security alerts on my devices",
+  "secAlertNewDevice": "New device sign-in alerts",
+  "notifCatSecurity": "Security",
+  "secTitle": "Security",
+  "secStatusProtected": "Your account is protected",
+  "secStatusAttention": "Your account needs attention",
+  "secStatusBody2faOn": "Two-factor authentication is on and nothing unusual was found.",
+  "secStatusBody2faOff": "Turn on two-factor authentication to protect your account.",
+  "secStatusBodySuspicious": "We found a suspicious sign-in. Review it now.",
+  "secLastSignIn": "Last sign-in: {when}",
+  "@secLastSignIn": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "secSectionAccount": "Account security",
+  "secSectionDemo": "Demo",
+  "secChangePassword": "Change Password",
+  "secChangeEmail": "Change Email",
+  "secChangePhone": "Change Phone Number",
+  "secTwoFactor": "Two-Factor Authentication",
+  "secLoginActivity": "Login Activity",
+  "secDevices": "Logged-in Devices",
+  "secLogoutOthers": "Log Out From All Other Devices",
+  "secNotifications": "Security Notifications",
+  "secOn": "On",
+  "secOff": "Off",
+  "secDevicesCount": "{n} devices",
+  "@secDevicesCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "secLogoutOthersTitle": "Log out of all other devices?",
+  "secLogoutOthersBody": "This will end BLOCKS sessions on every device except this one.",
+  "secLogoutOthersConfirm": "Log Out Others",
+  "secLogoutOthersDone": "Logged out of all other devices",
+  "secDemoLab": "Security demo lab",
+  "secDemoLabBody": "Simulate sign-in attacks, alerts and device changes.",
+  "secReviewNeeded": "Review",
+  "secFieldRequired": "This field is required",
+  "secPasswordLabel": "Password",
+  "cpTitle": "Change Password",
+  "cpIntro": "Choose a strong password you don't use anywhere else.",
+  "cpCurrent": "Current password",
+  "cpNew": "New password",
+  "cpConfirm": "Confirm new password",
+  "cpShow": "Show password",
+  "cpHide": "Hide password",
+  "cpStrength": "Password strength",
+  "cpStrengthWeak": "Weak",
+  "cpStrengthFair": "Fair",
+  "cpStrengthStrong": "Strong",
+  "cpStrengthVeryStrong": "Very strong",
+  "cpRuleMinLength": "At least {n} characters",
+  "@cpRuleMinLength": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "cpRuleUpper": "An uppercase letter (A-Z)",
+  "cpRuleLower": "A lowercase letter (a-z)",
+  "cpRuleDigit": "A number (0-9)",
+  "cpRuleSpecial": "A special character (! @ # ...)",
+  "cpMismatch": "Passwords don't match",
+  "cpSubmit": "Change Password",
+  "cpForgot": "Forgot your current password?",
+  "cpSuccessTitle": "Password Changed",
+  "cpSuccessBody": "Your BLOCKS password has been updated successfully.",
+  "cpErrorTitle": "Unable to change password.",
+  "cpErrorBody": "Please verify your current password and try again.",
+  "cpErrWeak": "The new password doesn't meet the requirements.",
+  "cpErrSame": "Your new password must be different from the current one.",
+  "devTitle": "Your Devices",
+  "devActiveNow": "Active now",
+  "devCurrentBadge": "This device",
+  "devLogOut": "Log Out",
+  "devLogOutTitle": "Log out of this device?",
+  "devLogOutBody": "{device} will be signed out of BLOCKS.",
+  "@devLogOutBody": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "devLoggedOut": "Device logged out",
+  "devEmpty": "No other devices are signed in.",
+  "devOnPlatform": "{app} on {platform}",
+  "@devOnPlatform": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "platform": {
+        "type": "String"
+      }
+    }
+  },
+  "actTitle": "Login Activity",
+  "actFilterAll": "All",
+  "actFilterSuccessful": "Successful",
+  "actFilterFailed": "Failed",
+  "actFilterSuspicious": "Suspicious",
+  "actToday": "Today",
+  "actYesterday": "Yesterday",
+  "actEmptyTitle": "No activity to show",
+  "actEmptyBody": "Nothing matches this filter.",
+  "evLoginSuccess": "Successful Login",
+  "evLoginFailed": "Failed Login Attempt",
+  "evSuspicious": "Suspicious Login Attempt",
+  "evPasswordChanged": "Password Changed",
+  "evEmailChanged": "Email Changed",
+  "evPhoneChanged": "Phone Number Changed",
+  "evTwoFactorOn": "Two-Factor Authentication Enabled",
+  "evTwoFactorOff": "Two-Factor Authentication Disabled",
+  "evSessionRevoked": "Device Logged Out",
+  "evAttempts": "{n} failed attempts",
+  "@evAttempts": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "evReviewed": "Reviewed",
+  "tfTitle": "Two-Factor Authentication",
+  "tfIntro": "Add a second step when you sign in, so a stolen password isn't enough.",
+  "tfStatusOn": "Two-factor authentication is on",
+  "tfStatusOff": "Two-factor authentication is off",
+  "tfMethod": "Verification method",
+  "tfSms": "Text message (SMS)",
+  "tfSmsBody": "Codes are sent to {phone}",
+  "@tfSmsBody": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "tfAuthenticator": "Authenticator app",
+  "tfAuthenticatorBody": "Use an app like Google Authenticator or Authy.",
+  "tfEmailFallback": "Email fallback",
+  "tfEmailFallbackBody": "If you can't get a code, we can send one to your email.",
+  "tfEnable": "Turn on",
+  "tfDisable": "Turn off",
+  "tfChooseMethod": "Choose how to get codes",
+  "tfCodeSentTo": "We sent a code to {dest}.",
+  "@tfCodeSentTo": {
+    "placeholders": {
+      "dest": {
+        "type": "String"
+      }
+    }
+  },
+  "tfAuthSetup": "Open your authenticator app and enter the code shown for BLOCKS.",
+  "tfVerify": "Verify and turn on",
+  "tfEnabledToast": "Two-factor authentication is on",
+  "tfDisableTitle": "Turn off two-factor authentication?",
+  "tfDisableBody": "Your account will only be protected by your password. Enter it to confirm.",
+  "tfDisabledToast": "Two-factor authentication is off",
+  "tfDemoNote": "Demo: no real SMS or authenticator app is used.",
+  "otpEnterCode": "Verification code",
+  "otpLabel": "{n}-digit code",
+  "@otpLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "otpDemoHint": "Demo OTP: {code}",
+  "@otpDemoHint": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "otpDemoNotice": "Demo only. A real build never shows the code on screen.",
+  "otpResend": "Resend code",
+  "otpResendIn": "Resend in {seconds}s",
+  "@otpResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "otpResent": "A new code was sent",
+  "otpIncorrect": "That code isn't right. {attempts} attempts left.",
+  "@otpIncorrect": {
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      }
+    }
+  },
+  "otpExpired": "This code has expired. Request a new one.",
+  "otpLocked": "Too many wrong codes. Try again after {time}.",
+  "@otpLocked": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "snTitle": "Security Notifications",
+  "snIntro": "Choose how BLOCKS alerts you about account activity.",
+  "snCritical": "Suspicious sign-ins and account changes",
+  "snCriticalBody": "Always on. We always alert you when a sign-in looks suspicious or your password, email or phone changes.",
+  "snSentTitle": "Alerts sent to your email",
+  "snSentEmpty": "No security emails have been sent yet.",
+  "snSentTo": "Sent to {email}",
+  "@snSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "snDemoNote": "Demo: emails are simulated and only listed here.",
+  "alertSuspiciousTitle": "Suspicious Login Attempt",
+  "alertSuspiciousBody": "We detected multiple unsuccessful login attempts on your BLOCKS account.",
+  "alertNewDeviceTitle": "New Device Sign-in",
+  "alertNewDeviceBody": "A new device signed in to your BLOCKS account.",
+  "alertDevice": "Device",
+  "alertLocation": "Approximate location",
+  "alertTime": "Time",
+  "alertIfYou": "If this was you",
+  "alertIfYouBody": "You don't need to do anything.",
+  "alertIfNotYou": "If this wasn't you",
+  "alertIfNotYouBody": "Change your password and review your logged-in devices.",
+  "alertSecure": "Secure Account",
+  "alertReview": "Review Devices",
+  "alertWasMe": "This Was Me",
+  "alertAcknowledged": "Thanks. We've marked this as you.",
+  "alertSent": "Security Alert Sent",
+  "alertSentBody": "We've sent a security notification to your registered email and active BLOCKS devices.",
+  "alertPrivacyNote": "For your privacy we only show an approximate location.",
+  "cpRuleMet": "met",
+  "cpRuleNotMet": "not met yet",
+  "otpDemoFill": "Tap to fill the code.",
+  "tfWrongPassword": "That password isn't right.",
+  "authSignInPassword": "Sign in with password",
+  "siTitle": "Welcome back",
+  "siSubtitle": "Sign in to your BLOCKS account.",
+  "siIdentifier": "Email, phone or username",
+  "siButton": "Sign In",
+  "siForgot": "Forgot password?",
+  "siInvalid": "Incorrect email, phone or password.",
+  "siAttemptsLeft": "{n} attempts left before your account is temporarily protected.",
+  "@siAttemptsLeft": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "siProtectedTitle": "Account temporarily protected",
+  "siProtectedAttempts": "{n} failed login attempts detected.",
+  "@siProtectedAttempts": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "siProtectedBody": "Your account has been temporarily protected.",
+  "siProtectedAdvice": "If this wasn't you, secure your account immediately.",
+  "siProtectedUntil": "You can try again after {time}.",
+  "@siProtectedUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "siResetPassword": "Reset password",
+  "siDemoCard": "Demo account",
+  "siDemoPassword": "Password: {password}",
+  "@siDemoPassword": {
+    "placeholders": {
+      "password": {
+        "type": "String"
+      }
+    }
+  },
+  "siDemoFill": "Tap to fill in the demo sign-in.",
+  "labIntro": "Run security scenarios on the demo server to show alerts, protection and device changes. Nothing here exists in a real build.",
+  "labStatus": "What the server sees",
+  "labFailed": "Failed sign-ins: {n} of {total}",
+  "@labFailed": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "labNotProtected": "Sign-in is not restricted",
+  "labProtectedUntil": "Sign-in is protected until {time}",
+  "@labProtectedUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "labEmails": "Security emails sent: {n}",
+  "@labEmails": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "labDevices": "Active devices: {n}",
+  "@labDevices": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "labPhotoArmed": "The next profile photo upload will fail",
+  "labRun": "Run",
+  "labReset": "Reset demo data",
+  "labResetDone": "Demo security data reset",
+  "labOpenAlert": "Open the alert",
+  "labTrySignIn": "Sign out and try the sign-in screen",
+  "labNormalTitle": "Normal login",
+  "labNormalBody": "A successful sign-in from this device. No alert.",
+  "labWrongTitle": "Wrong password",
+  "labWrongBody": "One failed sign-in. Repeat it to watch the attempt counter.",
+  "labMaxTitle": "Maximum failed attempts",
+  "labMaxBody": "Reaches the limit: protection starts, and an event, notification and email are created.",
+  "labSuspiciousTitle": "Suspicious login notification",
+  "labSuspiciousBody": "A sign-in attempt from an unknown device raises the alert.",
+  "labPasswordTitle": "Password changed",
+  "labPasswordBody": "Records the change and sends the alert (your password stays the same).",
+  "labNewDeviceTitle": "New device login",
+  "labNewDeviceBody": "A new phone appears in your devices with a New Login alert.",
+  "labRevokedTitle": "Session revoked",
+  "labRevokedBody": "Another device is logged out, with a Device Removed alert.",
+  "labPhotoTitle": "Photo upload fails",
+  "labPhotoBody": "The next profile photo upload fails so you can see the error and retry.",
+  "fpTitle": "Forgot Password",
+  "fpStep": "Step {current} of {total}",
+  "@fpStep": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "fpChooseTitle": "How should we verify you?",
+  "fpChooseBody": "Pick where we should send your verification code.",
+  "fpViaEmail": "Reset password using Email",
+  "fpViaPhone": "Reset password using Phone",
+  "fpEmailBody": "We'll send a verification code to your email.",
+  "fpPhoneBody": "We'll text a verification code to your phone.",
+  "fpEmailLabel": "Email address",
+  "fpPhoneLabel": "Phone number",
+  "fpSendCode": "Send Verification Code",
+  "fpSendOtp": "Send OTP",
+  "fpVerifyCode": "Verify Code",
+  "fpNewTitle": "Create a new password",
+  "fpNewBody": "Choose a strong password you haven't used before.",
+  "fpSave": "Reset Password",
+  "fpDoneTitle": "Password Changed Successfully",
+  "fpDoneBody": "You can now sign in with your new password.",
+  "fpDoneBodyInApp": "Your password is updated and your other devices were signed out for your safety.",
+  "fpBackToSignIn": "Back to sign in",
+  "fpErrEmail": "Enter a valid email address.",
+  "fpErrPhone": "Enter a valid 10-digit mobile number.",
+  "fpTooMany": "Too many attempts. Please try again later.",
+  "fpExpired": "This verification expired. Please start again.",
+  "fpDemoAny": "Demo: any valid email or phone number works.",
+  "ccCurrentEmail": "Current email",
+  "ccCurrentPhone": "Current phone number",
+  "ccNewEmail": "New email address",
+  "ccNewPhone": "New phone number",
+  "ccPasswordHint": "For your security, enter your password to continue.",
+  "ccSendCode": "Send Verification Code",
+  "ccConfirmTitle": "Confirm the change",
+  "ccConfirmBodyEmail": "Your BLOCKS email will change to {value}.",
+  "@ccConfirmBodyEmail": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "ccConfirmBodyPhone": "Your BLOCKS phone number will change to {value}.",
+  "@ccConfirmBodyPhone": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "ccConfirm": "Confirm",
+  "ccDoneEmailTitle": "Email Updated",
+  "ccDoneEmailBody": "We sent an alert to your previous address so you know it was you.",
+  "ccDonePhoneTitle": "Phone Number Updated",
+  "ccDonePhoneBody": "Your new number is now on your account.",
+  "ccErrSameEmail": "That is already your current email.",
+  "ccErrSamePhone": "That is already your current phone number.",
+  "epTitle": "Edit Profile",
+  "epSave": "Save",
+  "epSaveChanges": "Save changes",
+  "epSaved": "Profile updated",
+  "epPublicSection": "Public profile",
+  "epPublicHint": "Anyone on BLOCKS can see this.",
+  "epPrivateSection": "Private details",
+  "epPrivateHint": "Only you can see this.",
+  "epName": "Full name",
+  "epUsername": "Username",
+  "epBio": "Bio",
+  "epBioCount": "{n}/{total}",
+  "@epBioCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "epWebsite": "Website",
+  "epLocation": "Location",
+  "epCountry": "Country",
+  "epState": "State",
+  "epDistrict": "District",
+  "epDob": "Date of birth",
+  "epDobHint": "Select your date of birth",
+  "epGender": "Gender",
+  "epGenderFemale": "Female",
+  "epGenderMale": "Male",
+  "epGenderNonBinary": "Non-binary",
+  "epGenderPrefer": "Prefer not to say",
+  "epLanguage": "Language",
+  "epLanguageHint": "Applies to the whole app straight away.",
+  "epUsernameChecking": "Checking availability...",
+  "epUsernameAvailable": "This username is available",
+  "epErrNameShort": "Enter at least {n} characters.",
+  "@epErrNameShort": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "epErrNameLong": "Use {n} characters or fewer.",
+  "@epErrNameLong": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "epErrUsernameShort": "Use at least {n} characters.",
+  "@epErrUsernameShort": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "epErrUsernameLong": "Use {n} characters or fewer.",
+  "@epErrUsernameLong": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "epErrUsernameChars": "Use only letters, numbers, dots and underscores. It can't start or end with a dot.",
+  "epErrUsernameReserved": "That username isn't available.",
+  "epErrUsernameTaken": "That username is already taken.",
+  "epErrBioLong": "Keep your bio under {n} characters.",
+  "@epErrBioLong": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "epErrWebsite": "Enter a valid website, for example example.com.",
+  "epErrDobFuture": "Your date of birth can't be in the future.",
+  "epErrDobAge": "You must be at least {n} years old.",
+  "@epErrDobAge": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "epErrDobInvalid": "Enter a valid date of birth.",
+  "epDiscard": "Discard changes?",
+  "epDiscardBody": "Your edits will be lost.",
+  "epDiscardConfirm": "Discard",
+  "epKeepEditing": "Keep editing",
+  "phTitle": "Change Profile Photo",
+  "phTake": "Take Photo",
+  "phChoose": "Choose from Gallery",
+  "phRemove": "Remove Photo",
+  "phRemoveTitle": "Remove your photo?",
+  "phRemoveBody": "Your profile will show your initials instead.",
+  "phEditSemantics": "Change profile photo",
+  "phUploading": "Uploading photo... {percent}%",
+  "@phUploading": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "phDone": "Profile photo updated",
+  "phRemoved": "Profile photo removed",
+  "phErrUnsupported": "Use a JPG, PNG or WebP photo.",
+  "phErrTooLarge": "That photo is too large. Choose one under {n} MB.",
+  "@phErrTooLarge": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "phErrNetwork": "Couldn't upload the photo. Check your connection and try again.",
+  "phErrPick": "Couldn't open your camera or gallery.",
+  "settingsEmail": "Email",
+  "settingsPhone": "Phone",
+  "settingsPassword": "Password",
+  "settingsSectionPrivacySafety": "Privacy & safety",
+  "secOverview": "Security overview",
+  "reelVideoSemantics": "Reel by {name}. Tap to play or pause, double tap to like.",
+  "@reelVideoSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "audiencePrivate": "Private",
+  "evPayoutAccountChanged": "Payout account changed",
+  "evIdentityChanged": "Identity details submitted",
+  "rsToolClips": "Clips",
+  "rsToolTrim": "Trim",
+  "rsToolMusic": "Music",
+  "rsToolText": "Text",
+  "rsToolStickers": "Stickers",
+  "rsToolFilters": "Filters",
+  "rsToolAdjust": "Adjust",
+  "rsToolTransitions": "Transitions",
+  "rsToolCover": "Cover",
+  "fltOriginal": "Original",
+  "fltVivid": "Vivid",
+  "fltWarm": "Warm",
+  "fltCool": "Cool",
+  "fltCinematic": "Cinematic",
+  "fltPortrait": "Portrait",
+  "fltVintage": "Vintage",
+  "fltBw": "Black & White",
+  "fltGolden": "Golden Hour",
+  "fltIndia": "India",
+  "fltUrban": "Urban",
+  "fltFood": "Foodie",
+  "fltTravel": "Travel",
+  "fltNight": "Night",
+  "trNone": "None",
+  "trFade": "Fade",
+  "trSlide": "Slide",
+  "trZoom": "Zoom",
+  "trWipe": "Wipe",
+  "stkEmoji": "Emoji",
+  "stkIndia": "India",
+  "stkTravel": "Travel",
+  "stkFood": "Food",
+  "stkBusiness": "Business",
+  "stkLove": "Love",
+  "stkFunny": "Funny",
+  "stkFestival": "Festival",
+  "stkSports": "Sports",
+  "stkCelebration": "Celebration",
+  "fontClean": "Clean",
+  "fontSerif": "Serif",
+  "fontMono": "Mono",
+  "fontDisplay": "Display",
+  "fontScript": "Script",
+  "anNone": "None",
+  "anFade": "Fade",
+  "anPop": "Pop",
+  "anSlideUp": "Slide up",
+  "anTypewriter": "Typewriter",
+  "adjBrightness": "Brightness",
+  "adjContrast": "Contrast",
+  "adjSaturation": "Saturation",
+  "adjWarmth": "Warmth",
+  "adjHighlights": "Highlights",
+  "adjShadows": "Shadows",
+  "adjSharpness": "Sharpness",
+  "adjFade": "Fade",
+  "adjVignette": "Vignette",
+  "musTrending": "Trending",
+  "musPopular": "Popular",
+  "musNew": "New releases",
+  "musHindi": "Hindi",
+  "musTelugu": "Telugu",
+  "musTamil": "Tamil",
+  "musBengali": "Bengali",
+  "musMarathi": "Marathi",
+  "musPunjabi": "Punjabi",
+  "musKannada": "Kannada",
+  "musMalayalam": "Malayalam",
+  "musInstrumental": "Instrumental",
+  "musDevotional": "Devotional",
+  "musTravel": "Travel",
+  "musFitness": "Fitness",
+  "musRomantic": "Romantic",
+  "musComedy": "Comedy",
+  "rightsPlatform": "BLOCKS Library",
+  "rightsLicensed": "Licensed",
+  "rightsCreator": "Creator-owned",
+  "rightsFree": "Royalty-free",
+  "rightsRestricted": "Restricted",
+  "qualDataSaver": "Data Saver",
+  "qualBalanced": "Balanced",
+  "qualHigh": "High",
+  "qualOriginal": "Original",
+  "qualDataSaverHint": "Smallest upload. Good for slow or costly data.",
+  "qualBalancedHint": "Recommended. Sharp picture with a smaller file.",
+  "qualHighHint": "Sharper detail at a higher bitrate.",
+  "qualOriginalHint": "No compression. Largest and slowest to upload.",
+  "pubPreparing": "Preparing",
+  "pubCompressing": "Compressing",
+  "pubProcessing": "Processing",
+  "pubUploading": "Uploading",
+  "pubServer": "Processing on server",
+  "pubModeration": "Moderation",
+  "pubPublished": "Published",
+  "pubFailed": "Failed",
+  "pubTitle": "Publishing",
+  "pubKeepOpen": "Please keep BLOCKS open until your reel is published.",
+  "pubFileOf": "File {current} of {total}",
+  "@pubFileOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "pubBytesOf": "{sent} of {size} uploaded",
+  "@pubBytesOf": {
+    "placeholders": {
+      "sent": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "pubServerBody": "BLOCKS is preparing your reel for every screen size.",
+  "pubModerationBody": "Checking safety, copyright and community rules.",
+  "pubCheckSafety": "Safety check",
+  "pubCheckCopyright": "Copyright check",
+  "pubCheckPolicy": "Policy check",
+  "pubDone": "done",
+  "pubInProgress": "in progress",
+  "pubWaiting": "waiting",
+  "pubPublishedTitle": "Reel Published ✓",
+  "pubPublishedBody": "Your reel is eligible for {district} discovery.",
+  "@pubPublishedBody": {
+    "placeholders": {
+      "district": {
+        "type": "String"
+      }
+    }
+  },
+  "pubViewReels": "Go to Reels",
+  "pubOpenStudio": "Open Creator Studio",
+  "pubFailedTitle": "Upload failed",
+  "pubFailNetwork": "The connection dropped. Nothing is lost, and the upload will continue where it stopped.",
+  "pubFailModeration": "This reel can’t be published. Reason: {reason}.",
+  "@pubFailModeration": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "pubFailCancelled": "Publishing was stopped.",
+  "pubFailLimits": "Your reel doesn’t meet the length or size limits. Edit it and try again.",
+  "pubFailUnknown": "Something went wrong. Please try again.",
+  "pubSavedAsDraft": "Your reel is saved as a draft.",
+  "pubRetry": "Retry",
+  "pubEditReel": "Edit reel",
+  "pubSaveDraft": "Save Draft",
+  "pubLeaveTitle": "Stop publishing?",
+  "pubLeaveBody": "Your reel stays saved as a draft and you can publish it later.",
+  "pubLeaveStay": "Keep publishing",
+  "pubLeaveCancel": "Stop and save draft",
+  "rsTitle": "New reel",
+  "rsSaveDraft": "Save Draft",
+  "rsNext": "Next",
+  "rsPublish": "Publish reel",
+  "rsPlay": "Play preview",
+  "rsPause": "Pause preview",
+  "rsPreviewEmpty": "Add videos or photos to start your reel.",
+  "rsPreviewLabel": "Preview at {time} of {length}",
+  "@rsPreviewLabel": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "rsSeekValue": "{time}",
+  "@rsSeekValue": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "rsTextLayer": "Text: {text}",
+  "@rsTextLayer": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "rsStickerLayer": "Sticker {sticker}",
+  "@rsStickerLayer": {
+    "placeholders": {
+      "sticker": {
+        "type": "String"
+      }
+    }
+  },
+  "rsTimeline": "Timeline",
+  "rsTotalOfLimit": "{used} of {limit}",
+  "@rsTotalOfLimit": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "rsTimelineEmpty": "Your clips will appear here.",
+  "rsAddMedia": "Add media",
+  "rsPhoto": "Photo",
+  "rsVideo": "Video",
+  "rsClipLabel": "Clip {index} of {count}, {type}, {length}",
+  "@rsClipLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "type": {
+        "type": "String"
+      },
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "rsMoveEarlier": "Move earlier",
+  "rsMoveLater": "Move later",
+  "rsClipsEmpty": "Add videos and photos to start editing.",
+  "rsSelectClip": "Select a clip in the timeline to edit it.",
+  "rsReplace": "Replace",
+  "rsDuplicate": "Duplicate",
+  "rsSplit": "Split here",
+  "rsDelete": "Delete",
+  "rsVolume": "Volume",
+  "rsPhotoDuration": "How long to show this photo",
+  "rsSecondsShort": "{seconds}s",
+  "@rsSecondsShort": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "rsMinutesShort": "{minutes} min",
+  "@rsMinutesShort": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "rsTrimPhoto": "Photos don’t need trimming. Choose how long this one stays on screen.",
+  "rsTrimUnavailable": "This clip can’t be trimmed.",
+  "rsTrimRange": "Trim start and end",
+  "rsTrimStart": "Start {time}",
+  "@rsTrimStart": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "rsTrimEnd": "End {time}",
+  "@rsTrimEnd": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "rsTrimLength": "Length {length}",
+  "@rsTrimLength": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "rsResetTrim": "Reset trim",
+  "rsTransitionBody": "How this clip changes into the next one.",
+  "rsTransitionLast": "The last clip has no next clip, so it has no transition.",
+  "rsApplyToAll": "Apply to all clips",
+  "rsIntensity": "Intensity",
+  "rsResetAdjust": "Reset",
+  "rsOriginalAudio": "Original audio",
+  "rsOriginalAudioBody": "The sound from your own clips.",
+  "rsMusicSelected": "{title} by {artist}",
+  "@rsMusicSelected": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "rsMusicClipRange": "{artist} · {start}–{end}",
+  "@rsMusicClipRange": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "rsAddMusic": "Add music",
+  "rsChangeMusic": "Change music",
+  "rsEditMusicClip": "Choose part",
+  "rsRemoveMusic": "Remove music",
+  "rsOriginalSound": "Original sound",
+  "rsCoverPreview": "Cover preview",
+  "rsCoverFirst": "First frame",
+  "rsCoverFrame": "Pick a frame",
+  "rsCoverImage": "From photos",
+  "rsCoverAt": "Frame at",
+  "rsCoverPhotos": "Choose a photo",
+  "rsCoverPhotoN": "Photo {index}",
+  "@rsCoverPhotoN": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "rsCoverText": "Cover text",
+  "rsCoverTextHint": "A short title for your cover",
+  "rsLayers": "Layers",
+  "rsTextNew": "New text",
+  "rsTextHint": "Type something…",
+  "rsTextAdd": "Add",
+  "rsTextEdit": "Edit text",
+  "rsFont": "Font",
+  "rsColor": "Colour",
+  "rsColorSwatch": "Colour {color}",
+  "@rsColorSwatch": {
+    "placeholders": {
+      "color": {
+        "type": "String"
+      }
+    }
+  },
+  "rsAlignment": "Alignment",
+  "rsAlignStart": "Left",
+  "rsAlignCenter": "Centre",
+  "rsAlignEnd": "Right",
+  "rsBackground": "Background",
+  "rsNoBackground": "None",
+  "rsBackgroundSwatch": "Background colour {color}",
+  "@rsBackgroundSwatch": {
+    "placeholders": {
+      "color": {
+        "type": "String"
+      }
+    }
+  },
+  "rsOpacity": "Opacity",
+  "rsAnimation": "Animation",
+  "rsSize": "Size",
+  "rsRotation": "Rotation",
+  "rsVisibleBetween": "Shown on screen between",
+  "rsVisibleFor": "Visible for {length}, from {start}",
+  "@rsVisibleFor": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      }
+    }
+  },
+  "rsAddSticker": "Add sticker {sticker}",
+  "@rsAddSticker": {
+    "placeholders": {
+      "sticker": {
+        "type": "String"
+      }
+    }
+  },
+  "rsStickerHint": "Tap a sticker to add it. Drag it on the preview to move it; use two fingers to resize and rotate.",
+  "rsLengthLimit": "Reel length",
+  "rsIssueNoClips": "Add at least one video or photo.",
+  "rsIssueTooLong": "Your reel is longer than {seconds} seconds. Trim a clip or choose a longer reel length.",
+  "@rsIssueTooLong": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "rsIssueTooManyClips": "You can use up to {count} clips in one reel.",
+  "@rsIssueTooManyClips": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rsIssueTooManyPhotos": "You can use up to {count} photos in one reel.",
+  "@rsIssueTooManyPhotos": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rsIssueVideoTooLarge": "Videos can be up to {mb} MB.",
+  "@rsIssueVideoTooLarge": {
+    "placeholders": {
+      "mb": {
+        "type": "int"
+      }
+    }
+  },
+  "rsIssueClipTooShort": "One of your clips is too short.",
+  "rsSliverCut": "A cut there would leave a clip that is too short.",
+  "rsDraftSaved": "Saved to Drafts",
+  "rsDraftSaveFailed": "Couldn’t save the draft. Try again.",
+  "rsMusicUnavailable": "That track is no longer available.",
+  "rsLeaveTitle": "Leave the editor?",
+  "rsLeaveBody": "You have unsaved changes.",
+  "rsLeaveStay": "Keep editing",
+  "rsLeaveDiscard": "Discard",
+  "rsLeaveSave": "Save draft",
+  "rsPickerTitle": "Add to your reel",
+  "rsPickerBody": "Tap videos and photos in the order you want them. You can reorder them later.",
+  "rsReplaceTitle": "Replace clip",
+  "rsReplaceBody": "Pick the video or photo to use instead.",
+  "rsFilterAll": "All",
+  "rsFilterVideos": "Videos",
+  "rsFilterPhotos": "Photos",
+  "rsRecord": "Record a video",
+  "rsRecordFailed": "Couldn’t record. Try again.",
+  "rsPickerEmpty": "Nothing here yet",
+  "rsPickerEmptyBody": "Record a video or add photos to your gallery.",
+  "rsPickerAdd": "Add {count} to reel",
+  "@rsPickerAdd": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rsPickerAddNone": "Select videos or photos",
+  "rsSelectedSummary": "{videos} videos, {photos} photos",
+  "@rsSelectedSummary": {
+    "placeholders": {
+      "videos": {
+        "type": "int"
+      },
+      "photos": {
+        "type": "int"
+      }
+    }
+  },
+  "rsSelectedN": "selected, number {n}",
+  "@rsSelectedN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "rsTooLarge": "Too large",
+  "rsGalleryItemTooLarge": "{type}, {size}. Too large to add.",
+  "@rsGalleryItemTooLarge": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "rsMusicTitle": "Add music",
+  "rsMusicSearchHint": "Search title, artist, language or genre",
+  "rsClearSearch": "Clear search",
+  "rsAllMusic": "All music",
+  "rsTrendingNow": "Trending now",
+  "rsMusicRightsNote": "Every track here is licensed, owned by BLOCKS, or made by creators who allow its use.",
+  "rsMusicEmpty": "No music found",
+  "rsMusicEmptyBody": "Try another word or category.",
+  "rsReelsUsing": "{reels} reels",
+  "@rsReelsUsing": {
+    "placeholders": {
+      "reels": {
+        "type": "String"
+      }
+    }
+  },
+  "rsTrackLabel": "{title}. {meta}",
+  "@rsTrackLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "meta": {
+        "type": "String"
+      }
+    }
+  },
+  "rsPreviewOf": "Preview {title}",
+  "@rsPreviewOf": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "rsStopPreviewOf": "Stop preview of {title}",
+  "@rsStopPreviewOf": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "rsClipTitle": "Choose the part to use",
+  "rsClipRange": "Music start and end",
+  "rsClipNote": "The music can be up to {length} long, the length of your reel.",
+  "@rsClipNote": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "rsPreviewClip": "Preview",
+  "rsStopPreview": "Stop",
+  "rsUseClip": "Use this part",
+  "rsDetailsTitle": "Reel details",
+  "rsHashtags": "Hashtags",
+  "rsTagPeople": "Tag people",
+  "rsTagNobody": "Nobody tagged",
+  "rsTaggedCount": "{count} people tagged",
+  "@rsTaggedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rsTagSearchHint": "Search people",
+  "rsTagDone": "Done ({count})",
+  "@rsTagDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rsAllowComments": "Allow comments",
+  "rsAllowRemix": "Allow remix",
+  "rsAllowRemixBody": "Others can use your audio or build on your reel.",
+  "rsAllowSharing": "Allow sharing",
+  "rsQualityTitle": "Upload quality",
+  "rsQualityBody": "BLOCKS makes your files smaller on your phone, so uploads are faster and use less data.",
+  "rsSizeOriginal": "Original",
+  "rsSizeOptimized": "Optimized",
+  "rsSizeSaved": "Smaller",
+  "rsSizeSummary": "Original {original}, optimized {optimized}, {percent} percent smaller",
+  "@rsSizeSummary": {
+    "placeholders": {
+      "original": {
+        "type": "String"
+      },
+      "optimized": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "rsQualityNote": "Videos are sent at up to {resolution}.",
+  "@rsQualityNote": {
+    "placeholders": {
+      "resolution": {
+        "type": "String"
+      }
+    }
+  },
+  "rsQualityNoteOriginal": "Your files are sent exactly as they are. This uses the most data.",
+  "rsServerNote": "BLOCKS checks and re-encodes every upload on its own servers, so quality and safety never depend on your phone.",
+  "csNavLabel": "Creator Studio sections",
+  "csNavOverview": "Overview",
+  "csNavReels": "Reels",
+  "csNavPosts": "Posts",
+  "csNavDrafts": "Drafts",
+  "csNavAnalytics": "Analytics",
+  "csNavReach": "Reach",
+  "csNavEarnings": "Earnings",
+  "csNavPayout": "Payout",
+  "csEstimatedChip": "Estimated",
+  "csThisMonth": "This month",
+  "csThisMonthAmount": "This month {amount}",
+  "@csThisMonthAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "csAvailable": "Available",
+  "csPending": "Pending",
+  "csPaid": "Paid",
+  "csMenuTitle": "Your studio",
+  "csHintReels": "Your published reels",
+  "csHintPosts": "Photo and text posts",
+  "csHintDrafts": "Unfinished reels",
+  "csHintDraftsCount": "{count} unfinished",
+  "@csHintDraftsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "csHintAnalytics": "Views, watch time, audience",
+  "csHintReach": "Climb the Reach Ladder",
+  "csHintEarnings": "Estimated rewards",
+  "csHintPayout": "Verify, add bank, withdraw",
+  "csPayoutSetupTitle": "Get paid",
+  "csPayoutSetupBody": "Verify your identity, add a bank account, then withdraw once you have {minimum} available.",
+  "@csPayoutSetupBody": {
+    "placeholders": {
+      "minimum": {
+        "type": "String"
+      }
+    }
+  },
+  "csPayoutReadyTitle": "Ready to withdraw",
+  "csPayoutReadyBody": "{amount} is available to withdraw.",
+  "@csPayoutReadyBody": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "csStepIdentity": "Verify identity",
+  "csStepBank": "Add a bank account",
+  "csStepWithdraw": "Withdraw your earnings",
+  "csStepDone": "done",
+  "csSetUpPayouts": "Set up payouts",
+  "csRequestPayout": "Request payout",
+  "csNewReel": "New reel",
+  "csNewPost": "New post",
+  "csNew": "New",
+  "csNoCaption": "No caption",
+  "csReelsEmpty": "No reels yet",
+  "csReelsEmptyBody": "Make your first reel and it starts in your District.",
+  "csPostsEmpty": "No posts yet",
+  "csPostsEmptyBody": "Share a photo or a thought with your District.",
+  "csReelRowLabel": "{title}, {views} views",
+  "@csReelRowLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "views": {
+        "type": "String"
+      }
+    }
+  },
+  "csViewsCount": "{views} views",
+  "@csViewsCount": {
+    "placeholders": {
+      "views": {
+        "type": "String"
+      }
+    }
+  },
+  "csDraftsEmpty": "No drafts",
+  "csDraftsEmptyBody": "Reels you save while editing appear here.",
+  "csDraftReady": "Ready to publish",
+  "csDraftNeedsChanges": "Needs changes",
+  "csDraftClips": "{count} clips · {length}",
+  "@csDraftClips": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "csDraftEdited": "Edited {ago}",
+  "@csDraftEdited": {
+    "placeholders": {
+      "ago": {
+        "type": "String"
+      }
+    }
+  },
+  "csDraftLabel": "Draft with {count} clips, {length}, {status}",
+  "@csDraftLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "length": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "csContinueEditing": "Continue editing",
+  "csDraftDeleteTitle": "Delete this draft?",
+  "csDraftDeleteBody": "It will be removed from this device. The videos and photos in your gallery are not touched.",
+  "csDraftDeleted": "Draft deleted",
+  "csDraftDuplicated": "Draft duplicated",
+  "caRangeLabel": "Time range",
+  "caRange7": "7 days",
+  "caRange28": "28 days",
+  "caRange90": "90 days",
+  "caViewsChartTitle": "Views per day",
+  "caViewsChartSubtitle": "{views} views in {days} days",
+  "@caViewsChartSubtitle": {
+    "placeholders": {
+      "views": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "caViewsChartLabel": "Views per day over the last {days} days, {views} in total",
+  "@caViewsChartLabel": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "views": {
+        "type": "String"
+      }
+    }
+  },
+  "caViews": "Views",
+  "caQualifiedViews": "Qualified views",
+  "caWatchTime": "Watch time",
+  "caEngagement": "Engagement",
+  "caLikes": "Likes",
+  "caComments": "Comments",
+  "caShares": "Shares",
+  "caSaves": "Saves",
+  "caFollowers": "New followers",
+  "caAudienceTitle": "Where your viewers are",
+  "caAudienceOther": "Other places",
+  "caReelsTitle": "Your reels",
+  "caReelsHint": "Tap a reel for its full numbers.",
+  "caCollecting": "Collecting data",
+  "caCollectingBody": "Numbers for a new reel appear shortly after it is published.",
+  "caCompletionShort": "{rate} watched to end",
+  "@caCompletionShort": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "caHours": "{hours} h",
+  "@caHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "caMinutes": "{minutes} min",
+  "@caMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "caReelTitle": "Reel analytics",
+  "caQualifiedReachIs": "{reach} qualified reach",
+  "@caQualifiedReachIs": {
+    "placeholders": {
+      "reach": {
+        "type": "String"
+      }
+    }
+  },
+  "caReachTitle": "Reach Ladder",
+  "caReachBody": "How far this reel has climbed from District to Global.",
+  "caAvgWatch": "Average watch",
+  "caSecondsOf": "{current}s of {total}s",
+  "@caSecondsOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "caCompletion": "Watched to the end",
+  "caEstEarnings": "Estimated earnings",
+  "caRetentionTitle": "Audience retention",
+  "caRetentionBody": "How many viewers were still watching, from the start to the end of the reel.",
+  "caRetentionLabel": "Audience retention curve: {rate} watched to the end",
+  "@caRetentionLabel": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "crYourLevel": "Your Reach level",
+  "crYourLevelBody": "{reach} qualified reach in the last 30 days",
+  "@crYourLevelBody": {
+    "placeholders": {
+      "reach": {
+        "type": "String"
+      }
+    }
+  },
+  "crLevelsTitle": "The four levels",
+  "crLevelsBody": "Content starts in your District and climbs as more real people watch it.",
+  "crRange": "{from} – {to} qualified reach",
+  "@crRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "crRangeOpen": "{from}+ qualified reach",
+  "@crRangeOpen": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      }
+    }
+  },
+  "crLevelReached": "Reached",
+  "crLevelLocked": "Not reached yet",
+  "crReelsTitle": "Your reels on the ladder",
+  "crReelsBody": "How far each reel is from its next level.",
+  "crReelProgress": "{title}: {level}. {remaining} more qualified reach to reach {next}.",
+  "@crReelProgress": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "level": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      },
+      "next": {
+        "type": "String"
+      }
+    }
+  },
+  "crReelTop": "{title}: at the top of the ladder.",
+  "@crReelTop": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "crTopLevel": "At the top of the ladder",
+  "crToNext": "{remaining} more to reach {next}",
+  "@crToNext": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      },
+      "next": {
+        "type": "String"
+      }
+    }
+  },
+  "crQualifiedTitle": "What is qualified reach?",
+  "crQualifiedBody": "Qualified reach counts real people who actually watched your content. Repeat views from the same person, bots and accidental taps do not count. The thresholds for each level are set by BLOCKS and can change.",
+  "ceAvailableHint": "Ready to withdraw",
+  "cePendingHint": "Still being checked",
+  "cePaidHint": "Sent to your bank",
+  "ceHeroNote": "An estimate of this cycle’s reward. It is confirmed when the month closes.",
+  "ceByLevelTitle": "Earnings by Reach level",
+  "ceByLevelBody": "Where the views behind your estimate came from.",
+  "ceLevelTotal": "Estimated total",
+  "ceMonthsTitle": "Last 6 months",
+  "ceMonthsLabel": "Monthly earnings for the last 6 months. This month: {amount}",
+  "@ceMonthsLabel": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "ceRewardTitle": "Qualified Creator Reward",
+  "ceRewardBody": "Your reward is not a fixed amount per view. It depends on the quality of the attention your content earns.",
+  "ceReachLevel": "Reach level",
+  "cePoolTitle": "Reward pool",
+  "cePoolBody": "{reach} qualified reach so far ({period}). Creators share the monthly pool in proportion to their qualified reach and its quality.",
+  "@cePoolBody": {
+    "placeholders": {
+      "reach": {
+        "type": "String"
+      },
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "cePoolNote": "Estimated. The pool and each share are final only when the month closes.",
+  "ceHowItWorks": "How rewards work",
+  "ceHowTitle": "How the Qualified Creator Reward works",
+  "ceHow1": "Only qualified views count: real people, counted once, who watched for long enough.",
+  "ceHow2": "Watch time, shares, saves and engagement show how much people valued your content.",
+  "ceHow3": "Your Reach level matters too: reaching further on the ladder lifts your share of the pool.",
+  "ceHow4": "At the end of the month the pool is shared among creators, and your amount becomes final.",
+  "ceHowDisclaimer": "Amounts shown are estimates. They can change after quality and fraud checks, and are never a promise of payment.",
+  "ceGoToPayout": "Go to Payout Center",
+  "kycTitle": "Identity verification",
+  "kycFlowTitle": "Verify your identity",
+  "kycNotStarted": "Not started",
+  "kycPending": "Pending",
+  "kycUnderReview": "Under review",
+  "kycVerified": "Verified",
+  "kycRejected": "Rejected",
+  "kycActionRequired": "Action required",
+  "kycExpired": "Expired",
+  "kycHintNotStarted": "Verify your identity to receive payouts.",
+  "kycHintPending": "We have your documents and will start the review shortly.",
+  "kycHintUnderReview": "Your documents are being reviewed. You will be notified when it is done.",
+  "kycHintVerified": "Your identity is verified. You can receive payouts.",
+  "kycHintRejected": "We could not verify your identity from these documents.",
+  "kycHintActionRequired": "We need a clearer or different document to continue.",
+  "kycHintExpired": "Your verification has expired. Renew it to keep receiving payouts.",
+  "kycReasonMismatch": "The name or details did not match the document.",
+  "kycReasonUnreadable": "The document could not be read clearly.",
+  "kycReasonBlurry": "The picture was too blurry.",
+  "kycReasonExpiredDocument": "The document has expired.",
+  "kycReasonGeneric": "Please check your details and try again.",
+  "kycIndividual": "Individual",
+  "kycBusiness": "Business",
+  "kycIndividualBody": "Verify yourself with a government ID.",
+  "kycBusinessBody": "Verify a business with its registration and an authorised person.",
+  "kycDocReceived": "Received",
+  "kycDocAccepted": "Accepted",
+  "kycDocRejected": "Rejected",
+  "kycDetailsTitle": "Verification details",
+  "kycType": "Type",
+  "kycLegalName": "Full legal name",
+  "kycBusinessName": "Business name",
+  "kycSubmitted": "Submitted",
+  "kycReviewed": "Reviewed",
+  "kycValidUntil": "Valid until",
+  "kycDocumentsTitle": "Documents",
+  "kycMaskedNote": "Numbers are always shown hidden. BLOCKS never shows a full ID number.",
+  "kycStart": "Start verification",
+  "kycRenew": "Renew verification",
+  "kycTryAgain": "Try again",
+  "kycCheckStatus": "Check status",
+  "kycPrivacyTitle": "How your documents are protected",
+  "kycPrivacy1": "Sent securely and stored encrypted in private storage.",
+  "kycPrivacy2": "Not kept on this phone after you send them.",
+  "kycPrivacy3": "Only a small, trained team can open them, and every access is logged.",
+  "kycPrivacy4": "They are deleted when the law no longer requires them to be kept.",
+  "kycStepOf": "Step {current} of {total}",
+  "@kycStepOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "kycTypeTitle": "Who is being verified?",
+  "kycTypeBody": "Choose how you will receive payouts.",
+  "kycDetailsHeading": "Your details",
+  "kycDetailsBody": "Enter your name exactly as it appears on your document.",
+  "kycNameHelp": "Must match your document and your bank account.",
+  "kycSignatoryName": "Authorised person’s full name",
+  "kycDocsHeading": "Your documents",
+  "kycDocsBody": "Choose a document, enter its number and add a clear picture.",
+  "kycIdentityDoc": "Identity document",
+  "kycBusinessDoc": "Business document",
+  "kycSignatoryDoc": "Authorised person’s ID",
+  "kycNumber": "Number",
+  "kycDocument": "Document",
+  "kycFile": "File",
+  "kycFileBack": "Back side",
+  "kycFront": "Front",
+  "kycBack": "Back",
+  "kycUploadFront": "Upload a picture",
+  "kycUploadBack": "Upload the back",
+  "kycNoFile": "No file chosen",
+  "kycChoose": "Choose",
+  "kycRemoveFile": "Remove file",
+  "kycFileRules": "Up to {mb} MB. Accepted: {types}.",
+  "@kycFileRules": {
+    "placeholders": {
+      "mb": {
+        "type": "int"
+      },
+      "types": {
+        "type": "String"
+      }
+    }
+  },
+  "kycFileNote": "Your file is sent securely and is not kept on this phone.",
+  "kycFileCamera": "Take a photo",
+  "kycFileGallery": "Choose from gallery",
+  "kycFilePdf": "Choose a PDF",
+  "kycFileDemoLarge": "Demo: a file that is too large",
+  "kycErrName": "Enter your full name using letters only.",
+  "kycErrBusiness": "Enter the business name.",
+  "kycErrNumber": "That number does not look right for this document.",
+  "kycErrFileLarge": "That file is too large.",
+  "kycErrFileType": "That file type is not accepted.",
+  "kycErrFileMissing": "Add a picture of the document.",
+  "kycErrDocMissing": "Choose a document and add it.",
+  "kycErrDocUnsupported": "That document is not accepted here.",
+  "kycReviewHeading": "Check and submit",
+  "kycReviewBody": "Make sure everything is right. Numbers are shown hidden.",
+  "kycReviewWarning": "Your documents are sent securely for review. Providing false information can lead to your account being restricted.",
+  "kycSubmit": "Submit for verification",
+  "kycProcessingNote": "This usually takes a moment. You can leave this screen; we will tell you when it is done.",
+  "kycStepReceived": "Documents received",
+  "kycStepReview": "Review",
+  "kycStepResult": "Result",
+  "bankEmptyTitle": "No bank account yet",
+  "bankEmptyBody": "Add the account you want payouts sent to.",
+  "bankAdd": "Add bank account",
+  "bankAddTitle": "Add bank account",
+  "bankSecurityNote": "Adding, changing or removing a bank account asks for your password and a code, and BLOCKS e-mails you about it.",
+  "bankPrimary": "Primary",
+  "bankMakePrimary": "Make primary",
+  "bankRemove": "Remove",
+  "bankRemoveTitle": "Remove this account?",
+  "bankRemoveBody": "{bank} •••• {last4} will no longer receive payouts.",
+  "@bankRemoveBody": {
+    "placeholders": {
+      "bank": {
+        "type": "String"
+      },
+      "last4": {
+        "type": "String"
+      }
+    }
+  },
+  "bankRemoved": "Bank account removed",
+  "bankPrimaryNow": "This is now your primary account",
+  "bankCardLabel": "{bank} account ending {last4}, {status}",
+  "@bankCardLabel": {
+    "placeholders": {
+      "bank": {
+        "type": "String"
+      },
+      "last4": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "bankHolder": "Account holder",
+  "bankHolderHelp": "Exactly as on your bank account.",
+  "bankAccountNumber": "Account number",
+  "bankConfirmAccount": "Confirm account number",
+  "bankIfsc": "IFSC code",
+  "bankBranch": "Branch",
+  "bankType": "Account type",
+  "bankSavings": "Savings",
+  "bankCurrent": "Current",
+  "bankFormNote": "Your account number is sent once, securely, and then never shown again. Only the last 4 digits stay visible.",
+  "bankSaveAndVerify": "Save and verify",
+  "bankVerifyingNow": "Checking with your bank…",
+  "bankEditDetails": "Edit details",
+  "bankManageAccounts": "Manage bank accounts",
+  "bankAwaitingIdentity": "Waiting for identity check",
+  "bankVerifying": "Verifying",
+  "bankVerified": "Verified",
+  "bankNameMismatch": "Name doesn’t match",
+  "bankFailed": "Verification failed",
+  "bankHintAwaitingIdentity": "Saved. We will check the name as soon as your identity is verified.",
+  "bankHintVerifying": "We are checking this account with the bank.",
+  "bankHintVerified": "This account can receive payouts.",
+  "bankHintNameMismatch": "The account holder’s name must match your verified identity. Edit the details or remove the account.",
+  "bankHintFailed": "We could not verify this account. Check the details and try again.",
+  "bankErrHolderRequired": "Enter the account holder’s name.",
+  "bankErrHolderInvalid": "Use letters only for the name.",
+  "bankErrAccountRequired": "Enter the account number.",
+  "bankErrAccountInvalid": "Account numbers have 9 to 18 digits.",
+  "bankErrDuplicate": "This account is already added.",
+  "bankErrConfirmRequired": "Type the account number again.",
+  "bankErrConfirmMismatch": "The two account numbers do not match.",
+  "bankErrIfscRequired": "Enter the IFSC code.",
+  "bankErrIfscInvalid": "An IFSC has 11 characters, like HDFC0001234.",
+  "bankErrIfscUnknown": "We do not recognise this IFSC.",
+  "poTitle": "Payout Center",
+  "poTabOverview": "Overview",
+  "poTabMethods": "Methods",
+  "poTabVerification": "Verification",
+  "poTabHistory": "History",
+  "poAvailable": "Available to withdraw",
+  "poPendingPaid": "Pending {pending} · Paid {paid}",
+  "@poPendingPaid": {
+    "placeholders": {
+      "pending": {
+        "type": "String"
+      },
+      "paid": {
+        "type": "String"
+      }
+    }
+  },
+  "poOpenTitle": "Payout of {amount} in progress",
+  "@poOpenTitle": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "poArrival": "Expected {from} – {to}",
+  "@poArrival": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "poEligibilityTitle": "Withdrawal checklist",
+  "poEligibilityBody": "BLOCKS checks these before every payout.",
+  "elIdentity": "Identity verified",
+  "elBank": "Bank account verified",
+  "elMinimum": "Balance of at least {minimum}",
+  "@elMinimum": {
+    "placeholders": {
+      "minimum": {
+        "type": "String"
+      }
+    }
+  },
+  "elNoHold": "No safety hold on payouts",
+  "elStanding": "Account in good standing",
+  "poNotYet": "not yet",
+  "poActionVerify": "Verify identity",
+  "poActionAddBank": "Add bank",
+  "poActionFixBank": "Fix bank",
+  "poHoldUntil": "Paused until {date}",
+  "@poHoldUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "poRulesTitle": "Payout rules",
+  "poRuleMinimum": "Minimum withdrawal {amount}.",
+  "@poRuleMinimum": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "poRuleTiming": "Money arrives in {minDays} to {maxDays} business days.",
+  "@poRuleTiming": {
+    "placeholders": {
+      "minDays": {
+        "type": "int"
+      },
+      "maxDays": {
+        "type": "int"
+      }
+    }
+  },
+  "poRuleStepUp": "Withdrawals of {amount} or more need an extra confirmation.",
+  "@poRuleStepUp": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "poRuleHold": "Payouts pause for {hours} hours after a bank account change.",
+  "@poRuleHold": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "poBlockedBy": "Not ready yet: {reason}",
+  "@poBlockedBy": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "poRequest": "Request payout",
+  "poTaxInfo": "Tax information",
+  "poHistoryEmpty": "No payouts yet",
+  "poHistoryEmptyBody": "Your payouts will appear here.",
+  "poRequested": "Requested",
+  "poProcessing": "Processing",
+  "poCompleted": "Completed",
+  "poFailed": "Failed",
+  "poReversed": "Reversed",
+  "poOnHold": "On hold",
+  "poReasonBankRejected": "The bank could not accept this payment. The money is back in your balance.",
+  "poReasonBankReturned": "The bank returned this payment. The money is back in your balance.",
+  "poReasonSecurityReview": "Held for a security check. We will update you.",
+  "poReasonGeneric": "Something went wrong with this payout.",
+  "poPaidOn": "Paid on {date}",
+  "@poPaidOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "poRequestedOn": "Requested {date}",
+  "@poRequestedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "poReference": "Reference {reference}",
+  "@poReference": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
+  "poTileLabel": "Payout of {amount}, {status}, requested {date}",
+  "@poTileLabel": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "poRequestTitle": "Request payout",
+  "poMinimumIs": "Minimum {amount}",
+  "@poMinimumIs": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "poAmount": "Amount to withdraw",
+  "poAll": "All",
+  "poSendTo": "Send to",
+  "poSummaryTitle": "Summary",
+  "poTaxNote": "BLOCKS does not calculate tax. If any deduction applies, the payout service applies it and shows it on your statement.",
+  "poReview": "Review payout",
+  "poConfirmTitle": "Confirm payout",
+  "poConfirmAmount": "Amount",
+  "poConfirmTo": "To",
+  "poConfirmArrival": "Expected arrival",
+  "poConfirmNote": "The money is set aside from your balance now and sent to your bank.",
+  "poConfirmStepUp": "This amount needs an extra confirmation with your password and a code.",
+  "poConfirmButton": "Confirm {amount}",
+  "@poConfirmButton": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "poNotReadyTitle": "You can’t withdraw yet",
+  "poNotReadyBody": "Finish the steps in the Payout Center first.",
+  "poGoToCenter": "Open Payout Center",
+  "poErrBelowMinimum": "That is below the minimum withdrawal.",
+  "poErrExceeds": "That is more than your available balance.",
+  "poErrNotEligible": "You are not eligible to withdraw right now.",
+  "poErrOnHold": "Payouts are paused after your recent bank change.",
+  "poErrNoBank": "Choose a bank account first.",
+  "poErrStepUp": "The extra confirmation was missing or expired. Please try again.",
+  "poSuccessTitle": "Payout requested",
+  "poSuccessBody": "{amount} is on its way to {bank}. Expected {window}.",
+  "@poSuccessBody": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "bank": {
+        "type": "String"
+      },
+      "window": {
+        "type": "String"
+      }
+    }
+  },
+  "poViewHistory": "View history",
+  "suTitle": "Confirm it’s you",
+  "suWhyAddBank": "You are adding a payout account. Confirm it’s you first.",
+  "suWhyChangeBank": "You are changing your primary payout account. Confirm it’s you first.",
+  "suWhyRemoveBank": "You are removing a payout account. Confirm it’s you first.",
+  "suWhyPayout": "This is a large withdrawal. Confirm it’s you first.",
+  "suWhyTax": "You are changing your tax details. Confirm it’s you first.",
+  "suWrongPassword": "That password isn’t right.",
+  "suConfirm": "Confirm",
+  "suNeverShare": "BLOCKS will never ask for this code in a message or call. Never share it.",
+  "suCodeAuthenticator": "Enter the code from your authenticator app.",
+  "suCodeSentPhone": "We sent a code to {destination}.",
+  "@suCodeSentPhone": {
+    "placeholders": {
+      "destination": {
+        "type": "String"
+      }
+    }
+  },
+  "suCodeSentEmail": "We sent a code to {destination}.",
+  "@suCodeSentEmail": {
+    "placeholders": {
+      "destination": {
+        "type": "String"
+      }
+    }
+  },
+  "taxTitle": "Tax information",
+  "taxPanTitle": "PAN",
+  "taxPanLabel": "PAN number",
+  "taxProvided": "Provided",
+  "taxNotProvided": "Not provided yet",
+  "taxUpdatedOn": "Updated {date}",
+  "@taxUpdatedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "taxAdd": "Add PAN",
+  "taxUpdate": "Update PAN",
+  "taxSave": "Save PAN",
+  "taxSaved": "Tax information saved",
+  "taxErrPan": "A PAN has 10 characters, like ABCDE1234F.",
+  "taxNote": "BLOCKS collects this so the payout provider can meet tax rules. BLOCKS does not calculate tax in the app. If a deduction applies, the payout service applies and itemises it. The number is shown hidden after you save it.",
+  "cdTitle": "Creator and payouts",
+  "cdIntro": "Steer the mock server so you can show the unhappy paths as well.",
+  "cdStatus": "Identity: {kyc} · Available {balance} · {banks} bank accounts · {payouts} open payouts",
+  "@cdStatus": {
+    "placeholders": {
+      "kyc": {
+        "type": "String"
+      },
+      "balance": {
+        "type": "String"
+      },
+      "banks": {
+        "type": "int"
+      },
+      "payouts": {
+        "type": "int"
+      }
+    }
+  },
+  "cdKycOutcome": "Next identity review ends as",
+  "cdOutcomeVerified": "Verified",
+  "cdOutcomeRejected": "Rejected",
+  "cdOutcomeAction": "Action required",
+  "cdPayoutOutcome": "Next payout ends as",
+  "cdPayCompleted": "Completed",
+  "cdPayFailed": "Failed",
+  "cdPayHold": "On hold",
+  "cdPayReversed": "Reversed",
+  "cdPublishOutcome": "Next reel publish",
+  "cdPubNormal": "Goes live",
+  "cdPubUploadFails": "Upload fails once",
+  "cdPubModeration": "Rejected by moderation",
+  "cdPubNote": "Applies to the next publish only.",
+  "cdSafetyHold": "Pause payouts for 24 h after a bank change",
+  "cdSafetyHoldBody": "Shows the safety hold. Off by default so the walk-through is not blocked.",
+  "cdOpenStudio": "Open Creator Studio",
+  "cdExpire": "Expire identity verification",
+  "cdReset": "Reset creator and payout data",
+  "cdResetDone": "Creator and payout data reset",
+  "kycDob": "Date of birth",
+  "kycDobHelp": "You must be at least {age} years old.",
+  "@kycDobHelp": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "kycErrDobRequired": "Choose your date of birth.",
+  "kycErrDobInvalid": "Enter a valid date of birth.",
+  "kycErrAge": "You must be at least {age} years old to be verified.",
+  "@kycErrAge": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "kycBusinessType": "Business type",
+  "kycErrBusinessType": "Choose the type of business.",
+  "kycVerifiedOn": "Verified on",
+  "rsLanesTitle": "Text and stickers on the timeline",
+  "rsLanesHint": "Each bar shows when it is on screen. Tap one to edit it.",
+  "rsLaneText": "Text “{content}”, on screen from {start} to {end}",
+  "@rsLaneText": {
+    "placeholders": {
+      "content": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "rsLaneSticker": "Sticker {content}, on screen from {start} to {end}",
+  "@rsLaneSticker": {
+    "placeholders": {
+      "content": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "taxAccountTitle": "Account",
+  "taxAccountType": "Account type",
+  "taxAccountUnknown": "Not set yet",
+  "taxDocsTitle": "Tax and payout documents",
+  "taxDocsBody": "Statements and any tax-withholding certificates your payout provider issues for your payouts appear here.",
+  "taxDocsEmpty": "No documents yet. They appear after your first completed payout.",
+  "taxDocStatement": "Payout statement",
+  "taxDocCertificate": "Tax withholding certificate",
+  "taxDocQuarter": "Quarter {quarter}, {year}",
+  "@taxDocQuarter": {
+    "placeholders": {
+      "quarter": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "taxDocReady": "Available",
+  "taxDocLater": "Issued after the period ends, if it applies",
+  "csNavMusic": "Copyright & music",
+  "cmTitle": "Copyright and music",
+  "cmIntro": "The tracks and original audio in your reels, and whether each can still be used.",
+  "cmUsedTitle": "Music in your reels",
+  "cmUsedBody": "Tracks come from licensed, BLOCKS-owned or creator-owned catalogues.",
+  "cmEmpty": "No music in your reels yet. Add a track when you create a reel.",
+  "cmStatusAvailable": "Available",
+  "cmStatusExpiring": "Licence ends soon",
+  "cmStatusUnavailable": "Not available for new reels",
+  "cmLicenceUntil": "Licence until {date}",
+  "@cmLicenceUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cmReasonExpired": "The licence for this track has ended.",
+  "cmReasonRegion": "This track is not licensed for use in your country.",
+  "cmReasonRestricted": "This track has no usable licence.",
+  "cmReelsUsing": "Reels using it: {n}",
+  "@cmReelsUsing": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "cmOriginalTitle": "Your original audio",
+  "cmOriginalBody": "Sound you recorded in your reels. Choose whether others can reuse it.",
+  "cmOriginalEmpty": "No original audio yet. Record sound in a reel and it appears here.",
+  "cmReuseLabel": "Others can reuse this audio",
+  "cmReuseOnDone": "Others can now reuse this audio",
+  "cmReuseOffDone": "Others can no longer reuse this audio",
+  "cmRightsNote": "BLOCKS checks rights again before every publish, and availability can change when a licence ends. This is not legal advice.",
+  "authCreateAccount": "Create an account",
+  "regTitle": "Create your account",
+  "regSubtitle": "Join BLOCKS with your e-mail or phone number.",
+  "regName": "Full name",
+  "regUsername": "Username",
+  "regUsernameHelp": "3–30 letters, numbers, dots or underscores",
+  "regEmail": "E-mail",
+  "regPhone": "Phone number",
+  "regContactHelp": "Give an e-mail, a phone number, or both. We send a code to confirm it.",
+  "regPassword": "Password",
+  "regDob": "Date of birth",
+  "regDobHelp": "Only used to check you are 13 or older. Never shown to others.",
+  "regDobChoose": "Choose your date of birth",
+  "regButton": "Create account",
+  "regHaveAccount": "I already have an account",
+  "regErrRequired": "This is required",
+  "regErrInvalid": "That does not look right",
+  "regErrUsername": "Use 3–30 letters, numbers, dots or underscores",
+  "regErrTaken": "That username is not available",
+  "regErrContact": "Enter an e-mail or a phone number",
+  "regErrTooYoung": "You must be at least 13 to join",
+  "regErrPassword": "Choose a stronger password (longer, with upper and lower case letters, a number and a symbol)",
+  "cvTitle": "Enter your code",
+  "cvSentTo": "We sent a 6-digit code to {destination}.",
+  "@cvSentTo": {
+    "placeholders": {
+      "destination": {
+        "type": "String"
+      }
+    }
+  },
+  "cvSent": "We sent you a 6-digit code.",
+  "cvApp": "Enter the 6-digit code from your authenticator app.",
+  "cvRecovery": "Enter one of your recovery codes.",
+  "cvRecoveryLabel": "Recovery code",
+  "cvContactIntro": "Confirm it is you to finish creating your account.",
+  "cvUnusualIntro": "This sign-in looks different from usual. Enter the code to confirm it is you.",
+  "cvButton": "Continue",
+  "cvUseApp": "Use my authenticator app",
+  "cvUseSent": "Use the code we sent instead",
+  "cvUseRecovery": "Use a recovery code",
+  "cvChallengeGone": "This step has expired. Start again.",
+  "cvLocked": "Too many wrong codes. Request a new code to continue.",
+  "cvWrong": "That code isn't right.",
+  "epUsernameLocked": "Your username is chosen once and cannot be changed.",
+  "authSubtitleLive": "Create an account, or sign in to the one you already have.",
+  "settingsLogoutBodyLive": "You can sign back in any time with your username and password.",
+  "createPostedLive": "Your post is live",
+  "createChangePhoto": "Change photo",
+  "createPhotoPreview": "Preview of your photo",
+  "createErrRestricted": "Your account can't post right now.",
+  "createErrRateLimited": "You're posting too fast. Wait a moment and try again."
+}
