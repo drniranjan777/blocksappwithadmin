@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:blocks_app/core/widgets/demo_art.dart';
 import 'package:blocks_app/data/models/reel_models.dart';
 import 'package:blocks_app/features/reel_studio/domain/reel_look.dart';
@@ -34,7 +36,11 @@ class MediaVisual extends StatelessWidget {
         (demoSeedOf(media.thumbnailPath ?? media.localPath) ??
             media.id.hashCode) +
         seedOffset;
-    Widget art = DemoArt(seed: seed);
+    // The person's own files are drawn as themselves. Generated artwork stands in only for the
+    // demo's invented media; it must never be shown in place of someone's real photo.
+    Widget art = media.origin == MediaOrigin.device
+        ? _DeviceArt(media: media)
+        : DemoArt(seed: seed);
     final m = matrix;
     if (m != null) {
       art = ColorFiltered(colorFilter: ColorFilter.matrix(m), child: art);
@@ -60,6 +66,51 @@ class MediaVisual extends StatelessWidget {
     }
     return art;
   }
+}
+
+/// A photo from the phone as it is, or (until a frame can be shown) a plain tile for a video.
+class _DeviceArt extends StatelessWidget {
+  const _DeviceArt({required this.media});
+
+  final MediaAsset media;
+
+  @override
+  Widget build(BuildContext context) {
+    final still = media.isPhoto ? media.localPath : media.thumbnailPath;
+    final tile = _VideoTile(name: media.name);
+    if (still == null) return tile;
+    return Image.file(
+      File(still),
+      fit: BoxFit.cover,
+      cacheWidth: 720,
+      gaplessPlayback: true,
+      errorBuilder: (_, _, _) => tile,
+    );
+  }
+}
+
+class _VideoTile extends StatelessWidget {
+  const _VideoTile({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFF1B1D3A), Color(0xFF0B0D1E)],
+      ),
+    ),
+    child: Center(
+      child: Icon(
+        Icons.videocam_rounded,
+        size: 28,
+        color: Colors.white.withValues(alpha: 0.75),
+      ),
+    ),
+  );
 }
 
 /// A clip with its filter and adjustments applied.

@@ -3020,6 +3020,45 @@ class AppLocalizationsTe extends AppLocalizations {
   String get pubModeration => 'మోడరేషన్';
 
   @override
+  String get rsPickFromPhone => 'మీ ఫోన్ నుండి ఎంచుకోండి';
+
+  @override
+  String get rsPhoneEmptyTitle => 'ఫోటోలు, వీడియోలు ఎంచుకోండి';
+
+  @override
+  String get rsPhoneEmptyBody =>
+      'మీ రీల్‌లో ఉంచాల్సినవి మీ ఫోన్ నుండి ఎంచుకోండి. మీరు ఎంచుకున్న ఫైళ్లు మాత్రమే BLOCKS తో పంచుకోబడతాయి.';
+
+  @override
+  String get rsPickUnsupported =>
+      'ఈ ఫైల్ ఉపయోగించలేరు. MP4 లేదా MOV వీడియో, లేదా JPG, PNG, WebP ఫోటో ఉపయోగించండి.';
+
+  @override
+  String get rsPickFailed =>
+      'గ్యాలరీ తెరవలేకపోయింది. దయచేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String rsPickSomeSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ఫైళ్లు పరిమితిని మించినందున వదిలివేయబడ్డాయి.',
+      one: 'ఒక ఫైల్ పరిమితిని మించినందున వదిలివేయబడింది.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pubInReview => 'సమీక్షలో ఉంది';
+
+  @override
+  String get pubInReviewTitle => 'రీల్ సమర్పించబడింది';
+
+  @override
+  String get pubInReviewBody =>
+      'మీ రీల్ మా సమీక్ష బృందం వద్ద ఉంది. ఆమోదం పొందగానే ఇది లైవ్ అవుతుంది, అప్పుడు క్రియేటర్ స్టూడియోలో కనిపిస్తుంది.';
+
+  @override
   String get pubPublished => 'ప్రచురించబడింది';
 
   @override

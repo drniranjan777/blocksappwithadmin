@@ -86,6 +86,8 @@ class _ReelPublishingScreenState extends ConsumerState<ReelPublishingScreen> {
               children: [
                 if (p.isPublished)
                   _Published(district: district)
+                else if (p.isInReview)
+                  const _InReview()
                 else if (p.hasFailed)
                   _Failed(progress: p.progress)
                 else
@@ -397,6 +399,61 @@ class _Published extends ConsumerWidget {
           icon: Icons.insights_rounded,
           variant: BlocksButtonVariant.tonal,
           onPressed: () => context.go(Routes.creatorStudio),
+        ),
+      ],
+    );
+  }
+}
+
+/// A reel the server is holding for a person to approve: submitted, not live.
+class _InReview extends ConsumerWidget {
+  const _InReview();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    return Column(
+      children: [
+        Container(
+          width: 112,
+          height: 112,
+          decoration: BoxDecoration(
+            color: context.scheme.primaryContainer,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.hourglass_top_rounded,
+            size: 60,
+            color: context.scheme.primary,
+          ),
+        ),
+        const SizedBox(height: BlocksSpacing.xl),
+        Semantics(
+          liveRegion: true,
+          child: Text(
+            l10n.pubInReviewTitle,
+            style: context.text.headlineMedium,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: BlocksSpacing.sm),
+        Text(
+          l10n.pubInReviewBody,
+          style: context.text.bodyLarge,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: BlocksSpacing.xl),
+        BlocksButton(
+          label: l10n.pubOpenStudio,
+          icon: Icons.insights_rounded,
+          onPressed: () => context.go(Routes.creatorStudio),
+        ),
+        const SizedBox(height: BlocksSpacing.sm),
+        BlocksButton(
+          label: l10n.pubViewReels,
+          icon: Icons.play_circle_rounded,
+          variant: BlocksButtonVariant.tonal,
+          onPressed: () => context.go(Routes.reels),
         ),
       ],
     );

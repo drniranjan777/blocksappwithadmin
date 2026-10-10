@@ -5512,6 +5512,60 @@ abstract class AppLocalizations {
   /// **'Moderation'**
   String get pubModeration;
 
+  /// No description provided for @rsPickFromPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from your phone'**
+  String get rsPickFromPhone;
+
+  /// No description provided for @rsPhoneEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick photos and videos'**
+  String get rsPhoneEmptyTitle;
+
+  /// No description provided for @rsPhoneEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose what to put in your reel from your phone. Only the files you choose are shared with BLOCKS.'**
+  String get rsPhoneEmptyBody;
+
+  /// No description provided for @rsPickUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'That file can\'t be used. Use an MP4 or MOV video, or a JPG, PNG or WebP photo.'**
+  String get rsPickUnsupported;
+
+  /// No description provided for @rsPickFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The gallery could not be opened. Please try again.'**
+  String get rsPickFailed;
+
+  /// No description provided for @rsPickSomeSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{One file was left out because it would break a limit.} other{{count} files were left out because they would break a limit.}}'**
+  String rsPickSomeSkipped(int count);
+
+  /// No description provided for @pubInReview.
+  ///
+  /// In en, this message translates to:
+  /// **'In review'**
+  String get pubInReview;
+
+  /// No description provided for @pubInReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reel submitted'**
+  String get pubInReviewTitle;
+
+  /// No description provided for @pubInReviewBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reel is with our review team. It goes live as soon as it is approved, and you will see it in Creator Studio then.'**
+  String get pubInReviewBody;
+
   /// No description provided for @pubPublished.
   ///
   /// In en, this message translates to:

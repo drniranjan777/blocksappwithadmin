@@ -205,6 +205,10 @@ enum PublishStage {
   uploading,
   serverProcessing,
   moderation,
+
+  /// The reel exists and is being held for a person to approve it. It is not live yet, and
+  /// nothing more will happen on this phone until that decision is made.
+  inReview,
   published,
   failed,
 }
@@ -366,7 +370,9 @@ class PublishJobStatus extends Equatable {
   final String? failureCode;
 
   bool get isTerminal =>
-      stage == PublishStage.published || stage == PublishStage.failed;
+      stage == PublishStage.published ||
+      stage == PublishStage.inReview ||
+      stage == PublishStage.failed;
 
   @override
   List<Object?> get props => [stage, fraction, reelId, moderation, failureCode];
@@ -400,7 +406,9 @@ class PublishProgress extends Equatable {
   final ModerationResult? moderation;
 
   bool get isTerminal =>
-      stage == PublishStage.published || stage == PublishStage.failed;
+      stage == PublishStage.published ||
+      stage == PublishStage.inReview ||
+      stage == PublishStage.failed;
 
   @override
   List<Object?> get props => [

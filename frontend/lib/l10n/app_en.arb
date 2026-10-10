@@ -1589,6 +1589,18 @@
   "pubUploading": "Uploading",
   "pubServer": "Processing on server",
   "pubModeration": "Moderation",
+  "rsPickFromPhone": "Choose from your phone",
+  "rsPhoneEmptyTitle": "Pick photos and videos",
+  "rsPhoneEmptyBody": "Choose what to put in your reel from your phone. Only the files you choose are shared with BLOCKS.",
+  "rsPickUnsupported": "That file can't be used. Use an MP4 or MOV video, or a JPG, PNG or WebP photo.",
+  "rsPickFailed": "The gallery could not be opened. Please try again.",
+  "rsPickSomeSkipped": "{count, plural, =1{One file was left out because it would break a limit.} other{{count} files were left out because they would break a limit.}}",
+  "@rsPickSomeSkipped": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "pubInReview": "In review",
+  "pubInReviewTitle": "Reel submitted",
+  "pubInReviewBody": "Your reel is with our review team. It goes live as soon as it is approved, and you will see it in Creator Studio then.",
   "pubPublished": "Published",
   "pubFailed": "Failed",
   "pubTitle": "Publishing",

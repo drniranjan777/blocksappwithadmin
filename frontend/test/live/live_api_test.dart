@@ -22,7 +22,14 @@ import 'package:blocks_app/app/config/app_config.dart';
 import 'package:blocks_app/core/errors/app_failure.dart';
 import 'package:blocks_app/core/services/local_store.dart';
 import 'package:blocks_app/data/api/api_auth_repository.dart';
+import 'package:blocks_app/core/services/media_picker.dart';
 import 'package:blocks_app/data/api/api_client.dart';
+import 'package:blocks_app/data/api/api_reel_repositories.dart';
+import 'package:blocks_app/data/api/device_media_library_repository.dart';
+import 'package:blocks_app/data/models/media_models.dart' as media;
+import 'package:blocks_app/data/models/reel_models.dart';
+import 'package:blocks_app/features/reel_studio/application/reel_publisher.dart';
+import 'package:blocks_app/features/reel_studio/domain/reel_timeline.dart';
 import 'package:blocks_app/data/api/api_creator_repository.dart';
 import 'package:blocks_app/data/api/api_feed_repository.dart';
 import 'package:blocks_app/data/api/api_moderation_repository.dart';
@@ -1150,6 +1157,128 @@ void main() {
     });
   });
 
+  group('making a reel against the running API', skip: run ? false : skip, () {
+    final suffix = Random().nextInt(900000) + 100000;
+    late final _Person maker;
+    late final Directory dir;
+    String? clip;
+
+    setUpAll(() async {
+      maker = _Person(origin!, 'qa.maker$suffix');
+      await maker.signUp(origin, displayName: 'Maker Live');
+      dir = Directory.systemTemp.createTempSync('live_reel_');
+      clip = await _makeClip(dir);
+    });
+    tearDownAll(() {
+      if (dir.existsSync()) dir.deleteSync(recursive: true);
+    });
+
+    test('the editor\'s limits come from the server', () async {
+      final config = await ApiCreatorConfigRepository(maker.api)
+          .getReelConfig();
+      expect(config.maxDurationSeconds, greaterThan(0));
+      expect(config.maxClips, greaterThan(0));
+      expect(config.maxVideoSizeMb, greaterThan(0));
+      expect(config.selectableDurations, isNotEmpty);
+    });
+
+    test('a real video goes from the phone to a reel on the server', () async {
+      if (clip == null) {
+        markTestSkipped('no ffmpeg to make a clip with');
+        return;
+      }
+      final config = await ApiCreatorConfigRepository(maker.api)
+          .getReelConfig();
+
+      // 1. Choose it, as the studio does.
+      final library = DeviceMediaLibraryRepository(_OnDiskPicker([clip!]));
+      final asset = (await library.pickFromDevice(limit: 5)).single;
+      expect(asset.isVideo, isTrue);
+      expect(asset.durationMs, inInclusiveRange(2500, 3500));
+      expect(asset.width, 360);
+      expect(asset.height, 640);
+
+      // 2. Put it on the timeline and describe the reel.
+      final now = DateTime.now().toUtc();
+      final clipOnTimeline = ReelTimeline.clipFromMedia(
+        asset,
+        id: 'c1',
+        config: config,
+      );
+      final draft = ReelDraft(
+        id: 'draft~live$suffix',
+        clips: [clipOnTimeline],
+        overlays: const [],
+        settings: const ReelSettings(caption: 'A live test reel #blocks'),
+        updatedAt: now,
+        createdAt: now,
+      );
+
+      // 3. The app's own orchestrator, with the real repositories.
+      final publisher = ReelPublisher(
+        processing: const DeviceMediaProcessingRepository(),
+        upload: ApiMediaUploadRepository(MediaUploader(maker.api)),
+        publish: ApiReelPublishRepository(
+          maker.api,
+          pollEvery: const Duration(seconds: 1),
+        ),
+        config: config,
+      );
+      final events = await publisher
+          .run(draft, media.MediaProfile.balanced)
+          .toList();
+      final last = events.last;
+
+      expect(
+        [media.PublishStage.published, media.PublishStage.inReview],
+        contains(last.stage),
+        reason: 'ended at ${last.stage} (${last.failureCode})',
+      );
+      expect(
+        events.map((e) => e.stage),
+        contains(media.PublishStage.uploading),
+      );
+      final reelId = last.reelId;
+      expect(reelId, isNotNull);
+
+      // 4. It exists, is the maker's, and has the caption.
+      final seen = await maker.api.get('/reels/$reelId');
+      final body = seen.data! as Map;
+      expect(body['caption'], 'A live test reel #blocks');
+      expect(body['durationMs'], inInclusiveRange(2500, 3500));
+    });
+
+    test('the same edit sent again is the same reel', () async {
+      if (clip == null) return;
+      final config = await ApiCreatorConfigRepository(maker.api)
+          .getReelConfig();
+      final library = DeviceMediaLibraryRepository(_OnDiskPicker([clip!]));
+      final asset = (await library.pickFromDevice(limit: 5)).single;
+      final now = DateTime.now().toUtc();
+      final draft = ReelDraft(
+        id: 'draft~twice$suffix',
+        clips: [ReelTimeline.clipFromMedia(asset, id: 'c1', config: config)],
+        overlays: const [],
+        settings: const ReelSettings(caption: 'Sent twice'),
+        updatedAt: now,
+        createdAt: now,
+      );
+      final uploads = ApiMediaUploadRepository(MediaUploader(maker.api));
+      final session = await uploads.createSession(
+        asset,
+        bytes: File(asset.localPath).lengthSync(),
+      );
+      await uploads.upload(session).toList();
+      final receipt = await uploads.completeUpload(
+        await uploads.getSession(session.id),
+      );
+      final publish = ApiReelPublishRepository(maker.api);
+      final first = await publish.submit(draft, [receipt]);
+      final second = await publish.submit(draft, [receipt]);
+      expect(second.id, first.id);
+    });
+  });
+
   group(
     'reporting, blocking and muting against the running API',
     skip: run ? false : skip,
@@ -1251,6 +1380,68 @@ void main() {
       });
     },
   );
+}
+
+/// Hands the studio a file that is really on disk, as the system picker would.
+class _OnDiskPicker implements DeviceMediaPicker {
+  _OnDiskPicker(this.paths);
+
+  final List<String> paths;
+
+  @override
+  Future<List<PickedMediaFile>> pickMedia({required int limit}) async => [
+    for (final p in paths)
+      PickedMediaFile(
+        path: p,
+        name: p.split(RegExp(r'[\\/]')).last,
+        sizeBytes: File(p).lengthSync(),
+        isVideo: p.endsWith('.mp4'),
+      ),
+  ];
+
+  @override
+  Future<PickedMediaFile?> recordVideo({Duration? maxDuration}) async => null;
+}
+
+/// A real, playable three-second clip made with the backend's own ffmpeg (so no fixture file is
+/// kept in the repository). Null when that program is not here, and the test is skipped.
+Future<String?> _makeClip(Directory dir) async {
+  final configured = Platform.environment['BLOCKS_LIVE_FFMPEG'];
+  final candidates = [
+    ?configured,
+    '../backend/node_modules/@ffmpeg-installer/win32-x64/ffmpeg.exe',
+    '../backend/node_modules/@ffmpeg-installer/linux-x64/ffmpeg',
+    '../backend/node_modules/@ffmpeg-installer/darwin-arm64/ffmpeg',
+  ];
+  for (final c in candidates) {
+    if (!File(c).existsSync()) continue;
+    final out = '${dir.path}/live-clip.mp4';
+    final r = await Process.run(c, [
+      '-y',
+      '-f',
+      'lavfi',
+      '-i',
+      'testsrc=duration=3:size=360x640:rate=24',
+      '-f',
+      'lavfi',
+      '-i',
+      'anullsrc=r=44100:cl=mono',
+      '-t',
+      '3',
+      '-c:v',
+      'libx264',
+      '-pix_fmt',
+      'yuv420p',
+      '-c:a',
+      'aac',
+      '-shortest',
+      '-movflags',
+      '+faststart',
+      out,
+    ]);
+    if (r.exitCode == 0 && File(out).existsSync()) return out;
+  }
+  return null;
 }
 
 /// The server's id for [other] (they know it themselves).

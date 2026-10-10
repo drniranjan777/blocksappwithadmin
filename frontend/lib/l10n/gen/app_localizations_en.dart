@@ -3002,6 +3002,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pubModeration => 'Moderation';
 
   @override
+  String get rsPickFromPhone => 'Choose from your phone';
+
+  @override
+  String get rsPhoneEmptyTitle => 'Pick photos and videos';
+
+  @override
+  String get rsPhoneEmptyBody =>
+      'Choose what to put in your reel from your phone. Only the files you choose are shared with BLOCKS.';
+
+  @override
+  String get rsPickUnsupported =>
+      'That file can\'t be used. Use an MP4 or MOV video, or a JPG, PNG or WebP photo.';
+
+  @override
+  String get rsPickFailed =>
+      'The gallery could not be opened. Please try again.';
+
+  @override
+  String rsPickSomeSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count files were left out because they would break a limit.',
+      one: 'One file was left out because it would break a limit.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pubInReview => 'In review';
+
+  @override
+  String get pubInReviewTitle => 'Reel submitted';
+
+  @override
+  String get pubInReviewBody =>
+      'Your reel is with our review team. It goes live as soon as it is approved, and you will see it in Creator Studio then.';
+
+  @override
   String get pubPublished => 'Published';
 
   @override

@@ -3005,6 +3005,44 @@ class AppLocalizationsHi extends AppLocalizations {
   String get pubModeration => 'समीक्षा';
 
   @override
+  String get rsPickFromPhone => 'अपने फ़ोन से चुनें';
+
+  @override
+  String get rsPhoneEmptyTitle => 'फ़ोटो और वीडियो चुनें';
+
+  @override
+  String get rsPhoneEmptyBody =>
+      'अपनी रील में डालने के लिए फ़ोन से चुनें। BLOCKS के साथ केवल वही फ़ाइलें साझा होती हैं जो आप चुनते हैं।';
+
+  @override
+  String get rsPickUnsupported =>
+      'यह फ़ाइल इस्तेमाल नहीं हो सकती। MP4 या MOV वीडियो, या JPG, PNG या WebP फ़ोटो इस्तेमाल करें।';
+
+  @override
+  String get rsPickFailed => 'गैलरी नहीं खुल सकी। कृपया फिर कोशिश करें।';
+
+  @override
+  String rsPickSomeSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count फ़ाइलें छोड़ दी गईं क्योंकि वे सीमा तोड़ती थीं।',
+      one: 'एक फ़ाइल छोड़ दी गई क्योंकि वह सीमा तोड़ती।',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pubInReview => 'समीक्षा में';
+
+  @override
+  String get pubInReviewTitle => 'रील जमा हो गई';
+
+  @override
+  String get pubInReviewBody =>
+      'आपकी रील हमारी समीक्षा टीम के पास है। मंज़ूर होते ही यह लाइव हो जाएगी, और तब आप इसे क्रिएटर स्टूडियो में देखेंगे।';
+
+  @override
   String get pubPublished => 'प्रकाशित';
 
   @override

@@ -2,6 +2,7 @@ import 'package:blocks_app/app/config/app_config.dart';
 import 'package:blocks_app/core/services/local_media_store.dart';
 import 'package:blocks_app/core/services/local_store.dart';
 import 'package:blocks_app/data/api/api_providers.dart';
+import 'package:blocks_app/data/api/api_reel_repositories.dart';
 import 'package:blocks_app/data/api/unavailable_repositories.dart';
 import 'package:blocks_app/data/mock/mock_account_repositories.dart';
 import 'package:blocks_app/data/mock/mock_content_repositories.dart';
@@ -249,19 +250,28 @@ final exploreRepositoryProvider = Provider<ExploreRepository>(
 // ----------------------------------------- Reels, media, music, creator money --
 
 final mediaLibraryRepositoryProvider = Provider<MediaLibraryRepository>(
-  (ref) =>
-      _resolve(ref, 'MediaLibraryRepository', MockMediaLibraryRepository.new),
+  (ref) => _resolve(
+    ref,
+    'MediaLibraryRepository',
+    MockMediaLibraryRepository.new,
+    api: (ref) => ref.watch(deviceMediaLibraryRepositoryProvider),
+  ),
 );
 final mediaProcessingRepositoryProvider = Provider<MediaProcessingRepository>(
   (ref) => _resolve(
     ref,
     'MediaProcessingRepository',
     MockMediaProcessingRepository.new,
+    api: (ref) => ref.watch(deviceMediaProcessingRepositoryProvider),
   ),
 );
 final mediaUploadRepositoryProvider = Provider<MediaUploadRepository>(
-  (ref) =>
-      _resolve(ref, 'MediaUploadRepository', MockMediaUploadRepository.new),
+  (ref) => _resolve(
+    ref,
+    'MediaUploadRepository',
+    MockMediaUploadRepository.new,
+    api: (ref) => ref.watch(apiMediaUploadRepositoryProvider),
+  ),
 );
 final musicRepositoryProvider = Provider<MusicRepository>(
   (ref) => _resolve(ref, 'MusicRepository', MockMusicRepository.new),
@@ -271,15 +281,31 @@ final reelDraftRepositoryProvider = Provider<ReelDraftRepository>(
     ref,
     'ReelDraftRepository',
     (world) => MockReelDraftRepository(ref.watch(localStoreProvider), world),
+    api: (ref) {
+      // Drafts are private work, so they are kept under the signed-in person's id.
+      final users = ref.watch(userRepositoryProvider);
+      String? cached;
+      return LocalReelDraftRepository(ref.watch(localStoreProvider), () async {
+        return cached ??= (await users.getCurrentUser()).id;
+      }, now: ref.watch(clockProvider));
+    },
   ),
 );
 final reelPublishRepositoryProvider = Provider<ReelPublishRepository>(
-  (ref) =>
-      _resolve(ref, 'ReelPublishRepository', MockReelPublishRepository.new),
+  (ref) => _resolve(
+    ref,
+    'ReelPublishRepository',
+    MockReelPublishRepository.new,
+    api: (ref) => ref.watch(apiReelPublishRepositoryProvider),
+  ),
 );
 final creatorConfigRepositoryProvider = Provider<CreatorConfigRepository>(
-  (ref) =>
-      _resolve(ref, 'CreatorConfigRepository', MockCreatorConfigRepository.new),
+  (ref) => _resolve(
+    ref,
+    'CreatorConfigRepository',
+    MockCreatorConfigRepository.new,
+    api: (ref) => ref.watch(apiCreatorConfigRepositoryProvider),
+  ),
 );
 final creatorMusicRepositoryProvider = Provider<CreatorMusicRepository>(
   (ref) =>

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:blocks_app/app/config/app_config.dart';
 import 'package:blocks_app/core/services/local_store.dart';
+import 'package:blocks_app/core/services/media_picker.dart';
+import 'package:blocks_app/core/services/video_frame.dart';
 import 'package:blocks_app/data/api/api_auth_repository.dart';
 import 'package:blocks_app/data/api/api_client.dart';
 import 'package:blocks_app/data/api/api_creator_repository.dart';
@@ -12,11 +14,13 @@ import 'package:blocks_app/data/api/api_password_repositories.dart';
 import 'package:blocks_app/data/api/api_post_repository.dart';
 import 'package:blocks_app/data/api/api_profile_repository.dart';
 import 'package:blocks_app/data/api/api_reach_repository.dart';
+import 'package:blocks_app/data/api/api_reel_repositories.dart';
 import 'package:blocks_app/data/api/api_reel_repository.dart';
 import 'package:blocks_app/data/api/api_security_repository.dart';
 import 'package:blocks_app/data/api/api_session_repository.dart';
 import 'package:blocks_app/data/api/api_user_repository.dart';
 import 'package:blocks_app/data/api/content_kinds.dart';
+import 'package:blocks_app/data/api/device_media_library_repository.dart';
 import 'package:blocks_app/data/api/device_identity.dart';
 import 'package:blocks_app/data/api/media_uploader.dart';
 import 'package:blocks_app/data/api/mappers.dart';
@@ -143,6 +147,34 @@ final apiReelRepositoryProvider = Provider<ApiReelRepository>(
 
 final apiNotificationRepositoryProvider = Provider<ApiNotificationRepository>(
   (ref) => ApiNotificationRepository(ref.watch(apiClientProvider)),
+);
+
+/// The person's own phone as the reel studio's media library.
+///
+/// One instance per signed-in scope, so what one person picked is never offered to the next.
+final deviceMediaLibraryRepositoryProvider =
+    Provider<DeviceMediaLibraryRepository>(
+      (ref) => DeviceMediaLibraryRepository(
+        ref.watch(deviceMediaPickerProvider),
+        frame: ref.watch(videoFrameReaderProvider),
+      ),
+    );
+
+final deviceMediaProcessingRepositoryProvider =
+    Provider<DeviceMediaProcessingRepository>(
+      (ref) => const DeviceMediaProcessingRepository(),
+    );
+
+final apiMediaUploadRepositoryProvider = Provider<ApiMediaUploadRepository>(
+  (ref) => ApiMediaUploadRepository(ref.watch(mediaUploaderProvider)),
+);
+
+final apiReelPublishRepositoryProvider = Provider<ApiReelPublishRepository>(
+  (ref) => ApiReelPublishRepository(ref.watch(apiClientProvider)),
+);
+
+final apiCreatorConfigRepositoryProvider = Provider<ApiCreatorConfigRepository>(
+  (ref) => ApiCreatorConfigRepository(ref.watch(apiClientProvider)),
 );
 
 /// Sends photos and videos to storage (see [MediaUploader]).

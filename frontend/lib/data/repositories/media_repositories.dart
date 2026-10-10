@@ -6,8 +6,17 @@ import 'package:blocks_app/data/models/reel_models.dart';
 /// Demo: a generated gallery that works offline. Production: the device
 /// gallery and camera (`image_picker` / `photo_manager` / `camera`).
 abstract interface class MediaLibraryRepository {
+  /// True when the files come from the person's own phone, chosen with the system picker (a live
+  /// build), rather than from a built-in demo gallery. The picker then offers "Choose from your
+  /// phone", and [getLibrary] lists what was chosen so far.
+  bool get picksFromDevice;
+
   /// What the "gallery" currently offers, newest first.
   Future<List<MediaAsset>> getLibrary();
+
+  /// Opens the phone's own picker for up to [limit] photos and videos. Empty when the person
+  /// backs out. Only meaningful when [picksFromDevice] is true.
+  Future<List<MediaAsset>> pickFromDevice({required int limit});
 
   /// Captures a new clip with the camera.
   Future<MediaAsset> record();

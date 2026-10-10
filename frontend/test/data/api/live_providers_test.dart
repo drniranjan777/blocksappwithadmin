@@ -8,6 +8,8 @@ import 'package:blocks_app/data/api/api_password_repositories.dart';
 import 'package:blocks_app/data/api/api_post_repository.dart';
 import 'package:blocks_app/data/api/api_profile_repository.dart';
 import 'package:blocks_app/data/api/api_reach_repository.dart';
+import 'package:blocks_app/data/api/api_reel_repositories.dart';
+import 'package:blocks_app/data/api/device_media_library_repository.dart';
 import 'package:blocks_app/data/api/api_reel_repository.dart';
 import 'package:blocks_app/data/api/api_security_repository.dart';
 import 'package:blocks_app/data/api/api_session_repository.dart';
@@ -148,23 +150,50 @@ void main() {
       );
     });
 
-    test('the calls that return streams fail as a stream error', () async {
+    test('the reel studio is the phone and the server, not the demo', () {
       final c = _container(_live);
+      expect(
+        c.read(mediaLibraryRepositoryProvider),
+        isA<DeviceMediaLibraryRepository>(),
+      );
+      expect(
+        c.read(mediaProcessingRepositoryProvider),
+        isA<DeviceMediaProcessingRepository>(),
+      );
+      expect(
+        c.read(mediaUploadRepositoryProvider),
+        isA<ApiMediaUploadRepository>(),
+      );
+      expect(
+        c.read(reelPublishRepositoryProvider),
+        isA<ApiReelPublishRepository>(),
+      );
+      expect(
+        c.read(creatorConfigRepositoryProvider),
+        isA<ApiCreatorConfigRepository>(),
+      );
+      expect(
+        c.read(reelDraftRepositoryProvider),
+        isA<LocalReelDraftRepository>(),
+      );
+    });
+
+    test('the calls that return streams fail as a stream error', () async {
+      // The fallbacks that remain for parts of the app the server does not offer: they fail a
+      // stream as a stream, never by throwing from the call itself.
       await expectLater(
-        c
-            .read(mediaUploadRepositoryProvider)
-            .upload(
-              const UploadSession(
-                id: 's',
-                assetId: 'a',
-                totalBytes: 10,
-                chunkBytes: 5,
-              ),
-            ),
+        const UnavailableMediaUploadRepository().upload(
+          const UploadSession(
+            id: 's',
+            assetId: 'a',
+            totalBytes: 10,
+            chunkBytes: 5,
+          ),
+        ),
         emitsError(isA<ForbiddenFailure>()),
       );
       await expectLater(
-        c.read(reelPublishRepositoryProvider).watch('job'),
+        const UnavailableReelPublishRepository().watch('job'),
         emitsError(isA<ForbiddenFailure>()),
       );
     });

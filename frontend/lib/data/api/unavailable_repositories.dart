@@ -92,6 +92,10 @@ class UnavailableExploreRepository implements ExploreRepository {
 class UnavailableMediaLibraryRepository implements MediaLibraryRepository {
   const UnavailableMediaLibraryRepository();
 
+  // A getter, not a future: it must answer plainly instead of failing like the rest.
+  @override
+  bool get picksFromDevice => false;
+
   @override
   dynamic noSuchMethod(Invocation invocation) => _fail();
 }

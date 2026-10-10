@@ -168,6 +168,7 @@ String publishStageLabel(AppLocalizations l, PublishStage s) => switch (s) {
   PublishStage.uploading => l.pubUploading,
   PublishStage.serverProcessing => l.pubServer,
   PublishStage.moderation => l.pubModeration,
+  PublishStage.inReview => l.pubInReview,
   PublishStage.published => l.pubPublished,
   PublishStage.failed => l.pubFailed,
 };

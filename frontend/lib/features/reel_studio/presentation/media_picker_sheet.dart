@@ -46,6 +46,7 @@ class _MediaPickerSheetState extends ConsumerState<MediaPickerSheet> {
   final List<MediaAsset> _picked = [];
   _Filter _filter = _Filter.all;
   bool _recording = false;
+  bool _picking = false;
   String? _message;
 
   /// Whether adding [a] to what is already picked would break a limit.
@@ -112,11 +113,51 @@ class _MediaPickerSheetState extends ConsumerState<MediaPickerSheet> {
     }
   }
 
+  /// Opens the phone's own picker and lines up what was chosen, ready to add.
+  Future<void> _pickFromPhone() async {
+    final l10n = context.l10n;
+    setState(() {
+      _picking = true;
+      _message = null;
+    });
+    try {
+      final s = ref.read(reelStudioProvider);
+      final room = s.config.maxClips - s.draft.clips.length - _picked.length;
+      final found = await ref
+          .read(mediaLibraryRepositoryProvider)
+          .pickFromDevice(limit: room < 1 ? 1 : room);
+      ref.invalidate(mediaLibraryProvider);
+      if (!mounted) return;
+      if (widget.single) {
+        if (found.isNotEmpty) Navigator.of(context).pop([found.first]);
+        return;
+      }
+      var refused = 0;
+      for (final a in found) {
+        if (_blocker(a, ref.read(reelStudioProvider)) == null) {
+          setState(() => _picked.add(a));
+        } else {
+          refused++;
+        }
+      }
+      if (refused > 0) {
+        setState(() => _message = l10n.rsPickSomeSkipped(refused));
+      }
+    } on ValidationFailure {
+      if (mounted) setState(() => _message = l10n.rsPickUnsupported);
+    } on AppFailure {
+      if (mounted) setState(() => _message = l10n.rsPickFailed);
+    } finally {
+      if (mounted) setState(() => _picking = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final s = ref.watch(reelStudioProvider);
     final library = ref.watch(mediaLibraryProvider);
+    final fromPhone = ref.watch(mediaLibraryRepositoryProvider).picksFromDevice;
     final videos = _picked.where((m) => m.isVideo).length;
     final photos = _picked.length - videos;
 
@@ -157,6 +198,16 @@ class _MediaPickerSheetState extends ConsumerState<MediaPickerSheet> {
                   style: context.text.bodySmall,
                 ),
                 const SizedBox(height: BlocksSpacing.md),
+                if (fromPhone)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: BlocksSpacing.sm),
+                    child: BlocksButton(
+                      label: l10n.rsPickFromPhone,
+                      icon: Icons.photo_library_rounded,
+                      variant: BlocksButtonVariant.tonal,
+                      onPressed: _picking ? null : _pickFromPhone,
+                    ),
+                  ),
                 Row(
                   children: [
                     Expanded(
@@ -229,6 +280,13 @@ class _MediaPickerSheetState extends ConsumerState<MediaPickerSheet> {
                       m,
                 ];
                 if (items.isEmpty) {
+                  if (fromPhone) {
+                    return EmptyView(
+                      icon: Icons.photo_library_outlined,
+                      title: l10n.rsPhoneEmptyTitle,
+                      body: l10n.rsPhoneEmptyBody,
+                    );
+                  }
                   return EmptyView(
                     icon: Icons.photo_library_outlined,
                     title: l10n.rsPickerEmpty,

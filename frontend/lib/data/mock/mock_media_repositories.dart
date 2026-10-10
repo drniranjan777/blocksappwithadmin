@@ -16,6 +16,13 @@ class MockMediaLibraryRepository implements MediaLibraryRepository {
   late final List<MediaAsset> _gallery = buildDemoGallery();
 
   @override
+  bool get picksFromDevice => false;
+
+  @override
+  Future<List<MediaAsset>> pickFromDevice({required int limit}) async =>
+      const [];
+
+  @override
   Future<List<MediaAsset>> getLibrary() async {
     await _w.pause();
     return [..._c.recorded.reversed, ..._gallery];

@@ -37,6 +37,7 @@ class PublishState extends Equatable {
   PublishStage get stage => progress.stage;
   bool get hasFailed => stage == PublishStage.failed;
   bool get isPublished => stage == PublishStage.published;
+  bool get isInReview => stage == PublishStage.inReview;
 
   @override
   List<Object?> get props => [progress, isRunning, attempt];
@@ -90,7 +91,11 @@ class ReelPublishController extends Notifier<PublishState> {
               isRunning: !p.isTerminal,
               attempt: state.attempt,
             );
-            if (p.stage == PublishStage.published) cleanup = _onPublished();
+            // A reel held for review already exists on the server, so the draft has done its job.
+            if (p.stage == PublishStage.published ||
+                p.stage == PublishStage.inReview) {
+              cleanup = _onPublished();
+            }
           },
           onError: (Object _, StackTrace _) {
             state = PublishState(
