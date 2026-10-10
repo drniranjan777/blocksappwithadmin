@@ -971,7 +971,7 @@ By the person who wrote it or the owner of what it is on. Its replies go with it
 
 **Creator Studio: reach, the Ladder, eligibility and earnings in one call**
 
-Everything is computed on the server. `earnings.estimated` is a projection for the cycle in progress, not money and not a promise.
+Everything is computed on the server. `earnings.estimated` is a projection for the cycle in progress, not money and not a promise. `reach.coverage` is the share (0..1) of your published items that reached at least each level; `reach.bestItemQualifiedReach` is the most qualified views any one item got in the last 30 days.
 
 *Access:* Signed-in person
 
@@ -1007,7 +1007,7 @@ Cursor-paginated, newest first. `kind` is `reel` (default) or `post`.
 
 **Estimated, pending, finalized and available earnings, kept apart**
 
-`estimated` moves during a cycle and is not money. `pending` is fixed at the close of a cycle, awaiting release. `finalized` has been released into the ledger. `available` is what the ledger says you are owed now.
+`estimated` moves during a cycle and is not money. `pending` is fixed at the close of a cycle, awaiting release. `finalized` has been released into the ledger. `available` is what the ledger says you are owed now. `paidOut` is what completed payouts have sent you. `metrics30d` is what your audience did in the last 30 days, counted the way qualified reach is (qualified views and their watch time, shares, saves, likes, comments, and an engagement rate capped at 1). `bestLevel` is the highest Reach Ladder level any of your items has reached.
 
 *Access:* Signed-in person
 
