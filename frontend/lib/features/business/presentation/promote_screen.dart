@@ -309,9 +309,10 @@ class _PostStep extends ConsumerWidget {
       children: [
         posts.when(
           loading: () => const SizedBox(height: 200, child: LoadingView()),
-          error: (_, _) => SizedBox(
+          error: (err, _) => SizedBox(
             height: 240,
             child: ErrorView(
+              error: err,
               onRetry: () => ref.invalidate(promotablePostsProvider),
             ),
           ),

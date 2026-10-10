@@ -213,6 +213,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             child: SizedBox(
               height: 280,
               child: ErrorView(
+                error: grid.error,
                 onRetry: () => ref.invalidate(exploreGridProvider(filter)),
               ),
             ),
@@ -289,6 +290,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             height: 280,
             child: results.hasError
                 ? ErrorView(
+                    error: results.error,
                     onRetry: () => ref.invalidate(searchResultsProvider(query)),
                   )
                 : const LoadingView(),

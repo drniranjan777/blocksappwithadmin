@@ -340,6 +340,18 @@ abstract class AppLocalizations {
   /// **'Please check your connection and try again.'**
   String get errorBody;
 
+  /// No description provided for @unavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available yet'**
+  String get unavailableTitle;
+
+  /// No description provided for @unavailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This part of BLOCKS is not open to your account yet. Please check back soon.'**
+  String get unavailableBody;
+
   /// No description provided for @loading.
   ///
   /// In en, this message translates to:

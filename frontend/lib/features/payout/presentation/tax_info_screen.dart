@@ -99,8 +99,10 @@ class _TaxInfoScreenState extends ConsumerState<TaxInfoScreen> {
           maxWidth: 560,
           child: data.when(
             loading: () => const LoadingView(),
-            error: (_, _) =>
-                ErrorView(onRetry: () => ref.invalidate(taxInfoProvider)),
+            error: (err, _) => ErrorView(
+              error: err,
+              onRetry: () => ref.invalidate(taxInfoProvider),
+            ),
             data: (t) {
               final provided = t.status == TaxInfoStatus.provided;
               return ListView(

@@ -82,8 +82,10 @@ class _OverviewTab extends ConsumerWidget {
     final data = ref.watch(payoutOverviewProvider);
     return data.when(
       loading: () => const LoadingView(),
-      error: (_, _) =>
-          ErrorView(onRetry: () => ref.invalidate(payoutOverviewProvider)),
+      error: (err, _) => ErrorView(
+        error: err,
+        onRetry: () => ref.invalidate(payoutOverviewProvider),
+      ),
       data: (o) => PollWhile(
         active: o.openPayout != null,
         onTick: () => ref.invalidate(payoutOverviewProvider),
@@ -423,8 +425,10 @@ class _MethodsTab extends ConsumerWidget {
     final data = ref.watch(payoutOverviewProvider);
     return data.when(
       loading: () => const LoadingView(),
-      error: (_, _) =>
-          ErrorView(onRetry: () => ref.invalidate(payoutOverviewProvider)),
+      error: (err, _) => ErrorView(
+        error: err,
+        onRetry: () => ref.invalidate(payoutOverviewProvider),
+      ),
       data: (o) {
         final accounts = o.bankAccounts;
         return RefreshIndicator(
@@ -698,8 +702,10 @@ class _VerificationTab extends ConsumerWidget {
     final data = ref.watch(kycApplicationProvider);
     return data.when(
       loading: () => const LoadingView(),
-      error: (_, _) =>
-          ErrorView(onRetry: () => ref.invalidate(kycApplicationProvider)),
+      error: (err, _) => ErrorView(
+        error: err,
+        onRetry: () => ref.invalidate(kycApplicationProvider),
+      ),
       data: (k) {
         final color = kycStatusColor(context, k.status);
         final reason =
@@ -945,8 +951,10 @@ class _HistoryTab extends ConsumerWidget {
     final data = ref.watch(payoutHistoryProvider);
     return data.when(
       loading: () => const LoadingView(),
-      error: (_, _) =>
-          ErrorView(onRetry: () => ref.invalidate(payoutHistoryProvider)),
+      error: (err, _) => ErrorView(
+        error: err,
+        onRetry: () => ref.invalidate(payoutHistoryProvider),
+      ),
       data: (list) {
         if (list.isEmpty) {
           return EmptyView(

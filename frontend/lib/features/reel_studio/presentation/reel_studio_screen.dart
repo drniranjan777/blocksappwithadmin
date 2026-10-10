@@ -266,7 +266,14 @@ class _ReelStudioScreenState extends ConsumerState<ReelStudioScreen>
           ],
         ),
         body: SafeArea(
-          child: s.isLoading
+          child: s.loadError != null
+              ? ErrorView(
+                  error: s.loadError,
+                  onRetry: () => ref
+                      .read(reelStudioProvider.notifier)
+                      .retryBegin(widget.draftId),
+                )
+              : s.isLoading
               ? const LoadingView()
               : ResponsiveCenter(
                   maxWidth: 640,

@@ -1,5 +1,6 @@
 import 'package:blocks_app/app/app.dart';
 import 'package:blocks_app/app/theme/app_theme.dart';
+import 'package:blocks_app/core/errors/provider_retry.dart';
 import 'package:blocks_app/core/services/local_store.dart';
 import 'package:blocks_app/data/providers.dart';
 import 'package:blocks_app/features/reels/application/reels_controller.dart';
@@ -41,6 +42,7 @@ Future<void> pumpBlocksApp(
   final log = playbackLog ?? PlaybackLog();
   await tester.pumpWidget(
     ProviderScope(
+      retry: providerRetry,
       overrides: [
         localStoreProvider.overrideWithValue(InMemoryLocalStore(storage)),
         mockLatencyProvider.overrideWithValue(Duration.zero),
@@ -61,6 +63,7 @@ Widget themed(
   List<Override> overrides = const [],
 }) {
   return ProviderScope(
+    retry: providerRetry,
     overrides: [
       mockLatencyProvider.overrideWithValue(Duration.zero),
       ...overrides,

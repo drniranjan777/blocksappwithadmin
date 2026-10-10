@@ -41,7 +41,10 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
     Widget body;
     if (list == null) {
       body = async.hasError
-          ? ErrorView(onRetry: () => ref.invalidate(conversationsProvider))
+          ? ErrorView(
+              error: async.error,
+              onRetry: () => ref.invalidate(conversationsProvider),
+            )
           : const LoadingView();
     } else if (list.isEmpty) {
       body = query.isEmpty

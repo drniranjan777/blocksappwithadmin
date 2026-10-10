@@ -49,7 +49,7 @@ class CreatorStudioScreen extends ConsumerWidget {
     return StudioScaffold(
       section: StudioSection.overview,
       body: dash.hasError || earnings.hasError
-          ? ErrorView(onRetry: refresh)
+          ? ErrorView(error: dash.error ?? earnings.error, onRetry: refresh)
           : !dash.hasValue || !earnings.hasValue
           ? const LoadingView()
           : RefreshIndicator(

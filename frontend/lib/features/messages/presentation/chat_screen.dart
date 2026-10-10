@@ -69,6 +69,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (data == null) {
       body = async.hasError
           ? ErrorView(
+              error: async.error,
               onRetry: () =>
                   ref.invalidate(chatControllerProvider(widget.conversationId)),
             )

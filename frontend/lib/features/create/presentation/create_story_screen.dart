@@ -1,13 +1,16 @@
 import 'package:blocks_app/app/router/routes.dart';
 import 'package:blocks_app/app/theme/blocks_tokens.dart';
 import 'package:blocks_app/core/constants/demo_media.dart';
+import 'package:blocks_app/core/errors/app_failure.dart';
 import 'package:blocks_app/core/extensions/build_context_x.dart';
 import 'package:blocks_app/core/widgets/app_snack.dart';
 import 'package:blocks_app/core/widgets/blocks_button.dart';
 import 'package:blocks_app/core/widgets/demo_art.dart';
 import 'package:blocks_app/core/widgets/responsive_center.dart';
+import 'package:blocks_app/core/widgets/state_views.dart';
 import 'package:blocks_app/features/create/application/create_controllers.dart';
 import 'package:blocks_app/features/create/presentation/widgets/create_widgets.dart';
+import 'package:blocks_app/features/stories/application/story_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -30,7 +33,17 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
 
   Future<void> _share() async {
     final l10n = context.l10n;
-    await ref.read(createStoryControllerProvider.notifier).submit();
+    try {
+      await ref.read(createStoryControllerProvider.notifier).submit();
+    } on AppFailure catch (e) {
+      // Say what happened. Never leave a tap with no answer, and never claim it was posted.
+      if (!mounted) return;
+      showAppSnack(
+        context,
+        isFeatureUnavailable(e) ? l10n.unavailableTitle : l10n.errorTitle,
+      );
+      return;
+    }
     if (!mounted) return;
     showAppSnack(context, l10n.createStoryPosted);
     // Stories are created from Home's tray or the Create hub.
@@ -42,6 +55,23 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
     final l10n = context.l10n;
     final s = ref.watch(createStoryControllerProvider);
     final c = ref.read(createStoryControllerProvider.notifier);
+
+    // A live build whose server has no stories yet: say so, instead of offering demo artwork
+    // that can never be posted.
+    final stories = ref.watch(storyControllerProvider);
+    if (isFeatureUnavailable(stories.error)) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.createStoryTitle),
+          leading: IconButton(
+            tooltip: l10n.close,
+            icon: const Icon(Icons.close_rounded),
+            onPressed: () => context.pop(),
+          ),
+        ),
+        body: SafeArea(child: ErrorView(error: stories.error)),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(

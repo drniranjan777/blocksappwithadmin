@@ -67,6 +67,7 @@ class ReelStudioState extends Equatable {
     this.isDirty = false,
     this.lastSavedAt,
     this.notice,
+    this.loadError,
   });
 
   final ReelDraft draft;
@@ -80,6 +81,10 @@ class ReelStudioState extends Equatable {
   final bool isDirty;
   final DateTime? lastSavedAt;
   final StudioNotice? notice;
+
+  /// Why the studio could not open (the reel settings or the draft could not be loaded). While
+  /// this is set the screen says so, instead of spinning forever.
+  final Object? loadError;
 
   List<ReelIssue> get issues => ReelValidator.validate(draft, config);
   Duration get limit => ReelValidator.effectiveLimit(draft, config);
@@ -119,6 +124,8 @@ class ReelStudioState extends Equatable {
     bool? isDirty,
     DateTime? lastSavedAt,
     StudioNotice? notice,
+    Object? loadError,
+    bool clearLoadError = false,
   }) => ReelStudioState(
     draft: draft ?? this.draft,
     config: config ?? this.config,
@@ -133,6 +140,7 @@ class ReelStudioState extends Equatable {
     isDirty: isDirty ?? this.isDirty,
     lastSavedAt: lastSavedAt ?? this.lastSavedAt,
     notice: notice ?? this.notice,
+    loadError: clearLoadError ? null : (loadError ?? this.loadError),
   );
 
   @override
@@ -148,6 +156,7 @@ class ReelStudioState extends Equatable {
     isDirty,
     lastSavedAt,
     notice,
+    loadError,
   ];
 }
 
@@ -184,9 +193,14 @@ class ReelStudioController extends Notifier<ReelStudioState> {
   /// Opens [draftId], or starts a new reel when it is null or not found.
   Future<void> begin(String? draftId) async {
     final now = _now();
-    final config = await ref
-        .read(creatorConfigRepositoryProvider)
-        .getReelConfig();
+    final ReelConfig config;
+    try {
+      config = await ref.read(creatorConfigRepositoryProvider).getReelConfig();
+    } on AppFailure catch (e) {
+      // Without the settings there is nothing to edit. Say so; do not leave the screen loading.
+      state = state.copyWith(isLoading: false, loadError: e);
+      return;
+    }
     // The location comes from the profile; don't start before it has loaded.
     AppUser? user;
     try {
@@ -197,7 +211,12 @@ class ReelStudioController extends Notifier<ReelStudioState> {
 
     ReelDraft? existing;
     if (draftId != null) {
-      existing = await ref.read(reelDraftRepositoryProvider).get(draftId);
+      try {
+        existing = await ref.read(reelDraftRepositoryProvider).get(draftId);
+      } on AppFailure catch (e) {
+        state = state.copyWith(isLoading: false, loadError: e);
+        return;
+      }
     }
     final draft =
         existing ??
@@ -218,6 +237,12 @@ class ReelStudioController extends Notifier<ReelStudioState> {
       clearClip: draft.clips.isEmpty,
       clearOverlay: true,
     );
+  }
+
+  /// "Try again" after the studio could not open.
+  Future<void> retryBegin(String? draftId) async {
+    state = state.copyWith(isLoading: true, clearLoadError: true);
+    await begin(draftId);
   }
 
   void _edit(ReelDraft next, {String? selectClip}) {

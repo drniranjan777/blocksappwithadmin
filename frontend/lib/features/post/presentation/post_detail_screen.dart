@@ -36,8 +36,10 @@ class PostDetailScreen extends ConsumerWidget {
       body: SafeArea(
         child: async.when(
           loading: () => const LoadingView(),
-          error: (_, _) =>
-              ErrorView(onRetry: () => ref.invalidate(postProvider(postId))),
+          error: (err, _) => ErrorView(
+            error: err,
+            onRetry: () => ref.invalidate(postProvider(postId)),
+          ),
           data: (post) => _Body(post: post),
         ),
       ),

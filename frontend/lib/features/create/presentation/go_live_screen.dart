@@ -35,8 +35,10 @@ class GoLiveScreen extends ConsumerWidget {
       body: SafeArea(
         child: eligibility.when(
           loading: () => const LoadingView(),
-          error: (_, _) =>
-              ErrorView(onRetry: () => ref.invalidate(currentUserProvider)),
+          error: (err, _) => ErrorView(
+            error: err,
+            onRetry: () => ref.invalidate(currentUserProvider),
+          ),
           data: (result) => ResponsiveCenter(
             child: ListView(
               padding: const EdgeInsets.all(BlocksSpacing.lg),

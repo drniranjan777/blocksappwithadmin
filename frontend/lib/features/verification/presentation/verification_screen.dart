@@ -49,6 +49,7 @@ class VerificationScreen extends ConsumerWidget {
         child: status == null
             ? (async.hasError
                   ? ErrorView(
+                      error: async.error,
                       onRetry: () =>
                           ref.invalidate(verificationControllerProvider),
                     )

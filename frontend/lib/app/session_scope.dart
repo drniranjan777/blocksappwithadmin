@@ -1,4 +1,5 @@
 import 'package:blocks_app/app/router/routes.dart';
+import 'package:blocks_app/core/errors/provider_retry.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -44,6 +45,8 @@ class _SessionScopeState extends State<SessionScope> {
       // A new key is a new scope: the old one and every provider in it are
       // disposed.
       key: ValueKey(_generation),
+      // Say what went wrong at once; see `providerRetry`.
+      retry: providerRetry,
       overrides: [
         ...widget.overrides,
         sessionScopeResetProvider.overrideWithValue(_reset),

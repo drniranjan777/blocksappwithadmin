@@ -32,8 +32,10 @@ class CreatorEarningsScreen extends ConsumerWidget {
       section: StudioSection.earnings,
       body: data.when(
         loading: () => const LoadingView(),
-        error: (_, _) =>
-            ErrorView(onRetry: () => ref.invalidate(earningsProvider)),
+        error: (err, _) => ErrorView(
+          error: err,
+          onRetry: () => ref.invalidate(earningsProvider),
+        ),
         data: (e) => RefreshIndicator(
           onRefresh: () async {
             ref.invalidate(earningsProvider);

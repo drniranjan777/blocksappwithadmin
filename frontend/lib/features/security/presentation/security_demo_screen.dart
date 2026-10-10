@@ -155,7 +155,8 @@ class _SecurityDemoScreenState extends ConsumerState<SecurityDemoScreen> {
                 data: (s) => _StatusCard(status: s),
                 loading: () =>
                     const SizedBox(height: 120, child: LoadingView()),
-                error: (_, _) => ErrorView(
+                error: (err, _) => ErrorView(
+                  error: err,
                   onRetry: () => ref.invalidate(demoStatusProvider),
                 ),
               ),

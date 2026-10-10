@@ -216,7 +216,8 @@ class _MediaPickerSheetState extends ConsumerState<MediaPickerSheet> {
           Expanded(
             child: library.when(
               loading: () => const LoadingView(),
-              error: (_, _) => ErrorView(
+              error: (err, _) => ErrorView(
+                error: err,
                 onRetry: () => ref.invalidate(mediaLibraryProvider),
               ),
               data: (all) {

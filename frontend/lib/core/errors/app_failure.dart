@@ -21,6 +21,12 @@ sealed class AppFailure extends Equatable implements Exception {
   List<Object?> get props => [message, code, details];
 }
 
+/// Whether [error] is the answer of a part of the app that the server does not offer yet (the
+/// `Unavailable*` repositories of a live build). Retrying it cannot help, and it is not the
+/// person's connection.
+bool isFeatureUnavailable(Object? error) =>
+    error is AppFailure && error.code == 'NOT_AVAILABLE';
+
 class NetworkFailure extends AppFailure {
   const NetworkFailure([super.message = 'No connection', super.code]);
 }

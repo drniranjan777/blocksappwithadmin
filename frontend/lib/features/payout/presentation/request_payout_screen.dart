@@ -195,7 +195,8 @@ class _RequestPayoutScreenState extends ConsumerState<RequestPayoutScreen> {
               ? _Success(payout: _done!)
               : data.when(
                   loading: () => const LoadingView(),
-                  error: (_, _) => ErrorView(
+                  error: (err, _) => ErrorView(
+                    error: err,
                     onRetry: () => ref.invalidate(payoutOverviewProvider),
                   ),
                   data: (o) => _form(context, o),

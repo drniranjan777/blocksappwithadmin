@@ -73,9 +73,10 @@ class _CreatorAnalyticsScreenState
               padding: EdgeInsets.symmetric(vertical: BlocksSpacing.huge),
               child: LoadingView(),
             ),
-            error: (_, _) => Padding(
+            error: (err, _) => Padding(
               padding: const EdgeInsets.symmetric(vertical: BlocksSpacing.xl),
               child: ErrorView(
+                error: err,
                 onRetry: () => ref.invalidate(analyticsProvider(_range)),
               ),
             ),
@@ -306,7 +307,8 @@ class ReelAnalyticsScreen extends ConsumerWidget {
       body: SafeArea(
         child: data.when(
           loading: () => const LoadingView(),
-          error: (_, _) => ErrorView(
+          error: (err, _) => ErrorView(
+            error: err,
             onRetry: () => ref.invalidate(reelPerformanceProvider(reelId)),
           ),
           data: (r) {

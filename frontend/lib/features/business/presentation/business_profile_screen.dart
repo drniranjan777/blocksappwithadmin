@@ -44,8 +44,9 @@ class _BusinessProfileState extends ConsumerState<BusinessProfileScreen> {
     return Scaffold(
       body: async.when(
         loading: () => const SafeArea(child: LoadingView()),
-        error: (_, _) => SafeArea(
+        error: (err, _) => SafeArea(
           child: ErrorView(
+            error: err,
             onRetry: () => ref.invalidate(businessProvider(_id)),
           ),
         ),
@@ -151,6 +152,7 @@ class _BusinessProfileState extends ConsumerState<BusinessProfileScreen> {
                 height: 240,
                 child: offers.hasError
                     ? ErrorView(
+                        error: offers.error,
                         onRetry: () =>
                             ref.invalidate(businessOffersProvider(_id)),
                       )

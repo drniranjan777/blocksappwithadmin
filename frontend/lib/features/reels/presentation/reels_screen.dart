@@ -1,4 +1,5 @@
 import 'package:blocks_app/app/router/routes.dart';
+import 'package:blocks_app/app/theme/app_theme.dart';
 import 'package:blocks_app/app/theme/blocks_tokens.dart';
 import 'package:blocks_app/core/extensions/build_context_x.dart';
 import 'package:blocks_app/core/utils/number_format.dart';
@@ -134,19 +135,30 @@ class _ReelsScreenState extends ConsumerState<ReelsScreen>
     final feed = ref.watch(reelsFeedProvider);
     final data = async.value;
 
+    // This screen is always black, so the messages on it use the dark theme: with the light one
+    // their titles are dark indigo on black and cannot be read.
+    Widget onBlack(Widget w) => Theme(data: AppTheme.dark(), child: w);
+
     final Widget body;
     if (async.isLoading || (data == null && !async.hasError)) {
-      body = const LoadingView();
+      body = onBlack(const LoadingView());
     } else if (data == null) {
-      body = ErrorView(onRetry: () => ref.invalidate(reelsControllerProvider));
+      body = onBlack(
+        ErrorView(
+          error: async.error,
+          onRetry: () => ref.invalidate(reelsControllerProvider),
+        ),
+      );
     } else if (data.items.isEmpty) {
-      body = feed == ReelFeed.following
-          ? EmptyView(
-              icon: Icons.people_outline_rounded,
-              title: context.l10n.reelsFollowingEmptyTitle,
-              body: context.l10n.reelsFollowingEmptyBody,
-            )
-          : const EmptyView();
+      body = onBlack(
+        feed == ReelFeed.following
+            ? EmptyView(
+                icon: Icons.people_outline_rounded,
+                title: context.l10n.reelsFollowingEmptyTitle,
+                body: context.l10n.reelsFollowingEmptyBody,
+              )
+            : const EmptyView(),
+      );
     } else {
       final items = data.items;
       body = PageView.builder(

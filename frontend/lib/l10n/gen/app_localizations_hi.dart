@@ -140,6 +140,13 @@ class AppLocalizationsHi extends AppLocalizations {
   String get errorBody => 'कृपया अपना कनेक्शन जाँचें और फिर कोशिश करें।';
 
   @override
+  String get unavailableTitle => 'अभी उपलब्ध नहीं है';
+
+  @override
+  String get unavailableBody =>
+      'BLOCKS का यह हिस्सा अभी आपके खाते के लिए चालू नहीं है। कृपया थोड़ी देर बाद फिर देखें।';
+
+  @override
   String get loading => 'लोड हो रहा है';
 
   @override

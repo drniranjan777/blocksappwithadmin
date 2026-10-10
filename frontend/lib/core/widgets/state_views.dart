@@ -1,4 +1,5 @@
 import 'package:blocks_app/app/theme/blocks_tokens.dart';
+import 'package:blocks_app/core/errors/app_failure.dart';
 import 'package:blocks_app/core/extensions/build_context_x.dart';
 import 'package:blocks_app/core/widgets/blocks_button.dart';
 import 'package:flutter/material.dart';
@@ -116,19 +117,32 @@ class EmptyView extends StatelessWidget {
 }
 
 class ErrorView extends StatelessWidget {
-  const ErrorView({super.key, this.message, this.onRetry});
+  const ErrorView({super.key, this.message, this.onRetry, this.error});
 
   final String? message;
   final VoidCallback? onRetry;
 
+  /// What failed, when the caller has it. A part of the app that the server does not offer yet
+  /// says so (and has no pointless "Try again"), instead of blaming the person's connection.
+  final Object? error;
+
   @override
-  Widget build(BuildContext context) => _MessageView(
-    icon: Icons.cloud_off_rounded,
-    title: context.l10n.errorTitle,
-    body: message ?? context.l10n.errorBody,
-    actionLabel: onRetry == null ? null : context.l10n.retry,
-    onAction: onRetry,
-  );
+  Widget build(BuildContext context) {
+    if (isFeatureUnavailable(error)) {
+      return _MessageView(
+        icon: Icons.schedule_rounded,
+        title: context.l10n.unavailableTitle,
+        body: context.l10n.unavailableBody,
+      );
+    }
+    return _MessageView(
+      icon: Icons.cloud_off_rounded,
+      title: context.l10n.errorTitle,
+      body: message ?? context.l10n.errorBody,
+      actionLabel: onRetry == null ? null : context.l10n.retry,
+      onAction: onRetry,
+    );
+  }
 }
 
 /// Renders an [AsyncValue] with consistent loading/error/empty handling so
@@ -152,7 +166,7 @@ class AsyncValueView<T> extends StatelessWidget {
     return value.when(
       data: (d) => (isEmpty?.call(d) ?? false) ? const EmptyView() : data(d),
       loading: () => const LoadingView(),
-      error: (e, _) => ErrorView(onRetry: onRetry),
+      error: (e, _) => ErrorView(error: e, onRetry: onRetry),
     );
   }
 }

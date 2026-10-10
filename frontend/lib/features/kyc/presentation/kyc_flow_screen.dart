@@ -267,8 +267,10 @@ class _KycFlowScreenState extends ConsumerState<KycFlowScreen> {
             maxWidth: 560,
             child: config.when(
               loading: () => const LoadingView(),
-              error: (_, _) =>
-                  ErrorView(onRetry: () => ref.invalidate(kycConfigProvider)),
+              error: (err, _) => ErrorView(
+                error: err,
+                onRetry: () => ref.invalidate(kycConfigProvider),
+              ),
               data: (cfg) => !_checkedExisting && existing.isLoading
                   ? const LoadingView()
                   : _body(context, cfg),
@@ -893,8 +895,10 @@ class _StatusStep extends ConsumerWidget {
     final data = ref.watch(kycApplicationProvider);
     return data.when(
       loading: () => const LoadingView(),
-      error: (_, _) =>
-          ErrorView(onRetry: () => ref.invalidate(kycApplicationProvider)),
+      error: (err, _) => ErrorView(
+        error: err,
+        onRetry: () => ref.invalidate(kycApplicationProvider),
+      ),
       data: (k) {
         final color = kycStatusColor(context, k.status);
         final working = k.status.isInProgress;

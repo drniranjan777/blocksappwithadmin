@@ -140,6 +140,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorBody => 'Please check your connection and try again.';
 
   @override
+  String get unavailableTitle => 'Not available yet';
+
+  @override
+  String get unavailableBody =>
+      'This part of BLOCKS is not open to your account yet. Please check back soon.';
+
+  @override
   String get loading => 'Loading';
 
   @override

@@ -36,8 +36,10 @@ class CreatorReachScreen extends ConsumerWidget {
       section: StudioSection.reach,
       body: dash.when(
         loading: () => const LoadingView(),
-        error: (_, _) =>
-            ErrorView(onRetry: () => ref.invalidate(creatorDashboardProvider)),
+        error: (err, _) => ErrorView(
+          error: err,
+          onRetry: () => ref.invalidate(creatorDashboardProvider),
+        ),
         data: (d) {
           final mine = calc.evaluate(d.qualifiedReach30d);
           return ListView(
@@ -92,7 +94,8 @@ class CreatorReachScreen extends ConsumerWidget {
                     padding: EdgeInsets.all(BlocksSpacing.lg),
                     child: LoadingView(),
                   ),
-                  error: (_, _) => ErrorView(
+                  error: (err, _) => ErrorView(
+                    error: err,
                     onRetry: () => ref.invalidate(
                       analyticsProvider(AnalyticsRange.days28),
                     ),

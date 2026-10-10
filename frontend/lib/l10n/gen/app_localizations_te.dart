@@ -138,6 +138,13 @@ class AppLocalizationsTe extends AppLocalizations {
   String get errorBody => 'దయచేసి మీ కనెక్షన్ తనిఖీ చేసి మళ్ళీ ప్రయత్నించండి.';
 
   @override
+  String get unavailableTitle => 'ఇంకా అందుబాటులో లేదు';
+
+  @override
+  String get unavailableBody =>
+      'BLOCKS లోని ఈ భాగం ఇంకా మీ ఖాతాకు అందుబాటులో లేదు. దయచేసి కొంత సమయం తర్వాత మళ్ళీ చూడండి.';
+
+  @override
   String get loading => 'లోడ్ అవుతోంది';
 
   @override

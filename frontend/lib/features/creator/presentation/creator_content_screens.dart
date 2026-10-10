@@ -54,13 +54,16 @@ class CreatorReelsScreen extends ConsumerWidget {
       ],
       body: me.when(
         loading: () => const LoadingView(),
-        error: (_, _) =>
-            ErrorView(onRetry: () => ref.invalidate(currentUserProvider)),
+        error: (err, _) => ErrorView(
+          error: err,
+          onRetry: () => ref.invalidate(currentUserProvider),
+        ),
         data: (user) {
           final reels = ref.watch(userReelsProvider(user.id));
           return reels.when(
             loading: () => const LoadingView(),
-            error: (_, _) => ErrorView(
+            error: (err, _) => ErrorView(
+              error: err,
               onRetry: () => ref.invalidate(userReelsProvider(user.id)),
             ),
             data: (page) {
@@ -255,13 +258,16 @@ class CreatorPostsScreen extends ConsumerWidget {
       ],
       body: me.when(
         loading: () => const LoadingView(),
-        error: (_, _) =>
-            ErrorView(onRetry: () => ref.invalidate(currentUserProvider)),
+        error: (err, _) => ErrorView(
+          error: err,
+          onRetry: () => ref.invalidate(currentUserProvider),
+        ),
         data: (user) {
           final posts = ref.watch(userPostsProvider(user.id));
           return posts.when(
             loading: () => const LoadingView(),
-            error: (_, _) => ErrorView(
+            error: (err, _) => ErrorView(
+              error: err,
               onRetry: () => ref.invalidate(userPostsProvider(user.id)),
             ),
             data: (page) {
@@ -405,8 +411,10 @@ class CreatorDraftsScreen extends ConsumerWidget {
       ],
       body: drafts.when(
         loading: () => const LoadingView(),
-        error: (_, _) =>
-            ErrorView(onRetry: () => ref.invalidate(reelDraftsProvider)),
+        error: (err, _) => ErrorView(
+          error: err,
+          onRetry: () => ref.invalidate(reelDraftsProvider),
+        ),
         data: (list) {
           if (list.isEmpty) {
             return EmptyView(

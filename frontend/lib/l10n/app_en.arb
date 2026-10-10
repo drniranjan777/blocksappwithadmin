@@ -60,6 +60,8 @@
   "emptyBody": "Be the first to create something.",
   "errorTitle": "Something went wrong",
   "errorBody": "Please check your connection and try again.",
+  "unavailableTitle": "Not available yet",
+  "unavailableBody": "This part of BLOCKS is not open to your account yet. Please check back soon.",
   "loading": "Loading",
   "feedFollowing": "Following",
   "feedForYou": "For You",
