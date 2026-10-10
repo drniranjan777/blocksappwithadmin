@@ -15,7 +15,12 @@ const production = (): NodeJS.ProcessEnv => ({
   FIELD_ENCRYPTION_ACTIVE_KEY: 'k1',
   CORS_ORIGINS: 'https://admin.blocks.example',
   EMAIL_PROVIDER: 'smtp',
+  SMTP_HOST: 'smtp.mail.example',
+  SMTP_USER: 'noreply@mail.example',
+  SMTP_PASS: 'not-a-real-password',
+  SMTP_FROM_EMAIL: 'noreply@mail.example',
   SMS_PROVIDER: 'http',
+  PUSH_PROVIDER: 'fcm',
   MODERATION_PROVIDER: 'manual',
   STORAGE_DRIVER: 's3',
   S3_REGION: 'ap-south-1',
@@ -168,5 +173,72 @@ describe('loadEnv', () => {
     expect(problemsOf({ DATABASE_URL: 'x', AUTH_MAX_FAILED_LOGINS: '1' }).join('\n')).toMatch(
       /AUTH_MAX_FAILED_LOGINS/,
     );
+  });
+});
+
+describe('SMTP settings', () => {
+  const smtp = (extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv => ({
+    NODE_ENV: 'development',
+    DATABASE_URL: 'postgresql://u:p@db:5432/blocks',
+    EMAIL_PROVIDER: 'smtp',
+    SMTP_HOST: 'smtp.mail.example',
+    SMTP_USER: 'noreply@mail.example',
+    SMTP_PASS: 'not-a-real-password',
+    SMTP_FROM_EMAIL: 'noreply@mail.example',
+    ...extra,
+  });
+
+  it('are required whenever e-mail goes out by SMTP, in every environment', () => {
+    const problems = problemsOf({
+      NODE_ENV: 'development',
+      DATABASE_URL: 'postgresql://u:p@db:5432/blocks',
+      EMAIL_PROVIDER: 'smtp',
+    }).join('\n');
+    for (const name of ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM_EMAIL']) {
+      expect(problems).toContain(name);
+    }
+  });
+
+  it('refuse a sender that is not a plain address', () => {
+    expect(
+      problemsOf(smtp({ SMTP_FROM_EMAIL: 'BLOCKS <noreply@mail.example>' })).join('\n'),
+    ).toMatch(/SMTP_FROM_EMAIL/);
+  });
+
+  it('start the connection encrypted on port 465 and upgrade it elsewhere, unless told', () => {
+    expect(loadEnv(smtp()).env.smtpSecure).toBe(true);
+    expect(loadEnv(smtp({ SMTP_PORT: '587' })).env.smtpSecure).toBe(false);
+    expect(loadEnv(smtp({ SMTP_PORT: '587', SMTP_SECURE: 'true' })).env.smtpSecure).toBe(true);
+    expect(loadEnv(smtp()).env.SMTP_FROM_NAME).toBe('BLOCKS');
+  });
+
+  it('are not needed for the development outbox', () => {
+    expect(
+      problemsOf({ NODE_ENV: 'development', DATABASE_URL: 'postgresql://u:p@db:5432/blocks' }),
+    ).toEqual([]);
+  });
+
+  it('give a code a 15-minute life unless configured otherwise', () => {
+    expect(loadEnv(smtp()).env.OTP_TTL_MINUTES).toBe(15);
+  });
+});
+
+describe('SMS_PROVIDER=none', () => {
+  it('lets production run on e-mail alone, with a warning', () => {
+    const source = { ...production(), SMS_PROVIDER: 'none' };
+    expect(problemsOf(source)).toEqual([]);
+    expect(loadEnv(source).warnings.join('\n')).toMatch(/SMS_PROVIDER=none/);
+  });
+
+  it('is still refused as the development stand-in when "dev" is left in production', () => {
+    expect(problemsOf({ ...production(), SMS_PROVIDER: 'dev' }).join('\n')).toMatch(/SMS_PROVIDER/);
+  });
+});
+
+describe('PUSH_PROVIDER=dev in production', () => {
+  it('starts, with a warning that nothing is delivered', () => {
+    const source = { ...production(), PUSH_PROVIDER: 'dev' };
+    expect(problemsOf(source)).toEqual([]);
+    expect(loadEnv(source).warnings.join(' | ')).toMatch(/PUSH_PROVIDER=dev/);
   });
 });

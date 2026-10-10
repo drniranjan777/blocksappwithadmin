@@ -54,7 +54,8 @@ const base = z.object({
   // --- account protection ---------------------------------------------------
   AUTH_MAX_FAILED_LOGINS: z.coerce.number().int().min(3).max(20).default(5),
   AUTH_LOCK_MINUTES: z.coerce.number().int().min(1).max(1440).default(15),
-  OTP_TTL_MINUTES: z.coerce.number().int().min(1).max(60).default(10),
+  /** How long a one-time code lives. The e-mail says this number, so change it only deliberately. */
+  OTP_TTL_MINUTES: z.coerce.number().int().min(1).max(60).default(15),
   OTP_MAX_ATTEMPTS: z.coerce.number().int().min(1).max(10).default(5),
   OTP_HMAC_SECRET: secret.optional(),
   ACCOUNT_DELETION_GRACE_DAYS: z.coerce.number().int().min(0).max(90).default(30),
@@ -67,9 +68,23 @@ const base = z.object({
 
   // --- providers ---------------------------------------------------------------
   EMAIL_PROVIDER: z.enum(['dev', 'smtp']).default('dev'),
-  EMAIL_FROM: z.string().default('BLOCKS <no-reply@blocks.example>'),
-  SMTP_URL: z.string().optional(),
-  SMS_PROVIDER: z.enum(['dev', 'http']).default('dev'),
+  /**
+   * SMTP, used when EMAIL_PROVIDER=smtp. The password comes from the environment (the server's
+   * protected .env file) and is never written to a log, a response or a process argument.
+   */
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(465),
+  /** TLS from the first byte (port 465). Default: on for port 465, off (STARTTLS required) otherwise. */
+  SMTP_SECURE: bool.optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM_EMAIL: z.string().optional(),
+  SMTP_FROM_NAME: z.string().default('BLOCKS'),
+  /**
+   * `none` is a deliberate "this deployment sends no SMS": it lets production run on e-mail alone.
+   * Phone numbers can then be stored but not verified, and sign-up needs an e-mail address.
+   */
+  SMS_PROVIDER: z.enum(['dev', 'http', 'none']).default('dev'),
   PUSH_PROVIDER: z.enum(['dev', 'fcm']).default('dev'),
   /**
    * `dev` approves every upload (development only); `manual` sends every upload to a
@@ -131,6 +146,8 @@ export type Env = z.infer<typeof base> & {
   isProduction: boolean;
   isTest: boolean;
   swaggerEnabled: boolean;
+  /** Whether the SMTP connection starts encrypted (implicit TLS) rather than upgrading. */
+  smtpSecure: boolean;
   devOutboxEnabled: boolean;
   workersEnabled: boolean;
   /** Whether KYC, bank-account and payout writes are allowed at all. */
@@ -176,6 +193,17 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): LoadedEnv {
     if (!value) problems.push(`${name}: required in production`);
   };
 
+  if (v.EMAIL_PROVIDER === 'smtp') {
+    for (const name of ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM_EMAIL'] as const) {
+      if (!v[name]) problems.push(`${name}: required when EMAIL_PROVIDER=smtp`);
+    }
+    if (v.SMTP_FROM_EMAIL && !/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(v.SMTP_FROM_EMAIL)) {
+      problems.push(
+        'SMTP_FROM_EMAIL: must be a plain e-mail address; the name goes in SMTP_FROM_NAME',
+      );
+    }
+  }
+
   if (isProduction) {
     need('JWT_SECRET', v.JWT_SECRET);
     need('OTP_HMAC_SECRET', v.OTP_HMAC_SECRET);
@@ -186,7 +214,20 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): LoadedEnv {
     if (v.CORS_ORIGINS.length === 0) problems.push('CORS_ORIGINS: list the allowed web origins');
     if (v.CORS_ORIGINS.includes('*')) problems.push('CORS_ORIGINS: a wildcard is not allowed');
     if (v.EMAIL_PROVIDER === 'dev') problems.push('EMAIL_PROVIDER: "dev" cannot send real e-mail');
-    if (v.SMS_PROVIDER === 'dev') problems.push('SMS_PROVIDER: "dev" cannot send real SMS');
+    if (v.SMS_PROVIDER === 'dev') {
+      problems.push('SMS_PROVIDER: "dev" cannot send real SMS (use "none" to run on e-mail alone)');
+    }
+    if (v.PUSH_PROVIDER === 'dev') {
+      warnings.push(
+        'PUSH_PROVIDER=dev: push notifications are written to an in-memory outbox and are not delivered.',
+      );
+    }
+    if (v.SMS_PROVIDER === 'none') {
+      warnings.push(
+        'SMS_PROVIDER=none: no text messages are sent. Sign-up needs an e-mail address, and phone ' +
+          'numbers cannot be verified.',
+      );
+    }
     if (v.STORAGE_DRIVER === 'local') problems.push('STORAGE_DRIVER: use s3 in production');
     if (v.DEV_OUTBOX_ENABLED) problems.push('DEV_OUTBOX_ENABLED: must be off in production');
     if (v.MODERATION_PROVIDER === 'dev') {
@@ -245,6 +286,8 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): LoadedEnv {
     }
   }
 
+  if (problems.length) throw new ConfigError(problems);
+
   const dev = devEncryptionKeys();
   const env: Env = {
     ...v,
@@ -256,6 +299,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): LoadedEnv {
     isProduction,
     isTest: v.NODE_ENV === 'test',
     swaggerEnabled: v.SWAGGER_ENABLED ?? !isProduction,
+    smtpSecure: v.SMTP_SECURE ?? v.SMTP_PORT === 465,
     devOutboxEnabled: !isProduction && (v.DEV_OUTBOX_ENABLED ?? true),
     workersEnabled: v.WORKERS_ENABLED ?? v.NODE_ENV !== 'test',
     moneyEnabled: v.MONEY_FEATURES_ENABLED ?? !isProduction,

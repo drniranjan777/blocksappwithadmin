@@ -35,7 +35,7 @@ npm run db:drift            # the Prisma schema and the migrations agree
 ```
 
 Integration tests start one PostgreSQL, migrate a template database, and give every test file
-its own clone. They use real ffmpeg and the local storage driver; provider adapters (e-mail, SMS,
+its own clone. They use real ffmpeg and the local storage driver; provider adapters (SMS,
 push, moderation) are the development implementations. They do **not** talk to a real S3 bucket,
 a CDN or a real KYC/bank/payout provider.
 

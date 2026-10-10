@@ -16,6 +16,8 @@ export interface EmailMessage {
   to: string;
   subject: string;
   text: string;
+  /** An HTML version; `text` is always sent too, as the fallback. */
+  html?: string;
   /** Template key, for provider-side analytics and for the delivery log. */
   template: string;
 }
@@ -63,6 +65,18 @@ export class DevEmailProvider extends EmailProvider {
       template: message.template,
     });
     return { providerMessageId: `dev-${stored.id}` };
+  }
+}
+
+/**
+ * `SMS_PROVIDER=none`: this deployment has no SMS gateway. Anything that tries to send a text
+ * fails loudly (the one-time-code path logs it and records the delivery as failed), so a message
+ * is never silently dropped and never sent through a stand-in.
+ */
+@Injectable()
+export class NoSmsProvider extends SmsProvider {
+  async send(): Promise<{ providerMessageId: string }> {
+    throw new Error('SMS is not enabled on this deployment (SMS_PROVIDER=none)');
   }
 }
 

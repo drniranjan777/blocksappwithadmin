@@ -1,8 +1,9 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, type OnModuleDestroy } from '@nestjs/common';
 import { ENV } from '../config/config.module.js';
 import type { Env } from '../config/env.js';
 import { maskEmail, maskPhone } from '../common/crypto/mask.js';
 import { PrismaService } from '../database/prisma.service.js';
+import { renderOtpEmail } from './otp-email.js';
 import type { NotificationType } from '../generated/prisma/client.js';
 import { EmailProvider, PushProvider, SmsProvider } from '../providers/providers.js';
 import {
@@ -51,8 +52,10 @@ export const MAX_DELIVERY_ATTEMPTS = BACKOFF_MINUTES.length;
  * keep their (non-secret) variables so a failed delivery can be retried.
  */
 @Injectable()
-export class NotificationService {
+export class NotificationService implements OnModuleDestroy {
   private readonly logger = new Logger('Notifications');
+  /** Code deliveries running in the background, so a shutdown can wait for them. */
+  private readonly inFlight = new Set<Promise<void>>();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -68,6 +71,11 @@ export class NotificationService {
    * Sends a one-time code. Failure is logged and swallowed: the caller cannot
    * react to it without revealing whether the account exists, and the user can
    * simply ask for another code.
+   *
+   * With a real provider the delivery runs in the background. Waiting for a mail server would
+   * make a request for a real account slower than one for an address with no account (which
+   * sends nothing), and that difference in time would tell a stranger which addresses are
+   * registered. The development outbox is instant, so it is awaited and tests can read it at once.
    */
   async sendCode(input: {
     userId?: string | undefined;
@@ -76,8 +84,43 @@ export class NotificationService {
     template: CodeTemplate;
     code: string;
   }): Promise<void> {
+    const provider = input.channel === 'EMAIL' ? this.env.EMAIL_PROVIDER : this.env.SMS_PROVIDER;
+    const delivery = this.deliverCode(input);
+    if (provider === 'dev') {
+      await delivery;
+      return;
+    }
+    const tracked: Promise<void> = delivery
+      .catch((e: unknown) =>
+        this.logger.error(
+          'Could not record the delivery of ' + input.template + ': ' + (e as Error).message,
+        ),
+      )
+      .finally(() => this.inFlight.delete(tracked));
+    this.inFlight.add(tracked);
+  }
+
+  /** Lets deliveries that have already started finish (a few seconds at most) before exit. */
+  async onModuleDestroy(): Promise<void> {
+    if (this.inFlight.size === 0) return;
+    await Promise.race([
+      Promise.allSettled(this.inFlight),
+      new Promise((resolve) => setTimeout(resolve, 10_000)),
+    ]);
+  }
+
+  private async deliverCode(input: {
+    userId?: string | undefined;
+    channel: 'EMAIL' | 'SMS';
+    to: string;
+    template: CodeTemplate;
+    code: string;
+  }): Promise<void> {
     const minutes = this.env.OTP_TTL_MINUTES;
-    const rendered = renderCode(input.template, input.code, minutes);
+    // Every code e-mail carries the same message (see otp-email.ts); the purpose of the code is
+    // the app's business, not the e-mail's.
+    const email = input.channel === 'EMAIL' ? renderOtpEmail(input.code, minutes) : undefined;
+    const rendered = email ?? renderCode(input.template, input.code, minutes);
     const toMasked = input.channel === 'EMAIL' ? maskEmail(input.to) : maskPhone(input.to);
     let providerMessageId: string | undefined;
     let error: string | undefined;
@@ -88,6 +131,7 @@ export class NotificationService {
             to: input.to,
             subject: rendered.subject,
             text: rendered.text,
+            ...(email ? { html: email.html } : {}),
             template: input.template,
           })
         ).providerMessageId;

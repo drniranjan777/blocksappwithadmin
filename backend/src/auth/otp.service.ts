@@ -143,6 +143,19 @@ export class OtpService {
       },
     });
 
+    // A new code replaces any earlier unused one for the same address and purpose, so only the
+    // code in the newest message can be used. (A resend already did this to its own challenge.)
+    await this.prisma.otpChallenge.updateMany({
+      where: {
+        destinationHash,
+        purpose: input.purpose,
+        id: { not: id },
+        verifiedAt: null,
+        consumedAt: null,
+      },
+      data: { consumedAt: new Date() },
+    });
+
     if (input.deliver !== false) {
       await this.notifications.sendCode({
         userId: input.userId,

@@ -2,11 +2,13 @@ import { Global, Module } from '@nestjs/common';
 import { ENV } from '../config/config.module.js';
 import type { Env } from '../config/env.js';
 import { DevOutbox } from './outbox.service.js';
+import { SmtpEmailProvider } from './smtp-email.provider.js';
 import {
   DevEmailProvider,
   DevPushProvider,
   DevSmsProvider,
   EmailProvider,
+  NoSmsProvider,
   PushProvider,
   SmsProvider,
 } from './providers.js';
@@ -23,9 +25,9 @@ function noAdapter(setting: string, value: string): never {
 }
 
 /**
- * Binds each provider interface to an implementation. Only the development
- * implementations exist today; a real vendor is one more class and one more case
- * here, with no change to the code that sends.
+ * Binds each provider interface to an implementation. E-mail has a development outbox and
+ * SMTP; SMS and push have only the development outbox today. A real vendor is one more class
+ * and one more case here, with no change to the code that sends.
  */
 @Global()
 @Module({
@@ -34,18 +36,34 @@ function noAdapter(setting: string, value: string): never {
     {
       provide: EmailProvider,
       inject: [ENV, DevOutbox],
-      useFactory: (env: Env, outbox: DevOutbox): EmailProvider =>
-        env.EMAIL_PROVIDER === 'dev'
-          ? new DevEmailProvider(outbox)
-          : noAdapter('EMAIL_PROVIDER', env.EMAIL_PROVIDER),
+      useFactory: (env: Env, outbox: DevOutbox): EmailProvider => {
+        if (env.EMAIL_PROVIDER === 'dev') return new DevEmailProvider(outbox);
+        if (env.EMAIL_PROVIDER === 'smtp') {
+          // `loadEnv` has already refused a configuration that lacks these.
+          return new SmtpEmailProvider(
+            {
+              host: env.SMTP_HOST ?? '',
+              port: env.SMTP_PORT,
+              secure: env.smtpSecure,
+              user: env.SMTP_USER ?? '',
+              pass: env.SMTP_PASS ?? '',
+              fromEmail: env.SMTP_FROM_EMAIL ?? '',
+              fromName: env.SMTP_FROM_NAME,
+            },
+            { verifyOnStart: !env.isTest },
+          );
+        }
+        return noAdapter('EMAIL_PROVIDER', env.EMAIL_PROVIDER);
+      },
     },
     {
       provide: SmsProvider,
       inject: [ENV, DevOutbox],
-      useFactory: (env: Env, outbox: DevOutbox): SmsProvider =>
-        env.SMS_PROVIDER === 'dev'
-          ? new DevSmsProvider(outbox)
-          : noAdapter('SMS_PROVIDER', env.SMS_PROVIDER),
+      useFactory: (env: Env, outbox: DevOutbox): SmsProvider => {
+        if (env.SMS_PROVIDER === 'dev') return new DevSmsProvider(outbox);
+        if (env.SMS_PROVIDER === 'none') return new NoSmsProvider();
+        return noAdapter('SMS_PROVIDER', env.SMS_PROVIDER);
+      },
     },
     {
       provide: PushProvider,

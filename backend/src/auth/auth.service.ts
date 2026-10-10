@@ -110,6 +110,10 @@ export class AuthService {
     if (dto.email !== undefined && !email) issues.push({ field: 'email', reasons: ['invalid'] });
     const phone = dto.phone === undefined ? undefined : normalizePhone(dto.phone);
     if (dto.phone !== undefined && !phone) issues.push({ field: 'phone', reasons: ['invalid'] });
+    // With no SMS gateway a phone number cannot be proven, so it cannot be the way in.
+    if (!email && phone && this.env.SMS_PROVIDER === 'none') {
+      issues.push({ field: 'email', reasons: ['email_required'] });
+    }
     if (!email && !phone && issues.length === 0) {
       issues.push({ field: 'email', reasons: ['email_or_phone_required'] });
     }
