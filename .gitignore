@@ -1,0 +1,59 @@
+# ---------------------------------------------------------------------------
+# BLOCKS monorepo. Each package (frontend/, backend/, admin-frontend/) may add
+# its own ignore rules; these are the ones that apply everywhere.
+# ---------------------------------------------------------------------------
+
+# Secrets: only *.example files are ever committed.
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.jks
+keystore.properties
+service-account*.json
+
+# Node
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+.npm/
+
+# Generated code (recreated by `npm run db:generate`)
+backend/src/generated/
+
+# Local development data
+backend/uploads/
+backend/.devdb/
+backend/.dev-storage/
+*.sqlite
+
+# Flutter / Dart (frontend/.gitignore covers the rest)
+.dart_tool/
+.flutter-plugins-dependencies
+frontend/build/
+frontend/android/.gradle/
+frontend/android/local.properties
+
+# Editors / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.iml
+.DS_Store
+Thumbs.db
+
+# Logs and scratch
+*.log
+.tmp/
+
+# Built installers (attach to a release instead of committing)
+apk/
+*.apk
